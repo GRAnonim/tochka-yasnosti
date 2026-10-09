@@ -245,6 +245,7 @@ export function ClarityApp() {
               {goalInputs.map((g, i) => (
                 <Input
                   key={i}
+                  data-testid={`goal-${i}`}
                   value={g}
                   placeholder={
                     i === 0
@@ -261,26 +262,19 @@ export function ClarityApp() {
                 />
               ))}
             </div>
-            <Button
+            <button
               type="button"
-              className="w-full"
+              data-testid="start-onboarding"
+              className="inline-flex h-12 w-full items-center justify-center rounded-xl bg-[var(--primary)] px-4 text-base font-medium text-[var(--primary-foreground)] transition hover:opacity-95 disabled:pointer-events-none disabled:opacity-40"
               disabled={goalInputs.filter((g) => g.trim()).length < 2}
               onClick={finishOnboarding}
             >
               Начать
-            </Button>
-            <details className="rounded-xl bg-[var(--surface)] px-3 py-2 text-sm text-[var(--ink-muted)]">
-              <summary className="cursor-pointer text-[var(--accent-ink)]">
-                О безопасности и границах продукта
-              </summary>
-              <div className="mt-2 space-y-2 leading-relaxed">
-                <p>
-                  Это не терапия и не диагноз. При кризисе — к специалисту.
-                  Телефон доверия: 8-800-2000-122.
-                </p>
-                <p>Данные теста хранятся только в этом браузере.</p>
-              </div>
-            </details>
+            </button>
+            <p className="pt-2 text-xs leading-relaxed text-[var(--ink-muted)]">
+              Не терапия и не диагноз. При кризисе — к специалисту
+              (8-800-2000-122). Данные теста остаются в этом браузере.
+            </p>
           </section>
         )}
 
@@ -297,17 +291,23 @@ export function ClarityApp() {
               </p>
             </div>
 
-            <div className="flex flex-col gap-2">
-              <Button className="w-full" size="lg" onClick={startNew}>
+            <div className="flex flex-col gap-3">
+              <button
+                type="button"
+                data-testid="new-situation"
+                className="inline-flex h-12 w-full items-center justify-center rounded-xl bg-[var(--primary)] px-4 text-base font-medium text-[var(--primary-foreground)] transition hover:opacity-95"
+                onClick={startNew}
+              >
                 Новая ситуация
-              </Button>
-              <Button
-                variant="secondary"
-                className="w-full"
+              </button>
+              <button
+                type="button"
+                data-testid="open-stats"
+                className="inline-flex h-11 w-full items-center justify-center rounded-xl bg-[var(--secondary)] px-4 text-sm font-medium text-[var(--secondary-foreground)] transition hover:opacity-95"
                 onClick={() => setScreen("stats")}
               >
                 Статистика
-              </Button>
+              </button>
             </div>
 
             {pendingFeedback.length > 0 && (
@@ -414,18 +414,21 @@ export function ClarityApp() {
               ясность.
             </p>
             <Textarea
+              data-testid="situation-text"
               value={draftText}
               onChange={(e) => setDraftText(e.target.value)}
               rows={5}
               placeholder="Например: коллега просит взять срочную задачу в пятницу вечером…"
             />
-            <Button
-              className="w-full"
+            <button
+              type="button"
+              data-testid="situation-next"
+              className="inline-flex h-11 w-full items-center justify-center rounded-xl bg-[var(--primary)] px-4 text-sm font-medium text-[var(--primary-foreground)] disabled:opacity-40"
               disabled={draftText.trim().length < 8}
               onClick={() => setScreen("filter")}
             >
               Дальше
-            </Button>
+            </button>
           </section>
         )}
 
@@ -439,14 +442,15 @@ export function ClarityApp() {
             </p>
             <div className="grid gap-2">
               {FILTERS.map((f) => (
-                <Button
+                <button
+                  type="button"
                   key={f}
-                  variant="secondary"
-                  className="h-auto justify-start py-3 whitespace-normal"
+                  data-testid={`filter-${f}`}
+                  className="h-auto w-full rounded-xl bg-[var(--secondary)] px-4 py-3 text-left text-sm font-medium text-[var(--secondary-foreground)]"
                   onClick={() => chooseFilter(f)}
                 >
                   {FILTER_LABELS[f]}
-                </Button>
+                </button>
               ))}
             </div>
           </section>
@@ -468,16 +472,17 @@ export function ClarityApp() {
             <h2 className="font-display text-xl leading-snug text-[var(--ink)]">
               {questions[qIndex]?.prompt}
             </h2>
-            <div className="grid gap-2">
-              {questions[qIndex]?.options.map((opt) => (
-                <Button
+            <div className="grid gap-2" data-testid="question-options">
+              {questions[qIndex]?.options.map((opt, idx) => (
+                <button
+                  type="button"
                   key={opt.label}
-                  variant="secondary"
-                  className="h-auto justify-start py-3 text-left whitespace-normal"
+                  data-testid={`question-option-${idx}`}
+                  className="h-auto w-full rounded-xl bg-[var(--secondary)] px-4 py-3 text-left text-sm font-medium whitespace-normal text-[var(--secondary-foreground)]"
                   onClick={() => answerCurrent(opt.value, opt.label)}
                 >
                   {opt.label}
-                </Button>
+                </button>
               ))}
             </div>
           </section>
@@ -527,16 +532,20 @@ export function ClarityApp() {
             </h2>
             <div className="space-y-3">
               <div className="space-y-1.5">
-                <Label>Что получили?</Label>
+                <Label htmlFor="fb-gained">Что получили?</Label>
                 <Input
+                  id="fb-gained"
+                  data-testid="fb-gained"
                   value={fbGained}
                   onChange={(e) => setFbGained(e.target.value)}
                   placeholder="Опыт, покой, связь…"
                 />
               </div>
               <div className="space-y-1.5">
-                <Label>Что потратили?</Label>
+                <Label htmlFor="fb-spent">Что потратили?</Label>
                 <Input
+                  id="fb-spent"
+                  data-testid="fb-spent"
                   value={fbSpent}
                   onChange={(e) => setFbSpent(e.target.value)}
                   placeholder="Время, силы, деньги…"
@@ -643,16 +652,20 @@ export function ClarityApp() {
             </p>
             <div className="space-y-3">
               <div className="space-y-1.5">
-                <Label>Имя</Label>
+                <Label htmlFor="spec-name">Имя</Label>
                 <Input
+                  id="spec-name"
+                  data-testid="spec-name"
                   value={specName}
                   onChange={(e) => setSpecName(e.target.value)}
                   placeholder="Как обращаться"
                 />
               </div>
               <div className="space-y-1.5">
-                <Label>Контакт</Label>
+                <Label htmlFor="spec-contact">Контакт</Label>
                 <Input
+                  id="spec-contact"
+                  data-testid="spec-contact"
                   value={specContact}
                   onChange={(e) => setSpecContact(e.target.value)}
                   placeholder="Телефон, Telegram, email"
