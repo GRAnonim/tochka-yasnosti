@@ -31,8 +31,8 @@ import type {
 const FILTERS: LifeFilter[] = ["work", "close", "friends"];
 
 export function ClarityApp() {
-  const [state, setState] = useState<AppState | null>(null);
-  const [screen, setScreen] = useState<Screen>("home");
+  const [state, setState] = useState<AppState>(() => emptyState());
+  const [screen, setScreen] = useState<Screen>("onboarding");
   const [draftText, setDraftText] = useState("");
   const [draftFilter, setDraftFilter] = useState<LifeFilter | null>(null);
   const [draftAnswers, setDraftAnswers] = useState<QuestionAnswer[]>([]);
@@ -61,11 +61,17 @@ export function ClarityApp() {
       setSpecContact(loaded.specialist.contact);
       setSpecNote(loaded.specialist.note);
     }
-    const wa = initTelegram();
-    if (wa) {
+
+    // Telegram script may load later (lazyOnload)
+    const syncTg = () => {
+      const wa = initTelegram();
+      if (!wa) return;
       const name = wa.initDataUnsafe?.user?.first_name;
       setTgHint(name ? `Telegram · ${name}` : "Telegram Mini App");
-    }
+    };
+    syncTg();
+    const t = window.setTimeout(syncTg, 800);
+    return () => window.clearTimeout(t);
   }, []);
 
   const persist = (next: AppState) => {
@@ -73,23 +79,15 @@ export function ClarityApp() {
     saveState(next);
   };
 
-  const pendingFeedback = useMemo(() => {
-    if (!state) return [];
-    return state.situations.filter((s) => !s.feedback);
-  }, [state]);
-
-  const stats = useMemo(
-    () => computeStats(state?.situations ?? []),
-    [state?.situations],
+  const pendingFeedback = useMemo(
+    () => state.situations.filter((s) => !s.feedback),
+    [state],
   );
 
-  if (!state) {
-    return (
-      <div className="flex min-h-dvh items-center justify-center text-sm text-[var(--ink-muted)]">
-        Загрузка…
-      </div>
-    );
-  }
+  const stats = useMemo(
+    () => computeStats(state.situations),
+    [state.situations],
+  );
 
   const questions = draftFilter ? QUESTIONS_BY_FILTER[draftFilter] : [];
 
@@ -264,19 +262,25 @@ export function ClarityApp() {
               ))}
             </div>
             <Button
+              type="button"
               className="w-full"
               disabled={goalInputs.filter((g) => g.trim()).length < 2}
               onClick={finishOnboarding}
             >
               Начать
             </Button>
-            <button
-              type="button"
-              className="text-sm text-[var(--accent-ink)] underline-offset-4 hover:underline"
-              onClick={() => setScreen("safety")}
-            >
-              О безопасности и границах продукта
-            </button>
+            <details className="rounded-xl bg-[var(--surface)] px-3 py-2 text-sm text-[var(--ink-muted)]">
+              <summary className="cursor-pointer text-[var(--accent-ink)]">
+                О безопасности и границах продукта
+              </summary>
+              <div className="mt-2 space-y-2 leading-relaxed">
+                <p>
+                  Это не терапия и не диагноз. При кризисе — к специалисту.
+                  Телефон доверия: 8-800-2000-122.
+                </p>
+                <p>Данные теста хранятся только в этом браузере.</p>
+              </div>
+            </details>
           </section>
         )}
 
@@ -375,13 +379,6 @@ export function ClarityApp() {
             <div className="flex flex-wrap gap-3 pt-2 text-sm">
               <button
                 type="button"
-                className="text-[var(--accent-ink)] underline-offset-4 hover:underline"
-                onClick={() => setScreen("safety")}
-              >
-                Disclaimer
-              </button>
-              <button
-                type="button"
                 className="text-[var(--ink-muted)] underline-offset-4 hover:underline"
                 onClick={() => {
                   const next = emptyState();
@@ -393,6 +390,17 @@ export function ClarityApp() {
                 Сбросить данные
               </button>
             </div>
+            <details className="rounded-xl bg-[var(--surface)] px-3 py-2 text-sm text-[var(--ink-muted)]">
+              <summary className="cursor-pointer text-[var(--accent-ink)]">
+                Disclaimer
+              </summary>
+              <div className="mt-2 space-y-2 leading-relaxed">
+                <p>
+                  «Точка ясности» не ставит диагнозов и не заменяет врача или
+                  психолога. При кризисе: 8-800-2000-122.
+                </p>
+              </div>
+            </details>
           </section>
         )}
 
@@ -666,32 +674,6 @@ export function ClarityApp() {
           </section>
         )}
 
-        {screen === "safety" && (
-          <section className="space-y-4">
-            <h2 className="font-display text-xl text-[var(--ink)]">
-              Важно знать
-            </h2>
-            <div className="space-y-3 text-sm leading-relaxed text-[var(--ink-soft)]">
-              <p>
-                «Точка ясности» — инструмент саморефлексии и принятия решений. Он
-                не ставит диагнозов, не заменяет врача, психолога или
-                психотерапевта.
-              </p>
-              <p>
-                При суицидальных мыслях, насилии или тяжёлом кризисе обратитесь к
-                экстренной помощи и специалисту. В России: телефон доверия{" "}
-                <span className="whitespace-nowrap">8-800-2000-122</span>.
-              </p>
-              <p>
-                В этой тестовой версии данные хранятся только в вашем браузере
-                (localStorage). Можно удалить всё кнопкой «Сбросить данные».
-              </p>
-            </div>
-            <Button className="w-full" onClick={() => setScreen(state.onboardingDone ? "home" : "onboarding")}>
-              Понятно
-            </Button>
-          </section>
-        )}
       </main>
     </div>
   );

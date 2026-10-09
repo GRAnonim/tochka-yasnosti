@@ -64,5 +64,4 @@ export type Screen =
   | "decision"
   | "feedback"
   | "stats"
-  | "specialist"
-  | "safety";
+  | "specialist";
