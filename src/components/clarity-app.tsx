@@ -1,0 +1,698 @@
+"use client";
+
+import { useEffect, useMemo, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import {
+  DECISION_LABELS,
+  FILTER_LABELS,
+  QUESTIONS_BY_FILTER,
+} from "@/lib/questions";
+import {
+  buildSoftSummary,
+  feedbackDueAt,
+  suggestDecisions,
+} from "@/lib/summary";
+import { computeStats, statsLines } from "@/lib/stats";
+import { emptyState, loadState, saveState, uid } from "@/lib/storage";
+import { initTelegram } from "@/lib/telegram";
+import type {
+  AppState,
+  DecisionChoice,
+  Feeling,
+  LifeFilter,
+  QuestionAnswer,
+  Screen,
+  SituationRecord,
+} from "@/lib/types";
+
+const FILTERS: LifeFilter[] = ["work", "close", "friends"];
+
+export function ClarityApp() {
+  const [state, setState] = useState<AppState | null>(null);
+  const [screen, setScreen] = useState<Screen>("home");
+  const [draftText, setDraftText] = useState("");
+  const [draftFilter, setDraftFilter] = useState<LifeFilter | null>(null);
+  const [draftAnswers, setDraftAnswers] = useState<QuestionAnswer[]>([]);
+  const [qIndex, setQIndex] = useState(0);
+  const [draftSummary, setDraftSummary] = useState("");
+  const [draftLean, setDraftLean] = useState<"accept" | "decline" | "mixed">(
+    "mixed",
+  );
+  const [activeFeedbackId, setActiveFeedbackId] = useState<string | null>(null);
+  const [goalInputs, setGoalInputs] = useState(["", "", ""]);
+  const [specName, setSpecName] = useState("");
+  const [specContact, setSpecContact] = useState("");
+  const [specNote, setSpecNote] = useState("");
+  const [fbGained, setFbGained] = useState("");
+  const [fbSpent, setFbSpent] = useState("");
+  const [fbFeeling, setFbFeeling] = useState<Feeling>("same");
+  const [fbWorth, setFbWorth] = useState<boolean | null>(null);
+  const [tgHint, setTgHint] = useState("Браузерный режим");
+
+  useEffect(() => {
+    const loaded = loadState();
+    setState(loaded);
+    setScreen(loaded.onboardingDone ? "home" : "onboarding");
+    if (loaded.specialist) {
+      setSpecName(loaded.specialist.name);
+      setSpecContact(loaded.specialist.contact);
+      setSpecNote(loaded.specialist.note);
+    }
+    const wa = initTelegram();
+    if (wa) {
+      const name = wa.initDataUnsafe?.user?.first_name;
+      setTgHint(name ? `Telegram · ${name}` : "Telegram Mini App");
+    }
+  }, []);
+
+  const persist = (next: AppState) => {
+    setState(next);
+    saveState(next);
+  };
+
+  const pendingFeedback = useMemo(() => {
+    if (!state) return [];
+    return state.situations.filter((s) => !s.feedback);
+  }, [state]);
+
+  const stats = useMemo(
+    () => computeStats(state?.situations ?? []),
+    [state?.situations],
+  );
+
+  if (!state) {
+    return (
+      <div className="flex min-h-dvh items-center justify-center text-sm text-[var(--ink-muted)]">
+        Загрузка…
+      </div>
+    );
+  }
+
+  const questions = draftFilter ? QUESTIONS_BY_FILTER[draftFilter] : [];
+
+  const startNew = () => {
+    setDraftText("");
+    setDraftFilter(null);
+    setDraftAnswers([]);
+    setQIndex(0);
+    setDraftSummary("");
+    setDraftLean("mixed");
+    setScreen("new-situation");
+  };
+
+  const finishOnboarding = () => {
+    const goals = goalInputs
+      .map((t) => t.trim())
+      .filter(Boolean)
+      .slice(0, 3)
+      .map((text) => ({ id: uid("goal"), text }));
+    if (goals.length < 2) return;
+    persist({ ...state, goals, onboardingDone: true });
+    setScreen("home");
+  };
+
+  const chooseFilter = (filter: LifeFilter) => {
+    setDraftFilter(filter);
+    setDraftAnswers([]);
+    setQIndex(0);
+    setScreen("questions");
+  };
+
+  const answerCurrent = (value: number, label: string) => {
+    if (!draftFilter) return;
+    const q = questions[qIndex];
+    const nextAnswers = [
+      ...draftAnswers.filter((a) => a.questionId !== q.id),
+      { questionId: q.id, value, label },
+    ];
+    setDraftAnswers(nextAnswers);
+    if (qIndex + 1 < questions.length) {
+      setQIndex(qIndex + 1);
+      return;
+    }
+    const built = buildSoftSummary({
+      filter: draftFilter,
+      goals: state.goals,
+      answers: nextAnswers,
+      situation: draftText,
+    });
+    setDraftSummary(built.summary);
+    setDraftLean(built.lean);
+    setScreen("summary");
+  };
+
+  const saveDecision = (decision: DecisionChoice) => {
+    if (!draftFilter) return;
+    const record: SituationRecord = {
+      id: uid("sit"),
+      text: draftText.trim(),
+      filter: draftFilter,
+      answers: draftAnswers,
+      summary: draftSummary,
+      lean: draftLean,
+      decision,
+      createdAt: new Date().toISOString(),
+      feedbackDueAt: feedbackDueAt(),
+    };
+    persist({ ...state, situations: [record, ...state.situations] });
+    setScreen("home");
+  };
+
+  const openFeedback = (id: string) => {
+    setActiveFeedbackId(id);
+    setFbGained("");
+    setFbSpent("");
+    setFbFeeling("same");
+    setFbWorth(null);
+    setScreen("feedback");
+  };
+
+  const saveFeedback = () => {
+    if (!activeFeedbackId || fbWorth === null) return;
+    const situations = state.situations.map((s) =>
+      s.id === activeFeedbackId
+        ? {
+            ...s,
+            feedback: {
+              gained: fbGained.trim(),
+              spent: fbSpent.trim(),
+              feeling: fbFeeling,
+              worthIt: fbWorth,
+              answeredAt: new Date().toISOString(),
+            },
+          }
+        : s,
+    );
+    persist({ ...state, situations });
+    setActiveFeedbackId(null);
+    setScreen("stats");
+  };
+
+  const saveSpecialist = () => {
+    const name = specName.trim();
+    persist({
+      ...state,
+      specialist: name
+        ? {
+            name,
+            contact: specContact.trim(),
+            note: specNote.trim(),
+          }
+        : null,
+    });
+    setScreen("home");
+  };
+
+  return (
+    <div className="clarity-shell relative mx-auto flex min-h-dvh w-full max-w-lg flex-col px-4 pb-10 pt-6 sm:px-6">
+      <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+        <div className="clarity-orb clarity-orb-a" />
+        <div className="clarity-orb clarity-orb-b" />
+        <div className="clarity-grain" />
+      </div>
+
+      <header className="mb-6 flex items-start justify-between gap-3">
+        <div>
+          <p className="font-display text-[0.7rem] tracking-[0.22em] text-[var(--ink-muted)] uppercase">
+            {tgHint}
+          </p>
+          <h1 className="font-display mt-1 text-2xl leading-tight text-[var(--ink)] sm:text-[1.7rem]">
+            Точка ясности
+          </h1>
+        </div>
+        {screen !== "home" && screen !== "onboarding" && (
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-[var(--ink-muted)]"
+            onClick={() => setScreen("home")}
+          >
+            На главную
+          </Button>
+        )}
+      </header>
+
+      <main className="clarity-panel flex-1 animate-in fade-in duration-500">
+        {screen === "onboarding" && (
+          <section className="space-y-5">
+            <p className="text-[var(--ink-soft)]">
+              Короткий помощник для решений и саморефлексии. Это не терапия и не
+              диагноз — рядом с психологом или для спокойной ясности наедине с собой.
+            </p>
+            <div className="space-y-3">
+              <Label>2–3 ориентира на ближайшее время</Label>
+              {goalInputs.map((g, i) => (
+                <Input
+                  key={i}
+                  value={g}
+                  placeholder={
+                    i === 0
+                      ? "Например: беречь сон"
+                      : i === 1
+                        ? "Например: закончить учебный проект"
+                        : "Опционально"
+                  }
+                  onChange={(e) => {
+                    const next = [...goalInputs];
+                    next[i] = e.target.value;
+                    setGoalInputs(next);
+                  }}
+                />
+              ))}
+            </div>
+            <Button
+              className="w-full"
+              disabled={goalInputs.filter((g) => g.trim()).length < 2}
+              onClick={finishOnboarding}
+            >
+              Начать
+            </Button>
+            <button
+              type="button"
+              className="text-sm text-[var(--accent-ink)] underline-offset-4 hover:underline"
+              onClick={() => setScreen("safety")}
+            >
+              О безопасности и границах продукта
+            </button>
+          </section>
+        )}
+
+        {screen === "home" && (
+          <section className="space-y-6">
+            <div className="space-y-2">
+              <p className="text-lg leading-snug text-[var(--ink)]">
+                Разберите ситуацию, зафиксируйте решение и позже посмотрите, как
+                оно отозвалось.
+              </p>
+              <p className="text-sm text-[var(--ink-muted)]">
+                Ваши ориентиры:{" "}
+                {state.goals.map((g) => g.text).join(" · ") || "не заданы"}
+              </p>
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <Button className="w-full" size="lg" onClick={startNew}>
+                Новая ситуация
+              </Button>
+              <Button
+                variant="secondary"
+                className="w-full"
+                onClick={() => setScreen("stats")}
+              >
+                Статистика
+              </Button>
+            </div>
+
+            {pendingFeedback.length > 0 && (
+              <div className="space-y-3 border-t border-[var(--line)] pt-4">
+                <h2 className="font-display text-base text-[var(--ink)]">
+                  Обратная связь
+                </h2>
+                <p className="text-sm text-[var(--ink-muted)]">
+                  В тесте можно ответить сразу. В жизни — через 1–3 дня после
+                  решения.
+                </p>
+                <ul className="space-y-2">
+                  {pendingFeedback.slice(0, 5).map((s) => (
+                    <li key={s.id}>
+                      <button
+                        type="button"
+                        className="w-full rounded-xl border border-[var(--line)] bg-[var(--surface)] px-3 py-3 text-left transition hover:border-[var(--accent)]"
+                        onClick={() => openFeedback(s.id)}
+                      >
+                        <span className="line-clamp-2 text-sm text-[var(--ink)]">
+                          {s.text}
+                        </span>
+                        <span className="mt-1 block text-xs text-[var(--ink-muted)]">
+                          Решение: {DECISION_LABELS[s.decision]}
+                        </span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            <div className="space-y-2 border-t border-[var(--line)] pt-4">
+              <h2 className="font-display text-base text-[var(--ink)]">
+                Мой специалист
+              </h2>
+              <p className="text-sm text-[var(--ink-muted)]">
+                Тихий блок — не мешает рефлексии. Контакты только те, кому вы
+                доверяете.
+              </p>
+              {state.specialist ? (
+                <div className="rounded-xl bg-[var(--surface)] px-3 py-3 text-sm">
+                  <p className="font-medium text-[var(--ink)]">
+                    {state.specialist.name}
+                  </p>
+                  {state.specialist.contact && (
+                    <p className="text-[var(--ink-soft)]">
+                      {state.specialist.contact}
+                    </p>
+                  )}
+                  {state.specialist.note && (
+                    <p className="mt-1 text-[var(--ink-muted)]">
+                      {state.specialist.note}
+                    </p>
+                  )}
+                </div>
+              ) : (
+                <p className="text-sm text-[var(--ink-muted)]">Пока не указан.</p>
+              )}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setScreen("specialist")}
+              >
+                {state.specialist ? "Изменить" : "Указать контакты"}
+              </Button>
+            </div>
+
+            <div className="flex flex-wrap gap-3 pt-2 text-sm">
+              <button
+                type="button"
+                className="text-[var(--accent-ink)] underline-offset-4 hover:underline"
+                onClick={() => setScreen("safety")}
+              >
+                Disclaimer
+              </button>
+              <button
+                type="button"
+                className="text-[var(--ink-muted)] underline-offset-4 hover:underline"
+                onClick={() => {
+                  const next = emptyState();
+                  persist(next);
+                  setGoalInputs(["", "", ""]);
+                  setScreen("onboarding");
+                }}
+              >
+                Сбросить данные
+              </button>
+            </div>
+          </section>
+        )}
+
+        {screen === "new-situation" && (
+          <section className="space-y-4">
+            <h2 className="font-display text-xl text-[var(--ink)]">
+              Что происходит?
+            </h2>
+            <p className="text-sm text-[var(--ink-muted)]">
+              Коротко опишите просьбу, приглашение или выбор, в котором нужна
+              ясность.
+            </p>
+            <Textarea
+              value={draftText}
+              onChange={(e) => setDraftText(e.target.value)}
+              rows={5}
+              placeholder="Например: коллега просит взять срочную задачу в пятницу вечером…"
+            />
+            <Button
+              className="w-full"
+              disabled={draftText.trim().length < 8}
+              onClick={() => setScreen("filter")}
+            >
+              Дальше
+            </Button>
+          </section>
+        )}
+
+        {screen === "filter" && (
+          <section className="space-y-4">
+            <h2 className="font-display text-xl text-[var(--ink)]">
+              Какой это круг?
+            </h2>
+            <p className="text-sm text-[var(--ink-muted)]">
+              От фильтра зависят вопросы — работа, близкие или друзья.
+            </p>
+            <div className="grid gap-2">
+              {FILTERS.map((f) => (
+                <Button
+                  key={f}
+                  variant="secondary"
+                  className="h-auto justify-start py-3 whitespace-normal"
+                  onClick={() => chooseFilter(f)}
+                >
+                  {FILTER_LABELS[f]}
+                </Button>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {screen === "questions" && draftFilter && (
+          <section className="space-y-4">
+            <p className="text-xs tracking-wide text-[var(--ink-muted)] uppercase">
+              Вопрос {qIndex + 1} из {questions.length}
+            </p>
+            <div className="h-1.5 overflow-hidden rounded-full bg-[var(--line)]">
+              <div
+                className="h-full rounded-full bg-[var(--accent)] transition-all duration-500"
+                style={{
+                  width: `${((qIndex + 1) / questions.length) * 100}%`,
+                }}
+              />
+            </div>
+            <h2 className="font-display text-xl leading-snug text-[var(--ink)]">
+              {questions[qIndex]?.prompt}
+            </h2>
+            <div className="grid gap-2">
+              {questions[qIndex]?.options.map((opt) => (
+                <Button
+                  key={opt.label}
+                  variant="secondary"
+                  className="h-auto justify-start py-3 text-left whitespace-normal"
+                  onClick={() => answerCurrent(opt.value, opt.label)}
+                >
+                  {opt.label}
+                </Button>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {screen === "summary" && (
+          <section className="space-y-4">
+            <h2 className="font-display text-xl text-[var(--ink)]">
+              Мягкое резюме
+            </h2>
+            <p className="rounded-2xl bg-[var(--surface)] px-4 py-4 text-[var(--ink-soft)] leading-relaxed">
+              {draftSummary}
+            </p>
+            <p className="text-sm text-[var(--ink-muted)]">
+              Это ориентир, не приказ. Решение остаётся за вами.
+            </p>
+            <Button className="w-full" onClick={() => setScreen("decision")}>
+              Выбрать решение
+            </Button>
+          </section>
+        )}
+
+        {screen === "decision" && (
+          <section className="space-y-4">
+            <h2 className="font-display text-xl text-[var(--ink)]">
+              Зафиксировать решение
+            </h2>
+            <div className="grid gap-2">
+              {suggestDecisions(draftLean).map((d) => (
+                <Button
+                  key={d}
+                  variant={d === suggestDecisions(draftLean)[0] ? "default" : "secondary"}
+                  className="h-auto py-3"
+                  onClick={() => saveDecision(d)}
+                >
+                  {DECISION_LABELS[d]}
+                </Button>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {screen === "feedback" && (
+          <section className="space-y-4">
+            <h2 className="font-display text-xl text-[var(--ink)]">
+              Как отозвалось?
+            </h2>
+            <div className="space-y-3">
+              <div className="space-y-1.5">
+                <Label>Что получили?</Label>
+                <Input
+                  value={fbGained}
+                  onChange={(e) => setFbGained(e.target.value)}
+                  placeholder="Опыт, покой, связь…"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Что потратили?</Label>
+                <Input
+                  value={fbSpent}
+                  onChange={(e) => setFbSpent(e.target.value)}
+                  placeholder="Время, силы, деньги…"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Как себя чувствуете?</Label>
+                <div className="grid grid-cols-3 gap-2">
+                  {(
+                    [
+                      ["lighter", "Легче"],
+                      ["same", "Так же"],
+                      ["heavier", "Тяжелее"],
+                    ] as const
+                  ).map(([v, label]) => (
+                    <Button
+                      key={v}
+                      size="sm"
+                      variant={fbFeeling === v ? "default" : "secondary"}
+                      onClick={() => setFbFeeling(v)}
+                    >
+                      {label}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+              <div className="space-y-1.5">
+                <Label>Стоило того?</Label>
+                <div className="grid grid-cols-2 gap-2">
+                  <Button
+                    variant={fbWorth === true ? "default" : "secondary"}
+                    onClick={() => setFbWorth(true)}
+                  >
+                    Да
+                  </Button>
+                  <Button
+                    variant={fbWorth === false ? "default" : "secondary"}
+                    onClick={() => setFbWorth(false)}
+                  >
+                    Нет
+                  </Button>
+                </div>
+              </div>
+            </div>
+            <Button
+              className="w-full"
+              disabled={fbWorth === null}
+              onClick={saveFeedback}
+            >
+              Сохранить отзыв
+            </Button>
+          </section>
+        )}
+
+        {screen === "stats" && (
+          <section className="space-y-4">
+            <h2 className="font-display text-xl text-[var(--ink)]">
+              Статистика
+            </h2>
+            <ul className="space-y-3">
+              {statsLines(stats).map((line) => (
+                <li
+                  key={line}
+                  className="rounded-xl bg-[var(--surface)] px-3 py-3 text-sm leading-relaxed text-[var(--ink-soft)]"
+                >
+                  {line}
+                </li>
+              ))}
+            </ul>
+            {state.situations.length > 0 && (
+              <div className="space-y-2">
+                <h3 className="text-sm font-medium text-[var(--ink)]">
+                  Недавние
+                </h3>
+                <ul className="space-y-2">
+                  {state.situations.slice(0, 6).map((s) => (
+                    <li
+                      key={s.id}
+                      className="border-b border-[var(--line)] pb-2 text-sm last:border-0"
+                    >
+                      <p className="line-clamp-2 text-[var(--ink)]">{s.text}</p>
+                      <p className="text-xs text-[var(--ink-muted)]">
+                        {FILTER_LABELS[s.filter]} · {DECISION_LABELS[s.decision]}
+                        {s.feedback
+                          ? ` · отзыв: ${s.feedback.worthIt ? "стоило" : "не стоило"}`
+                          : " · ждёт отзыва"}
+                      </p>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </section>
+        )}
+
+        {screen === "specialist" && (
+          <section className="space-y-4">
+            <h2 className="font-display text-xl text-[var(--ink)]">
+              Мой специалист
+            </h2>
+            <p className="text-sm text-[var(--ink-muted)]">
+              Доска психологов появится позже. Сейчас — только ваши доверенные
+              контакты, отдельно от потока рефлексии.
+            </p>
+            <div className="space-y-3">
+              <div className="space-y-1.5">
+                <Label>Имя</Label>
+                <Input
+                  value={specName}
+                  onChange={(e) => setSpecName(e.target.value)}
+                  placeholder="Как обращаться"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Контакт</Label>
+                <Input
+                  value={specContact}
+                  onChange={(e) => setSpecContact(e.target.value)}
+                  placeholder="Телефон, Telegram, email"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Заметка</Label>
+                <Textarea
+                  value={specNote}
+                  onChange={(e) => setSpecNote(e.target.value)}
+                  rows={3}
+                  placeholder="Когда писать, о чём не забывать…"
+                />
+              </div>
+            </div>
+            <Button className="w-full" onClick={saveSpecialist}>
+              Сохранить
+            </Button>
+          </section>
+        )}
+
+        {screen === "safety" && (
+          <section className="space-y-4">
+            <h2 className="font-display text-xl text-[var(--ink)]">
+              Важно знать
+            </h2>
+            <div className="space-y-3 text-sm leading-relaxed text-[var(--ink-soft)]">
+              <p>
+                «Точка ясности» — инструмент саморефлексии и принятия решений. Он
+                не ставит диагнозов, не заменяет врача, психолога или
+                психотерапевта.
+              </p>
+              <p>
+                При суицидальных мыслях, насилии или тяжёлом кризисе обратитесь к
+                экстренной помощи и специалисту. В России: телефон доверия{" "}
+                <span className="whitespace-nowrap">8-800-2000-122</span>.
+              </p>
+              <p>
+                В этой тестовой версии данные хранятся только в вашем браузере
+                (localStorage). Можно удалить всё кнопкой «Сбросить данные».
+              </p>
+            </div>
+            <Button className="w-full" onClick={() => setScreen(state.onboardingDone ? "home" : "onboarding")}>
+              Понятно
+            </Button>
+          </section>
+        )}
+      </main>
+    </div>
+  );
+}
