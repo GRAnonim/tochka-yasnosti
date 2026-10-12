@@ -172,6 +172,7 @@ export type AppState = {
 export type Screen =
   | "home"
   | "onboarding"
+  | "edit-goals"
   | "practices"
   | "mood"
   | "gratitude"

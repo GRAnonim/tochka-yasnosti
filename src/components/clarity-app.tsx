@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -71,6 +71,8 @@ export function ClarityApp() {
   );
   const [activeFeedbackId, setActiveFeedbackId] = useState<string | null>(null);
   const [goalInputs, setGoalInputs] = useState(["", "", ""]);
+  const [goalError, setGoalError] = useState<string | null>(null);
+  const goalRefs = useRef<Array<HTMLInputElement | null>>([null, null, null]);
   const [specName, setSpecName] = useState("");
   const [specContact, setSpecContact] = useState("");
   const [specNote, setSpecNote] = useState("");
@@ -117,10 +119,29 @@ export function ClarityApp() {
   const [fiveSteps, setFiveSteps] = useState<string[]>([""]);
   const [fiveNeedNow, setFiveNeedNow] = useState("");
 
+  const fillGoalInputs = (goals: { text: string }[]) => {
+    setGoalInputs([
+      goals[0]?.text ?? "",
+      goals[1]?.text ?? "",
+      goals[2]?.text ?? "",
+    ]);
+    setGoalError(null);
+  };
+
+  const readGoalInputs = () => {
+    // Prefer live DOM values (covers browser autofill that skips React onChange)
+    const fromDom = goalRefs.current.map((el) => el?.value ?? "");
+    const hasDom = fromDom.some((v) => v.trim().length > 0);
+    return hasDom ? fromDom : goalInputs;
+  };
+
   useEffect(() => {
     const loaded = loadState();
     setState(loaded);
     setScreen(loaded.onboardingDone ? "home" : "onboarding");
+    if (!loaded.onboardingDone && loaded.goals.length > 0) {
+      fillGoalInputs(loaded.goals);
+    }
     if (loaded.specialist) {
       setSpecName(loaded.specialist.name);
       setSpecContact(loaded.specialist.contact);
@@ -436,13 +457,25 @@ export function ClarityApp() {
     setScreen("new-situation");
   };
 
-  const finishOnboarding = () => {
-    const goals = goalInputs
+  const openEditGoals = () => {
+    fillGoalInputs(state.goals);
+    setScreen("edit-goals");
+  };
+
+  const saveGoals = () => {
+    const raw = readGoalInputs();
+    // Keep React state in sync with what we actually save
+    setGoalInputs([raw[0] ?? "", raw[1] ?? "", raw[2] ?? ""]);
+    const goals = raw
       .map((t) => t.trim())
       .filter(Boolean)
       .slice(0, 3)
       .map((text) => ({ id: uid("goal"), text }));
-    if (goals.length < 2) return;
+    if (goals.length < 2) {
+      setGoalError("Нужно минимум два ориентира — затем нажмите ещё раз.");
+      return;
+    }
+    setGoalError(null);
     persist({ ...state, goals, onboardingDone: true });
     setScreen("home");
   };
@@ -556,7 +589,9 @@ export function ClarityApp() {
             Точка ясности
           </h1>
         </div>
-        {screen !== "home" && screen !== "onboarding" && (
+        {screen !== "home" &&
+          screen !== "onboarding" &&
+          screen !== "edit-goals" && (
           <Button
             variant="ghost"
             size="sm"
@@ -569,43 +604,71 @@ export function ClarityApp() {
       </header>
 
       <main className="clarity-panel flex-1 animate-in fade-in duration-500">
-        {screen === "onboarding" && (
-          <section className="space-y-5">
+        {(screen === "onboarding" || screen === "edit-goals") && (
+          <section className="space-y-5" data-testid="goals-form">
             <p className="text-[var(--ink-soft)]">
-              Короткий помощник для решений и саморефлексии. Это не терапия и не
-              диагноз — рядом с психологом или для спокойной ясности наедине с собой.
+              {screen === "edit-goals"
+                ? "Обновите ориентиры — можно стереть старые и написать новые."
+                : "Короткий помощник для решений и саморефлексии. Это не терапия и не диагноз — рядом с психологом или для спокойной ясности наедине с собой."}
             </p>
             <div className="space-y-3">
               <Label>2–3 ориентира на ближайшее время</Label>
+              <p className="text-xs text-[var(--ink-muted)]">
+                Серый текст в поле — только подсказка. Нужно вписать свои слова.
+              </p>
               {goalInputs.map((g, i) => (
                 <Input
                   key={i}
+                  ref={(el) => {
+                    goalRefs.current[i] = el;
+                  }}
                   data-testid={`goal-${i}`}
                   value={g}
+                  autoComplete="off"
                   placeholder={
                     i === 0
-                      ? "Например: беречь сон"
+                      ? "Свой ориентир №1"
                       : i === 1
-                        ? "Например: закончить учебный проект"
-                        : "Опционально"
+                        ? "Свой ориентир №2"
+                        : "Ещё один — по желанию"
                   }
                   onChange={(e) => {
                     const next = [...goalInputs];
                     next[i] = e.target.value;
                     setGoalInputs(next);
+                    if (goalError) setGoalError(null);
                   }}
                 />
               ))}
             </div>
+            {goalError && (
+              <p
+                className="text-sm text-[var(--danger-soft)]"
+                data-testid="goal-error"
+              >
+                {goalError}
+              </p>
+            )}
             <button
               type="button"
               data-testid="start-onboarding"
-              className="inline-flex h-12 w-full items-center justify-center rounded-xl bg-[var(--primary)] px-4 text-base font-medium text-[var(--primary-foreground)] transition hover:opacity-95 disabled:pointer-events-none disabled:opacity-40"
-              disabled={goalInputs.filter((g) => g.trim()).length < 2}
-              onClick={finishOnboarding}
+              className="inline-flex h-12 w-full items-center justify-center rounded-2xl bg-[var(--primary)] px-4 text-base font-medium text-[var(--primary-foreground)] transition hover:opacity-95"
+              onClick={saveGoals}
             >
-              Начать
+              {screen === "edit-goals" ? "Сохранить ориентиры" : "Начать"}
             </button>
+            {screen === "edit-goals" && (
+              <button
+                type="button"
+                className="inline-flex h-10 w-full items-center justify-center text-sm text-[var(--accent-ink)]"
+                onClick={() => {
+                  setGoalError(null);
+                  setScreen("home");
+                }}
+              >
+                Отмена
+              </button>
+            )}
             <p className="pt-2 text-xs leading-relaxed text-[var(--ink-muted)]">
               Не терапия и не диагноз. При кризисе — к специалисту
               (8-800-2000-122). Данные теста остаются в этом браузере.
@@ -624,6 +687,14 @@ export function ClarityApp() {
                 Ваши ориентиры:{" "}
                 {state.goals.map((g) => g.text).join(" · ") || "не заданы"}
               </p>
+              <button
+                type="button"
+                data-testid="edit-goals"
+                className="text-left text-sm text-[var(--accent-ink)] underline-offset-4 hover:underline"
+                onClick={openEditGoals}
+              >
+                Изменить ориентиры
+              </button>
             </div>
 
             <div className="flex flex-col gap-3">
@@ -726,7 +797,7 @@ export function ClarityApp() {
                 onClick={() => {
                   const next = emptyState();
                   persist(next);
-                  setGoalInputs(["", "", ""]);
+                  fillGoalInputs([]);
                   setScreen("onboarding");
                 }}
               >
