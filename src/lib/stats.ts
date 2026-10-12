@@ -1,5 +1,10 @@
-import type { DecisionChoice, SituationRecord } from "./types";
+import { moodLabel } from "./practices";
 import { DECISION_LABELS } from "./questions";
+import type {
+  DecisionChoice,
+  PracticeEntry,
+  SituationRecord,
+} from "./types";
 
 export type StatsSnapshot = {
   total: number;
@@ -9,9 +14,17 @@ export type StatsSnapshot = {
   declineWithFeedback: number;
   worthItYes: number;
   worthItNo: number;
+  practiceTotal: number;
+  moodCount: number;
+  gratitudeCount: number;
+  emotionsCount: number;
+  lastMood?: number;
 };
 
-export function computeStats(situations: SituationRecord[]): StatsSnapshot {
+export function computeStats(
+  situations: SituationRecord[],
+  practices: PracticeEntry[] = [],
+): StatsSnapshot {
   const decisions: Record<DecisionChoice, number> = {
     accept: 0,
     decline: 0,
@@ -37,6 +50,18 @@ export function computeStats(situations: SituationRecord[]): StatsSnapshot {
     }
   }
 
+  let moodCount = 0;
+  let gratitudeCount = 0;
+  let emotionsCount = 0;
+  let lastMood: number | undefined;
+  for (const p of practices) {
+    if (p.kind === "mood") {
+      moodCount += 1;
+      if (lastMood === undefined) lastMood = p.mood;
+    } else if (p.kind === "gratitude") gratitudeCount += 1;
+    else if (p.kind === "emotions") emotionsCount += 1;
+  }
+
   return {
     total: situations.length,
     withFeedback,
@@ -45,13 +70,35 @@ export function computeStats(situations: SituationRecord[]): StatsSnapshot {
     declineWithFeedback,
     worthItYes,
     worthItNo,
+    practiceTotal: practices.length,
+    moodCount,
+    gratitudeCount,
+    emotionsCount,
+    lastMood,
   };
 }
 
 export function statsLines(stats: StatsSnapshot): string[] {
   const lines: string[] = [];
+
+  if (stats.practiceTotal > 0) {
+    lines.push(
+      `Практик пакета 1: ${stats.practiceTotal} (настроение — ${stats.moodCount}, благодарность — ${stats.gratitudeCount}, эмоции — ${stats.emotionsCount}).`,
+    );
+    if (stats.lastMood !== undefined) {
+      lines.push(`Последнее настроение: ${moodLabel(stats.lastMood)}.`);
+    }
+  }
+
+  if (stats.total === 0 && stats.practiceTotal === 0) {
+    return [
+      "Пока записей нет — начните с практики настроения или разбора решения.",
+    ];
+  }
+
   if (stats.total === 0) {
-    return ["Пока нет закрытых ситуаций — пройдите один цикл от описания до решения."];
+    lines.push("Разборов решений пока нет — можно добавить, когда появится выбор.");
+    return lines;
   }
 
   lines.push(`Всего зафиксированных решений: ${stats.total}.`);
@@ -72,7 +119,9 @@ export function statsLines(stats: StatsSnapshot): string[] {
       `После факта «стоило того»: да — ${stats.worthItYes}, нет — ${stats.worthItNo}.`,
     );
   } else {
-    lines.push("Обратная связь ещё не собрана — ответьте по ситуации через пару дней (или сразу в тестовом режиме).");
+    lines.push(
+      "Обратная связь по решениям ещё не собрана — можно ответить сразу в тесте.",
+    );
   }
 
   return lines;

@@ -23,10 +23,18 @@ import type {
   DecisionChoice,
   Feeling,
   LifeFilter,
+  MoodLevel,
   QuestionAnswer,
   Screen,
   SituationRecord,
 } from "@/lib/types";
+import {
+  EmotionsPracticeForm,
+  GratitudePracticeForm,
+  MoodPracticeForm,
+  PracticeLog,
+  PracticesMenu,
+} from "@/components/package1-practices";
 
 const FILTERS: LifeFilter[] = ["work", "close", "friends"];
 
@@ -51,6 +59,19 @@ export function ClarityApp() {
   const [fbFeeling, setFbFeeling] = useState<Feeling>("same");
   const [fbWorth, setFbWorth] = useState<boolean | null>(null);
   const [tgHint, setTgHint] = useState("Браузерный режим");
+  const [moodValue, setMoodValue] = useState<MoodLevel | null>(null);
+  const [moodActivities, setMoodActivities] = useState<string[]>([]);
+  const [moodNote, setMoodNote] = useState("");
+  const [gratitudeItems, setGratitudeItems] = useState<[string, string, string]>([
+    "",
+    "",
+    "",
+  ]);
+  const [emotionTags, setEmotionTags] = useState<string[]>([]);
+  const [emotionIntensity, setEmotionIntensity] = useState<MoodLevel | null>(
+    null,
+  );
+  const [emotionNote, setEmotionNote] = useState("");
 
   useEffect(() => {
     const loaded = loadState();
@@ -85,9 +106,84 @@ export function ClarityApp() {
   );
 
   const stats = useMemo(
-    () => computeStats(state.situations),
-    [state.situations],
+    () => computeStats(state.situations, state.practices),
+    [state.situations, state.practices],
   );
+
+  const resetMoodDraft = () => {
+    setMoodValue(null);
+    setMoodActivities([]);
+    setMoodNote("");
+  };
+
+  const resetGratitudeDraft = () => {
+    setGratitudeItems(["", "", ""]);
+  };
+
+  const resetEmotionsDraft = () => {
+    setEmotionTags([]);
+    setEmotionIntensity(null);
+    setEmotionNote("");
+  };
+
+  const saveMood = () => {
+    if (moodValue === null) return;
+    persist({
+      ...state,
+      practices: [
+        {
+          id: uid("mood"),
+          kind: "mood",
+          mood: moodValue,
+          activities: moodActivities,
+          note: moodNote.trim(),
+          createdAt: new Date().toISOString(),
+        },
+        ...state.practices,
+      ],
+    });
+    resetMoodDraft();
+    setScreen("practice-log");
+  };
+
+  const saveGratitude = () => {
+    const items = gratitudeItems.map((i) => i.trim()).filter(Boolean);
+    if (items.length === 0) return;
+    persist({
+      ...state,
+      practices: [
+        {
+          id: uid("grat"),
+          kind: "gratitude",
+          items,
+          createdAt: new Date().toISOString(),
+        },
+        ...state.practices,
+      ],
+    });
+    resetGratitudeDraft();
+    setScreen("practice-log");
+  };
+
+  const saveEmotions = () => {
+    if (emotionTags.length === 0 || emotionIntensity === null) return;
+    persist({
+      ...state,
+      practices: [
+        {
+          id: uid("emo"),
+          kind: "emotions",
+          emotions: emotionTags,
+          intensity: emotionIntensity,
+          note: emotionNote.trim(),
+          createdAt: new Date().toISOString(),
+        },
+        ...state.practices,
+      ],
+    });
+    resetEmotionsDraft();
+    setScreen("practice-log");
+  };
 
   const questions = draftFilter ? QUESTIONS_BY_FILTER[draftFilter] : [];
 
@@ -282,8 +378,8 @@ export function ClarityApp() {
           <section className="space-y-6">
             <div className="space-y-2">
               <p className="text-lg leading-snug text-[var(--ink)]">
-                Разберите ситуацию, зафиксируйте решение и позже посмотрите, как
-                оно отозвалось.
+                Выберите практику или разберите решение — записи сохраняются на
+                этом устройстве.
               </p>
               <p className="text-sm text-[var(--ink-muted)]">
                 Ваши ориентиры:{" "}
@@ -294,11 +390,19 @@ export function ClarityApp() {
             <div className="flex flex-col gap-3">
               <button
                 type="button"
-                data-testid="new-situation"
+                data-testid="open-practices"
                 className="inline-flex h-12 w-full items-center justify-center rounded-xl bg-[var(--primary)] px-4 text-base font-medium text-[var(--primary-foreground)] transition hover:opacity-95"
+                onClick={() => setScreen("practices")}
+              >
+                Практики
+              </button>
+              <button
+                type="button"
+                data-testid="new-situation"
+                className="inline-flex h-11 w-full items-center justify-center rounded-xl bg-[var(--secondary)] px-4 text-sm font-medium text-[var(--secondary-foreground)] transition hover:opacity-95"
                 onClick={startNew}
               >
-                Новая ситуация
+                Разобрать решение
               </button>
               <button
                 type="button"
@@ -402,6 +506,62 @@ export function ClarityApp() {
               </div>
             </details>
           </section>
+        )}
+
+        {screen === "practices" && (
+          <PracticesMenu
+            onOpen={(key) => {
+              if (key === "decision") {
+                startNew();
+                return;
+              }
+              if (key === "mood") resetMoodDraft();
+              if (key === "gratitude") resetGratitudeDraft();
+              if (key === "emotions") resetEmotionsDraft();
+              setScreen(key);
+            }}
+            onLog={() => setScreen("practice-log")}
+          />
+        )}
+
+        {screen === "mood" && (
+          <MoodPracticeForm
+            mood={moodValue}
+            setMood={setMoodValue}
+            activities={moodActivities}
+            setActivities={setMoodActivities}
+            note={moodNote}
+            setNote={setMoodNote}
+            onSave={saveMood}
+          />
+        )}
+
+        {screen === "gratitude" && (
+          <GratitudePracticeForm
+            items={gratitudeItems}
+            setItem={(index, value) => {
+              const next: [string, string, string] = [...gratitudeItems];
+              next[index] = value;
+              setGratitudeItems(next);
+            }}
+            onSave={saveGratitude}
+          />
+        )}
+
+        {screen === "emotions" && (
+          <EmotionsPracticeForm
+            emotions={emotionTags}
+            setEmotions={setEmotionTags}
+            intensity={emotionIntensity}
+            setIntensity={setEmotionIntensity}
+            note={emotionNote}
+            setNote={setEmotionNote}
+            onSave={saveEmotions}
+          />
+        )}
+
+        {screen === "practice-log" && (
+          <PracticeLog entries={state.practices} />
         )}
 
         {screen === "new-situation" && (
