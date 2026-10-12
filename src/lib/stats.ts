@@ -22,6 +22,8 @@ export type StatsSnapshot = {
   abcCount: number;
   wheelCount: number;
   breathCount: number;
+  idealDayCount: number;
+  fiveWhysCount: number;
   lastMood?: number;
 };
 
@@ -61,6 +63,8 @@ export function computeStats(
   let abcCount = 0;
   let wheelCount = 0;
   let breathCount = 0;
+  let idealDayCount = 0;
+  let fiveWhysCount = 0;
   let lastMood: number | undefined;
   for (const p of practices) {
     if (p.kind === "mood") {
@@ -72,6 +76,8 @@ export function computeStats(
     else if (p.kind === "abc") abcCount += 1;
     else if (p.kind === "wheel") wheelCount += 1;
     else if (p.kind === "breath") breathCount += 1;
+    else if (p.kind === "ideal-day") idealDayCount += 1;
+    else if (p.kind === "five-whys") fiveWhysCount += 1;
   }
 
   return {
@@ -90,6 +96,8 @@ export function computeStats(
     abcCount,
     wheelCount,
     breathCount,
+    idealDayCount,
+    fiveWhysCount,
     lastMood,
   };
 }
@@ -99,7 +107,7 @@ export function statsLines(stats: StatsSnapshot): string[] {
 
   if (stats.practiceTotal > 0) {
     lines.push(
-      `Практик: ${stats.practiceTotal} (настроение — ${stats.moodCount}, благодарность — ${stats.gratitudeCount}, эмоции — ${stats.emotionsCount}, вопросы — ${stats.questionsCount}, ABC — ${stats.abcCount}, колесо — ${stats.wheelCount}, дыхание — ${stats.breathCount}).`,
+      `Практик: ${stats.practiceTotal} (настроение — ${stats.moodCount}, благодарность — ${stats.gratitudeCount}, эмоции — ${stats.emotionsCount}, вопросы — ${stats.questionsCount}, ABC — ${stats.abcCount}, колесо — ${stats.wheelCount}, дыхание — ${stats.breathCount}, идеальный день — ${stats.idealDayCount}, 5 почему — ${stats.fiveWhysCount}).`,
     );
     if (stats.lastMood !== undefined) {
       lines.push(`Последнее настроение: ${moodLabel(stats.lastMood)}.`);

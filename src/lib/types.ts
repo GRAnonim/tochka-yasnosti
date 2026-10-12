@@ -123,6 +123,32 @@ export type BreathPractice = {
   createdAt: string;
 };
 
+export type IdealDayPractice = {
+  id: string;
+  kind: "ideal-day";
+  horizon: string; // e.g. "через год" / "обычный хороший день"
+  setting: string;
+  actions: string;
+  feelings: string;
+  people: string;
+  smallStep: string;
+  createdAt: string;
+};
+
+export type FiveWhysStep = {
+  index: number;
+  why: string;
+};
+
+export type FiveWhysPractice = {
+  id: string;
+  kind: "five-whys";
+  starting: string;
+  steps: FiveWhysStep[];
+  needNow: string;
+  createdAt: string;
+};
+
 export type PracticeEntry =
   | MoodPractice
   | GratitudePractice
@@ -130,7 +156,9 @@ export type PracticeEntry =
   | AbcPractice
   | QuestionsPractice
   | WheelPractice
-  | BreathPractice;
+  | BreathPractice
+  | IdealDayPractice
+  | FiveWhysPractice;
 
 export type AppState = {
   version: 2;
@@ -152,6 +180,8 @@ export type Screen =
   | "questions"
   | "wheel"
   | "breath"
+  | "ideal-day"
+  | "five-whys"
   | "practice-log"
   | "new-situation"
   | "filter"

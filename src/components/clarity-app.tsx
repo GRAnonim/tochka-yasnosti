@@ -45,6 +45,10 @@ import {
   WheelPracticeForm,
 } from "@/components/package3-practices";
 import {
+  FiveWhysPracticeForm,
+  IdealDayPracticeForm,
+} from "@/components/package4-practices";
+import {
   QUESTION_TOPICS,
   WHEEL_AREAS,
   type QuestionTopicId,
@@ -100,6 +104,15 @@ export function ClarityApp() {
   const [breathDuration, setBreathDuration] =
     useState<BreathDurationSec>(60);
   const [breathNotice, setBreathNotice] = useState("");
+  const [idealHorizon, setIdealHorizon] = useState("");
+  const [idealSetting, setIdealSetting] = useState("");
+  const [idealActions, setIdealActions] = useState("");
+  const [idealFeelings, setIdealFeelings] = useState("");
+  const [idealPeople, setIdealPeople] = useState("");
+  const [idealStep, setIdealStep] = useState("");
+  const [fiveStarting, setFiveStarting] = useState("");
+  const [fiveSteps, setFiveSteps] = useState<string[]>([""]);
+  const [fiveNeedNow, setFiveNeedNow] = useState("");
 
   useEffect(() => {
     const loaded = loadState();
@@ -174,6 +187,21 @@ export function ClarityApp() {
   const resetBreathDraft = () => {
     setBreathDuration(60);
     setBreathNotice("");
+  };
+
+  const resetIdealDayDraft = () => {
+    setIdealHorizon("");
+    setIdealSetting("");
+    setIdealActions("");
+    setIdealFeelings("");
+    setIdealPeople("");
+    setIdealStep("");
+  };
+
+  const resetFiveWhysDraft = () => {
+    setFiveStarting("");
+    setFiveSteps([""]);
+    setFiveNeedNow("");
   };
 
   const saveMood = () => {
@@ -329,6 +357,62 @@ export function ClarityApp() {
       ],
     });
     resetBreathDraft();
+    setScreen("practice-log");
+  };
+
+  const saveIdealDay = () => {
+    if (
+      !idealHorizon.trim() ||
+      idealSetting.trim().length < 3 ||
+      idealActions.trim().length < 3 ||
+      idealFeelings.trim().length < 3 ||
+      idealStep.trim().length < 3
+    ) {
+      return;
+    }
+    persist({
+      ...state,
+      practices: [
+        {
+          id: uid("ideal"),
+          kind: "ideal-day",
+          horizon: idealHorizon.trim(),
+          setting: idealSetting.trim(),
+          actions: idealActions.trim(),
+          feelings: idealFeelings.trim(),
+          people: idealPeople.trim(),
+          smallStep: idealStep.trim(),
+          createdAt: new Date().toISOString(),
+        },
+        ...state.practices,
+      ],
+    });
+    resetIdealDayDraft();
+    setScreen("practice-log");
+  };
+
+  const saveFiveWhys = () => {
+    const steps = fiveSteps
+      .map((why, index) => ({ index: index + 1, why: why.trim() }))
+      .filter((s) => s.why.length >= 2);
+    if (fiveStarting.trim().length < 3 || steps.length < 2 || fiveNeedNow.trim().length < 2) {
+      return;
+    }
+    persist({
+      ...state,
+      practices: [
+        {
+          id: uid("five"),
+          kind: "five-whys",
+          starting: fiveStarting.trim(),
+          steps,
+          needNow: fiveNeedNow.trim(),
+          createdAt: new Date().toISOString(),
+        },
+        ...state.practices,
+      ],
+    });
+    resetFiveWhysDraft();
     setScreen("practice-log");
   };
 
@@ -669,6 +753,8 @@ export function ClarityApp() {
               if (key === "questions") resetQuestionsDraft();
               if (key === "wheel") resetWheelDraft();
               if (key === "breath") resetBreathDraft();
+              if (key === "ideal-day") resetIdealDayDraft();
+              if (key === "five-whys") resetFiveWhysDraft();
               setScreen(key);
             }}
             onLog={() => setScreen("practice-log")}
@@ -759,6 +845,43 @@ export function ClarityApp() {
             notice={breathNotice}
             setNotice={setBreathNotice}
             onSave={saveBreath}
+          />
+        )}
+
+        {screen === "ideal-day" && (
+          <IdealDayPracticeForm
+            horizon={idealHorizon}
+            setHorizon={setIdealHorizon}
+            setting={idealSetting}
+            setSetting={setIdealSetting}
+            actions={idealActions}
+            setActions={setIdealActions}
+            feelings={idealFeelings}
+            setFeelings={setIdealFeelings}
+            people={idealPeople}
+            setPeople={setIdealPeople}
+            smallStep={idealStep}
+            setSmallStep={setIdealStep}
+            onSave={saveIdealDay}
+          />
+        )}
+
+        {screen === "five-whys" && (
+          <FiveWhysPracticeForm
+            starting={fiveStarting}
+            setStarting={setFiveStarting}
+            steps={fiveSteps}
+            setStepWhy={(index, value) => {
+              setFiveSteps((prev) => {
+                const next = [...prev];
+                next[index] = value;
+                return next;
+              });
+            }}
+            addStep={() => setFiveSteps((prev) => [...prev, ""])}
+            needNow={fiveNeedNow}
+            setNeedNow={setFiveNeedNow}
+            onSave={saveFiveWhys}
           />
         )}
 

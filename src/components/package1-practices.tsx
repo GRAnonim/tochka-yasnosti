@@ -16,7 +16,9 @@ import type {
   AbcPractice,
   BreathPractice,
   EmotionsPractice,
+  FiveWhysPractice,
   GratitudePractice,
+  IdealDayPractice,
   MoodLevel,
   MoodPractice,
   PracticeEntry,
@@ -59,6 +61,8 @@ export type PracticeMenuKey =
   | "abc"
   | "wheel"
   | "breath"
+  | "ideal-day"
+  | "five-whys"
   | "decision";
 
 export function PracticesMenu({
@@ -73,7 +77,7 @@ export function PracticesMenu({
       <div>
         <h2 className="font-display text-xl text-[var(--ink)]">Практики</h2>
         <p className="mt-1 text-sm text-[var(--ink-muted)]">
-          Пакеты 1–3: записи, вопросы, ABC, баланс и дыхание. Разбор решения —
+          Пакеты 1–4: полный набор коротких упражнений. Разбор решения —
           отдельно.
         </p>
       </div>
@@ -87,6 +91,8 @@ export function PracticesMenu({
             ["abc", PRACTICE_META.abc],
             ["wheel", PRACTICE_META.wheel],
             ["breath", PRACTICE_META.breath],
+            ["ideal-day", PRACTICE_META["ideal-day"]],
+            ["five-whys", PRACTICE_META["five-whys"]],
             ["decision", PRACTICE_META.decision],
           ] as const
         ).map(([key, meta]) => (
@@ -377,8 +383,16 @@ function practiceSummary(entry: PracticeEntry): string {
     const low = [...w.scores].sort((a, b) => a.score - b.score)[0];
     return `среднее ${avg.toFixed(1)} · ниже всего: ${low?.label ?? "—"} (${low?.score ?? "—"})`;
   }
-  const b = entry as BreathPractice;
-  return `${Math.round(b.durationSec / 60)} мин · ${b.completed ? "до конца" : "остановлено раньше"}${b.notice ? ` · ${b.notice}` : ""}`;
+  if (entry.kind === "breath") {
+    const b = entry as BreathPractice;
+    return `${Math.round(b.durationSec / 60)} мин · ${b.completed ? "до конца" : "остановлено раньше"}${b.notice ? ` · ${b.notice}` : ""}`;
+  }
+  if (entry.kind === "ideal-day") {
+    const d = entry as IdealDayPractice;
+    return `${d.horizon}: ${d.smallStep}`;
+  }
+  const f = entry as FiveWhysPractice;
+  return `${f.starting} → ${f.steps.length} «почему» · нужно: ${f.needNow}`;
 }
 
 export function PracticeLog({ entries }: { entries: PracticeEntry[] }) {

@@ -63,11 +63,28 @@ export const PRACTICE_META = {
     title: "Практика дыхания",
     blurb: "1–3 минуты спокойного дыхания и короткая заметка после.",
   },
+  "ideal-day": {
+    title: "Идеальный день",
+    blurb: "Опишите желаемый день по шагам и один маленький шаг к нему.",
+  },
+  "five-whys": {
+    title: "5 почему",
+    blurb: "Аккуратно дойдите до корня чувства — и мягко закройте вопрос «что нужно сейчас».",
+  },
   decision: {
     title: "Разобрать решение",
     blurb: "Ситуация → вопросы → мягкое резюме → фиксация выбора.",
   },
 } as const;
+
+export const IDEAL_DAY_HORIZONS = [
+  "Обычный хороший день",
+  "Через месяц",
+  "Через год",
+] as const;
+
+export const FIVE_WHYS_MAX = 5;
+export const FIVE_WHYS_MIN = 2;
 
 export const WHEEL_AREAS = [
   { id: "health", label: "Здоровье" },
