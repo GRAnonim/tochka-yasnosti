@@ -28,6 +28,7 @@ import type {
   QuestionAnswer,
   Screen,
   SituationRecord,
+  WheelPractice,
 } from "@/lib/types";
 import {
   EmotionsPracticeForm,
@@ -48,6 +49,7 @@ import {
   FiveWhysPracticeForm,
   IdealDayPracticeForm,
 } from "@/components/package4-practices";
+import { WheelResultView } from "@/components/wheel-chart";
 import {
   QUESTION_TOPICS,
   WHEEL_AREAS,
@@ -101,6 +103,7 @@ export function ClarityApp() {
   >({});
   const [wheelScores, setWheelScores] = useState<Record<string, number>>({});
   const [wheelNote, setWheelNote] = useState("");
+  const [activeWheelId, setActiveWheelId] = useState<string | null>(null);
   const [breathDuration, setBreathDuration] =
     useState<BreathDurationSec>(60);
   const [breathNotice, setBreathNotice] = useState("");
@@ -324,22 +327,27 @@ export function ClarityApp() {
       score: wheelScores[area.id] ?? 0,
     }));
     if (scores.some((s) => s.score < 1)) return;
+    const entry: WheelPractice = {
+      id: uid("wheel"),
+      kind: "wheel",
+      scores,
+      focusNote: wheelNote.trim(),
+      createdAt: new Date().toISOString(),
+    };
     persist({
       ...state,
-      practices: [
-        {
-          id: uid("wheel"),
-          kind: "wheel",
-          scores,
-          focusNote: wheelNote.trim(),
-          createdAt: new Date().toISOString(),
-        },
-        ...state.practices,
-      ],
+      practices: [entry, ...state.practices],
     });
     resetWheelDraft();
-    setScreen("practice-log");
+    setActiveWheelId(entry.id);
+    setScreen("wheel-result");
   };
+
+  const activeWheel = useMemo(() => {
+    if (!activeWheelId) return null;
+    const found = state.practices.find((p) => p.id === activeWheelId);
+    return found && found.kind === "wheel" ? found : null;
+  }, [activeWheelId, state.practices]);
 
   const saveBreath = (completed: boolean) => {
     persist({
@@ -609,8 +617,8 @@ export function ClarityApp() {
           <section className="space-y-6">
             <div className="space-y-2">
               <p className="text-lg leading-snug text-[var(--ink)]">
-                Выберите практику или разберите решение — записи сохраняются на
-                этом устройстве.
+                Здесь можно мягко разобрать день и решения — без давления и без
+                оценок.
               </p>
               <p className="text-sm text-[var(--ink-muted)]">
                 Ваши ориентиры:{" "}
@@ -838,6 +846,14 @@ export function ClarityApp() {
           />
         )}
 
+        {screen === "wheel-result" && activeWheel && (
+          <WheelResultView
+            entry={activeWheel}
+            onJournal={() => setScreen("practice-log")}
+            onHome={() => setScreen("home")}
+          />
+        )}
+
         {screen === "breath" && (
           <BreathPracticeForm
             durationSec={breathDuration}
@@ -886,7 +902,13 @@ export function ClarityApp() {
         )}
 
         {screen === "practice-log" && (
-          <PracticeLog entries={state.practices} />
+          <PracticeLog
+            entries={state.practices}
+            onOpenWheel={(id) => {
+              setActiveWheelId(id);
+              setScreen("wheel-result");
+            }}
+          />
         )}
 
         {screen === "new-situation" && (

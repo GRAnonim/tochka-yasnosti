@@ -36,6 +36,10 @@ for (const id of areas) {
 await page.getByTestId("wheel-note").fill("вечером короткая прогулка");
 await page.screenshot({ path: `${out}/p3-wheel.png`, fullPage: true });
 await page.getByTestId("wheel-save").click();
+await page.getByTestId("wheel-result").waitFor();
+await page.getByTestId("wheel-chart-svg").waitFor();
+await page.screenshot({ path: `${out}/p3-wheel-result.png`, fullPage: true });
+await page.getByTestId("wheel-to-log").click();
 await page.getByTestId("practice-log-view").waitFor();
 
 await page.getByRole("button", { name: "На главную" }).click();

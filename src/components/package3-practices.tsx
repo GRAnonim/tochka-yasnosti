@@ -3,12 +3,13 @@
 import { useEffect, useMemo, useState } from "react";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { WheelChartCard } from "@/components/wheel-chart";
 import {
   BREATH_DURATIONS,
   PRACTICE_META,
   WHEEL_AREAS,
 } from "@/lib/practices";
-import type { BreathDurationSec } from "@/lib/types";
+import type { BreathDurationSec, WheelPractice } from "@/lib/types";
 
 export function WheelPracticeForm({
   scores,
@@ -33,6 +34,21 @@ export function WheelPracticeForm({
     const min = ranked[0]?.score ?? 0;
     return ranked.filter((a) => a.score === min).slice(0, 2);
   }, [ready, scores]);
+
+  const previewEntry = useMemo<WheelPractice | null>(() => {
+    if (!ready) return null;
+    return {
+      id: "preview",
+      kind: "wheel",
+      scores: WHEEL_AREAS.map((area) => ({
+        areaId: area.id,
+        label: area.label,
+        score: scores[area.id] ?? 0,
+      })),
+      focusNote: focusNote.trim(),
+      createdAt: new Date().toISOString(),
+    };
+  }, [ready, scores, focusNote]);
 
   return (
     <section className="space-y-4" data-testid="wheel-form">
@@ -63,8 +79,8 @@ export function WheelPracticeForm({
                   data-testid={`wheel-${area.id}-${n}`}
                   className={
                     scores[area.id] === n
-                      ? "h-8 rounded-md bg-[var(--primary)] text-xs font-medium text-[var(--primary-foreground)]"
-                      : "h-8 rounded-md bg-[var(--secondary)] text-xs font-medium"
+                      ? "h-8 rounded-lg bg-[var(--primary)] text-xs font-medium text-[var(--primary-foreground)]"
+                      : "h-8 rounded-lg bg-[var(--secondary)] text-xs font-medium text-[var(--ink-soft)]"
                   }
                   onClick={() => setScore(area.id, n)}
                 >
@@ -77,7 +93,7 @@ export function WheelPracticeForm({
       </div>
 
       {lowest.length > 0 && (
-        <p className="rounded-xl bg-[var(--surface)] px-3 py-3 text-sm text-[var(--ink-soft)]">
+        <p className="rounded-2xl bg-[var(--surface)] px-3 py-3 text-sm text-[var(--ink-soft)]">
           Сейчас ниже всего:{" "}
           {lowest.map((a) => `${a.label} (${a.score})`).join(", ")}. Можно
           коротко отметить один мягкий шаг.
@@ -96,11 +112,18 @@ export function WheelPracticeForm({
         />
       </div>
 
+      {previewEntry && (
+        <div className="space-y-2">
+          <p className="text-sm text-[var(--ink-muted)]">Предпросмотр круга</p>
+          <WheelChartCard entry={previewEntry} showDownload={false} />
+        </div>
+      )}
+
       <button
         type="button"
         data-testid="wheel-save"
         disabled={!ready}
-        className="inline-flex h-11 w-full items-center justify-center rounded-xl bg-[var(--primary)] px-4 text-sm font-medium text-[var(--primary-foreground)] disabled:opacity-40"
+        className="inline-flex h-11 w-full items-center justify-center rounded-2xl bg-[var(--primary)] px-4 text-sm font-medium text-[var(--primary-foreground)] disabled:opacity-40"
         onClick={onSave}
       >
         Сохранить колесо

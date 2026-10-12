@@ -100,7 +100,7 @@ export function PracticesMenu({
             type="button"
             key={key}
             data-testid={`practice-${key}`}
-            className="rounded-xl border border-[var(--line)] bg-[var(--surface)] px-4 py-3 text-left transition hover:border-[var(--accent)]"
+            className="practice-tile rounded-2xl border border-[var(--line)] bg-[var(--surface-strong)] px-4 py-3.5 text-left hover:border-[var(--accent)]"
             onClick={() => onOpen(key)}
           >
             <span className="block font-medium text-[var(--ink)]">
@@ -395,7 +395,13 @@ function practiceSummary(entry: PracticeEntry): string {
   return `${f.starting} → ${f.steps.length} «почему» · нужно: ${f.needNow}`;
 }
 
-export function PracticeLog({ entries }: { entries: PracticeEntry[] }) {
+export function PracticeLog({
+  entries,
+  onOpenWheel,
+}: {
+  entries: PracticeEntry[];
+  onOpenWheel?: (id: string) => void;
+}) {
   return (
     <section className="space-y-4" data-testid="practice-log-view">
       <h2 className="font-display text-xl text-[var(--ink)]">Журнал практик</h2>
@@ -405,22 +411,41 @@ export function PracticeLog({ entries }: { entries: PracticeEntry[] }) {
         </p>
       ) : (
         <ul className="space-y-2">
-          {entries.map((entry) => (
-            <li
-              key={entry.id}
-              className="rounded-xl bg-[var(--surface)] px-3 py-3 text-sm"
-            >
-              <p className="font-medium text-[var(--ink)]">
-                {PRACTICE_META[entry.kind].title}
-              </p>
-              <p className="mt-1 line-clamp-3 text-[var(--ink-soft)]">
-                {practiceSummary(entry)}
-              </p>
-              <p className="mt-1 text-xs text-[var(--ink-muted)]">
-                {formatPracticeDate(entry.createdAt)}
-              </p>
-            </li>
-          ))}
+          {entries.map((entry) => {
+            const clickable = entry.kind === "wheel" && onOpenWheel;
+            const body = (
+              <>
+                <p className="font-medium text-[var(--ink)]">
+                  {PRACTICE_META[entry.kind].title}
+                </p>
+                <p className="mt-1 line-clamp-3 text-[var(--ink-soft)]">
+                  {practiceSummary(entry)}
+                </p>
+                <p className="mt-1 text-xs text-[var(--ink-muted)]">
+                  {formatPracticeDate(entry.createdAt)}
+                  {entry.kind === "wheel" ? " · открыть круг" : ""}
+                </p>
+              </>
+            );
+            return (
+              <li key={entry.id}>
+                {clickable ? (
+                  <button
+                    type="button"
+                    data-testid={`open-wheel-${entry.id}`}
+                    className="w-full rounded-2xl bg-[var(--surface-strong)] px-3 py-3 text-left text-sm transition hover:border-[var(--accent)] border border-[var(--line)]"
+                    onClick={() => onOpenWheel(entry.id)}
+                  >
+                    {body}
+                  </button>
+                ) : (
+                  <div className="rounded-2xl bg-[var(--surface)] px-3 py-3 text-sm">
+                    {body}
+                  </div>
+                )}
+              </li>
+            );
+          })}
         </ul>
       )}
     </section>

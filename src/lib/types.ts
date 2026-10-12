@@ -179,6 +179,7 @@ export type Screen =
   | "abc"
   | "questions"
   | "wheel"
+  | "wheel-result"
   | "breath"
   | "ideal-day"
   | "five-whys"

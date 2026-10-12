@@ -50,46 +50,51 @@
 }
 
 :root {
-  /* Misted teal / slate — calm, not purple, not cream-terracotta */
-  --ink: #14323a;
-  --ink-soft: #2a4a52;
-  --ink-muted: #5d7a82;
-  --accent: #2f8f8a;
-  --accent-ink: #1f6f6b;
-  --surface: color-mix(in oklab, #ffffff 72%, #cfe8e4);
-  --line: color-mix(in oklab, #14323a 12%, transparent);
+  /*
+    Soft sage / mist blue-green for stressed or low-mood users:
+    low glare, gentle contrast, no purple neon, no harsh black/white.
+  */
+  --ink: #2a3f45;
+  --ink-soft: #3d5a61;
+  --ink-muted: #6a858c;
+  --accent: #5f9e95;
+  --accent-ink: #3f7a73;
+  --surface: color-mix(in oklab, #ffffff 78%, #d7ebe6);
+  --surface-strong: color-mix(in oklab, #ffffff 88%, #dceeea);
+  --line: color-mix(in oklab, #2a3f45 10%, transparent);
+  --danger-soft: #9a5b5b;
 
-  --background: #e8f1ef;
-  --foreground: #14323a;
-  --card: color-mix(in oklab, #ffffff 80%, #d7ebe8);
-  --card-foreground: #14323a;
-  --popover: #f4faf8;
-  --popover-foreground: #14323a;
-  --primary: #1f6f6b;
-  --primary-foreground: #f4fffd;
-  --secondary: color-mix(in oklab, #ffffff 55%, #c5ddd9);
-  --secondary-foreground: #14323a;
-  --muted: #d5e6e3;
-  --muted-foreground: #5d7a82;
-  --accent-foreground: #f4fffd;
-  --destructive: oklch(0.55 0.2 25);
-  --border: color-mix(in oklab, #14323a 14%, transparent);
-  --input: color-mix(in oklab, #14323a 14%, transparent);
-  --ring: #2f8f8a;
-  --chart-1: #2f8f8a;
-  --chart-2: #4a7c8c;
-  --chart-3: #6b9e8e;
-  --chart-4: #3d5c66;
-  --chart-5: #8eb8b0;
-  --radius: 0.85rem;
-  --sidebar: #f4faf8;
-  --sidebar-foreground: #14323a;
-  --sidebar-primary: #1f6f6b;
-  --sidebar-primary-foreground: #f4fffd;
-  --sidebar-accent: #d5e6e3;
-  --sidebar-accent-foreground: #14323a;
-  --sidebar-border: color-mix(in oklab, #14323a 12%, transparent);
-  --sidebar-ring: #2f8f8a;
+  --background: #eef4f2;
+  --foreground: #2a3f45;
+  --card: color-mix(in oklab, #ffffff 86%, #dff0eb);
+  --card-foreground: #2a3f45;
+  --popover: #f7fbfa;
+  --popover-foreground: #2a3f45;
+  --primary: #4f8f87;
+  --primary-foreground: #f7fffd;
+  --secondary: color-mix(in oklab, #ffffff 62%, #cfe4df);
+  --secondary-foreground: #2a3f45;
+  --muted: #ddeae6;
+  --muted-foreground: #6a858c;
+  --accent-foreground: #f7fffd;
+  --destructive: oklch(0.55 0.12 25);
+  --border: color-mix(in oklab, #2a3f45 12%, transparent);
+  --input: color-mix(in oklab, #2a3f45 12%, transparent);
+  --ring: #5f9e95;
+  --chart-1: #5f9e95;
+  --chart-2: #7aa3ae;
+  --chart-3: #8eb8a8;
+  --chart-4: #5d7a82;
+  --chart-5: #a7c4be;
+  --radius: 1rem;
+  --sidebar: #f7fbfa;
+  --sidebar-foreground: #2a3f45;
+  --sidebar-primary: #4f8f87;
+  --sidebar-primary-foreground: #f7fffd;
+  --sidebar-accent: #ddeae6;
+  --sidebar-accent-foreground: #2a3f45;
+  --sidebar-border: color-mix(in oklab, #2a3f45 10%, transparent);
+  --sidebar-ring: #5f9e95;
 }
 
 @layer base {
@@ -99,19 +104,24 @@
   body {
     @apply bg-background text-foreground;
     background-image:
-      radial-gradient(1200px 600px at 10% -10%, #c5e4df 0%, transparent 55%),
-      radial-gradient(900px 500px at 100% 0%, #b7d0dc 0%, transparent 50%),
-      linear-gradient(165deg, #eef5f3 0%, #dfeceb 45%, #d4e4e8 100%);
+      radial-gradient(1000px 520px at 8% -8%, #d5ebe4 0%, transparent 58%),
+      radial-gradient(880px 480px at 100% 0%, #d2e2ea 0%, transparent 52%),
+      radial-gradient(700px 420px at 50% 110%, #e4efe8 0%, transparent 55%),
+      linear-gradient(168deg, #f4f8f6 0%, #e8f0ed 48%, #e4ecef 100%);
     min-height: 100dvh;
   }
   html {
     @apply font-sans;
+  }
+  ::selection {
+    background: color-mix(in oklab, var(--primary) 28%, white);
   }
 }
 
 .font-display {
   font-family: var(--font-sora), ui-sans-serif, system-ui, sans-serif;
   letter-spacing: -0.02em;
+  font-weight: 550;
 }
 
 .clarity-shell {
@@ -119,50 +129,52 @@
 }
 
 .clarity-panel {
-  border-radius: 1.35rem;
-  background: color-mix(in oklab, #ffffff 58%, transparent);
-  border: 1px solid color-mix(in oklab, #14323a 8%, transparent);
-  box-shadow: 0 18px 50px color-mix(in oklab, #14323a 8%, transparent);
-  padding: 1.25rem;
-  backdrop-filter: blur(10px);
+  border-radius: 1.5rem;
+  background: color-mix(in oklab, #ffffff 66%, transparent);
+  border: 1px solid color-mix(in oklab, #2a3f45 7%, transparent);
+  box-shadow:
+    0 1px 0 color-mix(in oklab, #ffffff 70%, transparent) inset,
+    0 22px 48px color-mix(in oklab, #2a3f45 6%, transparent);
+  padding: 1.35rem;
+  backdrop-filter: blur(14px);
 }
 
 @media (min-width: 640px) {
   .clarity-panel {
-    padding: 1.5rem;
+    padding: 1.65rem;
   }
 }
 
 .clarity-orb {
   position: absolute;
   border-radius: 9999px;
-  filter: blur(40px);
-  opacity: 0.55;
-  animation: floaty 12s ease-in-out infinite;
+  filter: blur(48px);
+  opacity: 0.42;
+  animation: floaty 14s ease-in-out infinite;
 }
 
 .clarity-orb-a {
-  width: 280px;
-  height: 280px;
-  left: -80px;
-  top: 10%;
-  background: #9fd4cb;
+  width: 300px;
+  height: 300px;
+  left: -90px;
+  top: 8%;
+  background: #b7d8d0;
 }
 
 .clarity-orb-b {
-  width: 220px;
-  height: 220px;
-  right: -60px;
-  top: 55%;
-  background: #9bb9c9;
-  animation-delay: -4s;
+  width: 240px;
+  height: 240px;
+  right: -70px;
+  top: 52%;
+  background: #b8c9d4;
+  animation-delay: -5s;
 }
 
 .clarity-grain {
   position: absolute;
   inset: 0;
-  opacity: 0.04;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
 @keyframes floaty {
@@ -171,14 +183,14 @@
     transform: translateY(0) scale(1);
   }
   50% {
-    transform: translateY(-18px) scale(1.05);
+    transform: translateY(-14px) scale(1.04);
   }
 }
 
 @keyframes fade-in {
   from {
     opacity: 0;
-    transform: translateY(6px);
+    transform: translateY(8px);
   }
   to {
     opacity: 1;
@@ -187,5 +199,16 @@
 }
 
 .animate-in {
-  animation: fade-in 0.45s ease-out both;
+  animation: fade-in 0.5s ease-out both;
+}
+
+.practice-tile {
+  transition:
+    border-color 0.2s ease,
+    transform 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.practice-tile:hover {
+  transform: translateY(-1px);
 }
