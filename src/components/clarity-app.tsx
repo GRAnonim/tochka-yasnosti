@@ -35,6 +35,14 @@ import {
   PracticeLog,
   PracticesMenu,
 } from "@/components/package1-practices";
+import {
+  AbcPracticeForm,
+  QuestionsPracticeForm,
+} from "@/components/package2-practices";
+import {
+  QUESTION_TOPICS,
+  type QuestionTopicId,
+} from "@/lib/practices";
 
 const FILTERS: LifeFilter[] = ["work", "close", "friends"];
 
@@ -72,6 +80,15 @@ export function ClarityApp() {
     null,
   );
   const [emotionNote, setEmotionNote] = useState("");
+  const [abcA, setAbcA] = useState("");
+  const [abcB, setAbcB] = useState("");
+  const [abcC, setAbcC] = useState("");
+  const [abcReframe, setAbcReframe] = useState("");
+  const [questionsTopicId, setQuestionsTopicId] =
+    useState<QuestionTopicId | null>(null);
+  const [questionsAnswers, setQuestionsAnswers] = useState<
+    Record<string, string>
+  >({});
 
   useEffect(() => {
     const loaded = loadState();
@@ -124,6 +141,18 @@ export function ClarityApp() {
     setEmotionTags([]);
     setEmotionIntensity(null);
     setEmotionNote("");
+  };
+
+  const resetAbcDraft = () => {
+    setAbcA("");
+    setAbcB("");
+    setAbcC("");
+    setAbcReframe("");
+  };
+
+  const resetQuestionsDraft = () => {
+    setQuestionsTopicId(null);
+    setQuestionsAnswers({});
   };
 
   const saveMood = () => {
@@ -182,6 +211,60 @@ export function ClarityApp() {
       ],
     });
     resetEmotionsDraft();
+    setScreen("practice-log");
+  };
+
+  const saveAbc = () => {
+    if (
+      abcA.trim().length < 3 ||
+      abcB.trim().length < 3 ||
+      abcC.trim().length < 3
+    ) {
+      return;
+    }
+    persist({
+      ...state,
+      practices: [
+        {
+          id: uid("abc"),
+          kind: "abc",
+          activating: abcA.trim(),
+          beliefs: abcB.trim(),
+          consequences: abcC.trim(),
+          reframe: abcReframe.trim(),
+          createdAt: new Date().toISOString(),
+        },
+        ...state.practices,
+      ],
+    });
+    resetAbcDraft();
+    setScreen("practice-log");
+  };
+
+  const saveQuestionsPractice = () => {
+    const topic = QUESTION_TOPICS.find((t) => t.id === questionsTopicId);
+    if (!topic) return;
+    const answers = topic.questions.map((q) => ({
+      questionId: q.id,
+      question: q.text,
+      answer: (questionsAnswers[q.id] ?? "").trim(),
+    }));
+    if (answers.some((a) => a.answer.length < 2)) return;
+    persist({
+      ...state,
+      practices: [
+        {
+          id: uid("qgen"),
+          kind: "questions",
+          topicId: topic.id,
+          topicLabel: topic.label,
+          answers,
+          createdAt: new Date().toISOString(),
+        },
+        ...state.practices,
+      ],
+    });
+    resetQuestionsDraft();
     setScreen("practice-log");
   };
 
@@ -518,6 +601,8 @@ export function ClarityApp() {
               if (key === "mood") resetMoodDraft();
               if (key === "gratitude") resetGratitudeDraft();
               if (key === "emotions") resetEmotionsDraft();
+              if (key === "abc") resetAbcDraft();
+              if (key === "questions") resetQuestionsDraft();
               setScreen(key);
             }}
             onLog={() => setScreen("practice-log")}
@@ -557,6 +642,35 @@ export function ClarityApp() {
             note={emotionNote}
             setNote={setEmotionNote}
             onSave={saveEmotions}
+          />
+        )}
+
+        {screen === "abc" && (
+          <AbcPracticeForm
+            activating={abcA}
+            setActivating={setAbcA}
+            beliefs={abcB}
+            setBeliefs={setAbcB}
+            consequences={abcC}
+            setConsequences={setAbcC}
+            reframe={abcReframe}
+            setReframe={setAbcReframe}
+            onSave={saveAbc}
+          />
+        )}
+
+        {screen === "questions" && (
+          <QuestionsPracticeForm
+            topicId={questionsTopicId}
+            setTopicId={(id) => {
+              setQuestionsTopicId(id);
+              if (id === null) setQuestionsAnswers({});
+            }}
+            answers={questionsAnswers}
+            setAnswer={(questionId, value) => {
+              setQuestionsAnswers((prev) => ({ ...prev, [questionId]: value }));
+            }}
+            onSave={saveQuestionsPractice}
           />
         )}
 

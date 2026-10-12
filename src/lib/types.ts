@@ -73,7 +73,37 @@ export type EmotionsPractice = {
   createdAt: string;
 };
 
-export type PracticeEntry = MoodPractice | GratitudePractice | EmotionsPractice;
+export type AbcPractice = {
+  id: string;
+  kind: "abc";
+  activating: string; // A
+  beliefs: string; // B
+  consequences: string; // C
+  reframe: string; // мягкая альтернативная мысль (опционально)
+  createdAt: string;
+};
+
+export type ReflectionQa = {
+  questionId: string;
+  question: string;
+  answer: string;
+};
+
+export type QuestionsPractice = {
+  id: string;
+  kind: "questions";
+  topicId: string;
+  topicLabel: string;
+  answers: ReflectionQa[];
+  createdAt: string;
+};
+
+export type PracticeEntry =
+  | MoodPractice
+  | GratitudePractice
+  | EmotionsPractice
+  | AbcPractice
+  | QuestionsPractice;
 
 export type AppState = {
   version: 2;
@@ -91,6 +121,8 @@ export type Screen =
   | "mood"
   | "gratitude"
   | "emotions"
+  | "abc"
+  | "questions"
   | "practice-log"
   | "new-situation"
   | "filter"

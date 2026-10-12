@@ -13,11 +13,13 @@ import {
   moodLabel,
 } from "@/lib/practices";
 import type {
+  AbcPractice,
   EmotionsPractice,
   GratitudePractice,
   MoodLevel,
   MoodPractice,
   PracticeEntry,
+  QuestionsPractice,
 } from "@/lib/types";
 
 function Chip({
@@ -47,11 +49,19 @@ function Chip({
   );
 }
 
+export type PracticeMenuKey =
+  | "mood"
+  | "gratitude"
+  | "emotions"
+  | "questions"
+  | "abc"
+  | "decision";
+
 export function PracticesMenu({
   onOpen,
   onLog,
 }: {
-  onOpen: (screen: "mood" | "gratitude" | "emotions" | "decision") => void;
+  onOpen: (screen: PracticeMenuKey) => void;
   onLog: () => void;
 }) {
   return (
@@ -59,7 +69,8 @@ export function PracticesMenu({
       <div>
         <h2 className="font-display text-xl text-[var(--ink)]">Практики</h2>
         <p className="mt-1 text-sm text-[var(--ink-muted)]">
-          Пакет 1: короткие ежедневные упражнения. Разбор решения — отдельно.
+          Пакеты 1–2: ежедневные записи, вопросы и ABC. Разбор решения —
+          отдельно.
         </p>
       </div>
       <div className="grid gap-2">
@@ -68,6 +79,8 @@ export function PracticesMenu({
             ["mood", PRACTICE_META.mood],
             ["gratitude", PRACTICE_META.gratitude],
             ["emotions", PRACTICE_META.emotions],
+            ["questions", PRACTICE_META.questions],
+            ["abc", PRACTICE_META.abc],
             ["decision", PRACTICE_META.decision],
           ] as const
         ).map(([key, meta]) => (
@@ -338,8 +351,16 @@ function practiceSummary(entry: PracticeEntry): string {
     const g = entry as GratitudePractice;
     return g.items.join("; ");
   }
-  const e = entry as EmotionsPractice;
-  return `${e.emotions.join(", ")} · сила ${e.intensity}`;
+  if (entry.kind === "emotions") {
+    const e = entry as EmotionsPractice;
+    return `${e.emotions.join(", ")} · сила ${e.intensity}`;
+  }
+  if (entry.kind === "abc") {
+    const a = entry as AbcPractice;
+    return `A: ${a.activating} · B: ${a.beliefs}`;
+  }
+  const q = entry as QuestionsPractice;
+  return `${q.topicLabel}: ${q.answers[0]?.answer ?? ""}`;
 }
 
 export function PracticeLog({ entries }: { entries: PracticeEntry[] }) {
@@ -348,7 +369,7 @@ export function PracticeLog({ entries }: { entries: PracticeEntry[] }) {
       <h2 className="font-display text-xl text-[var(--ink)]">Журнал практик</h2>
       {entries.length === 0 ? (
         <p className="text-sm text-[var(--ink-muted)]">
-          Пока пусто — сохраните настроение, благодарность или эмоции.
+          Пока пусто — сохраните практику из меню.
         </p>
       ) : (
         <ul className="space-y-2">

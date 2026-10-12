@@ -42,7 +42,7 @@ await page.screenshot({ path: `${out}/p1-practice-log.png`, fullPage: true });
 
 await page.getByRole("button", { name: "На главную" }).click();
 await page.getByTestId("open-stats").click();
-await page.getByText(/Практик пакета 1/).waitFor();
+await page.getByText(/Практик:/).waitFor();
 await page.screenshot({ path: `${out}/p1-stats.png`, fullPage: true });
 
 console.log("PACKAGE1_E2E_OK");
