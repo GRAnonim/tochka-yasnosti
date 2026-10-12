@@ -20,6 +20,7 @@ import { emptyState, loadState, saveState, uid } from "@/lib/storage";
 import { initTelegram } from "@/lib/telegram";
 import type {
   AppState,
+  BreathDurationSec,
   DecisionChoice,
   Feeling,
   LifeFilter,
@@ -40,7 +41,12 @@ import {
   QuestionsPracticeForm,
 } from "@/components/package2-practices";
 import {
+  BreathPracticeForm,
+  WheelPracticeForm,
+} from "@/components/package3-practices";
+import {
   QUESTION_TOPICS,
+  WHEEL_AREAS,
   type QuestionTopicId,
 } from "@/lib/practices";
 
@@ -89,6 +95,11 @@ export function ClarityApp() {
   const [questionsAnswers, setQuestionsAnswers] = useState<
     Record<string, string>
   >({});
+  const [wheelScores, setWheelScores] = useState<Record<string, number>>({});
+  const [wheelNote, setWheelNote] = useState("");
+  const [breathDuration, setBreathDuration] =
+    useState<BreathDurationSec>(60);
+  const [breathNotice, setBreathNotice] = useState("");
 
   useEffect(() => {
     const loaded = loadState();
@@ -153,6 +164,16 @@ export function ClarityApp() {
   const resetQuestionsDraft = () => {
     setQuestionsTopicId(null);
     setQuestionsAnswers({});
+  };
+
+  const resetWheelDraft = () => {
+    setWheelScores({});
+    setWheelNote("");
+  };
+
+  const resetBreathDraft = () => {
+    setBreathDuration(60);
+    setBreathNotice("");
   };
 
   const saveMood = () => {
@@ -268,6 +289,49 @@ export function ClarityApp() {
     setScreen("practice-log");
   };
 
+  const saveWheel = () => {
+    const scores = WHEEL_AREAS.map((area) => ({
+      areaId: area.id,
+      label: area.label,
+      score: wheelScores[area.id] ?? 0,
+    }));
+    if (scores.some((s) => s.score < 1)) return;
+    persist({
+      ...state,
+      practices: [
+        {
+          id: uid("wheel"),
+          kind: "wheel",
+          scores,
+          focusNote: wheelNote.trim(),
+          createdAt: new Date().toISOString(),
+        },
+        ...state.practices,
+      ],
+    });
+    resetWheelDraft();
+    setScreen("practice-log");
+  };
+
+  const saveBreath = (completed: boolean) => {
+    persist({
+      ...state,
+      practices: [
+        {
+          id: uid("breath"),
+          kind: "breath",
+          durationSec: breathDuration,
+          completed,
+          notice: breathNotice.trim(),
+          createdAt: new Date().toISOString(),
+        },
+        ...state.practices,
+      ],
+    });
+    resetBreathDraft();
+    setScreen("practice-log");
+  };
+
   const questions = draftFilter ? QUESTIONS_BY_FILTER[draftFilter] : [];
 
   const startNew = () => {
@@ -295,7 +359,7 @@ export function ClarityApp() {
     setDraftFilter(filter);
     setDraftAnswers([]);
     setQIndex(0);
-    setScreen("questions");
+    setScreen("decision-questions");
   };
 
   const answerCurrent = (value: number, label: string) => {
@@ -603,6 +667,8 @@ export function ClarityApp() {
               if (key === "emotions") resetEmotionsDraft();
               if (key === "abc") resetAbcDraft();
               if (key === "questions") resetQuestionsDraft();
+              if (key === "wheel") resetWheelDraft();
+              if (key === "breath") resetBreathDraft();
               setScreen(key);
             }}
             onLog={() => setScreen("practice-log")}
@@ -674,6 +740,28 @@ export function ClarityApp() {
           />
         )}
 
+        {screen === "wheel" && (
+          <WheelPracticeForm
+            scores={wheelScores}
+            setScore={(areaId, score) => {
+              setWheelScores((prev) => ({ ...prev, [areaId]: score }));
+            }}
+            focusNote={wheelNote}
+            setFocusNote={setWheelNote}
+            onSave={saveWheel}
+          />
+        )}
+
+        {screen === "breath" && (
+          <BreathPracticeForm
+            durationSec={breathDuration}
+            setDurationSec={setBreathDuration}
+            notice={breathNotice}
+            setNotice={setBreathNotice}
+            onSave={saveBreath}
+          />
+        )}
+
         {screen === "practice-log" && (
           <PracticeLog entries={state.practices} />
         )}
@@ -730,7 +818,7 @@ export function ClarityApp() {
           </section>
         )}
 
-        {screen === "questions" && draftFilter && (
+        {screen === "decision-questions" && draftFilter && (
           <section className="space-y-4">
             <p className="text-xs tracking-wide text-[var(--ink-muted)] uppercase">
               Вопрос {qIndex + 1} из {questions.length}

@@ -14,12 +14,14 @@ import {
 } from "@/lib/practices";
 import type {
   AbcPractice,
+  BreathPractice,
   EmotionsPractice,
   GratitudePractice,
   MoodLevel,
   MoodPractice,
   PracticeEntry,
   QuestionsPractice,
+  WheelPractice,
 } from "@/lib/types";
 
 function Chip({
@@ -55,6 +57,8 @@ export type PracticeMenuKey =
   | "emotions"
   | "questions"
   | "abc"
+  | "wheel"
+  | "breath"
   | "decision";
 
 export function PracticesMenu({
@@ -69,7 +73,7 @@ export function PracticesMenu({
       <div>
         <h2 className="font-display text-xl text-[var(--ink)]">Практики</h2>
         <p className="mt-1 text-sm text-[var(--ink-muted)]">
-          Пакеты 1–2: ежедневные записи, вопросы и ABC. Разбор решения —
+          Пакеты 1–3: записи, вопросы, ABC, баланс и дыхание. Разбор решения —
           отдельно.
         </p>
       </div>
@@ -81,6 +85,8 @@ export function PracticesMenu({
             ["emotions", PRACTICE_META.emotions],
             ["questions", PRACTICE_META.questions],
             ["abc", PRACTICE_META.abc],
+            ["wheel", PRACTICE_META.wheel],
+            ["breath", PRACTICE_META.breath],
             ["decision", PRACTICE_META.decision],
           ] as const
         ).map(([key, meta]) => (
@@ -359,8 +365,20 @@ function practiceSummary(entry: PracticeEntry): string {
     const a = entry as AbcPractice;
     return `A: ${a.activating} · B: ${a.beliefs}`;
   }
-  const q = entry as QuestionsPractice;
-  return `${q.topicLabel}: ${q.answers[0]?.answer ?? ""}`;
+  if (entry.kind === "questions") {
+    const q = entry as QuestionsPractice;
+    return `${q.topicLabel}: ${q.answers[0]?.answer ?? ""}`;
+  }
+  if (entry.kind === "wheel") {
+    const w = entry as WheelPractice;
+    const avg =
+      w.scores.reduce((sum, s) => sum + s.score, 0) /
+      Math.max(w.scores.length, 1);
+    const low = [...w.scores].sort((a, b) => a.score - b.score)[0];
+    return `среднее ${avg.toFixed(1)} · ниже всего: ${low?.label ?? "—"} (${low?.score ?? "—"})`;
+  }
+  const b = entry as BreathPractice;
+  return `${Math.round(b.durationSec / 60)} мин · ${b.completed ? "до конца" : "остановлено раньше"}${b.notice ? ` · ${b.notice}` : ""}`;
 }
 
 export function PracticeLog({ entries }: { entries: PracticeEntry[] }) {

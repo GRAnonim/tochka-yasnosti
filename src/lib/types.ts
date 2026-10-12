@@ -98,12 +98,39 @@ export type QuestionsPractice = {
   createdAt: string;
 };
 
+export type WheelScore = {
+  areaId: string;
+  label: string;
+  score: number; // 1-10
+};
+
+export type WheelPractice = {
+  id: string;
+  kind: "wheel";
+  scores: WheelScore[];
+  focusNote: string;
+  createdAt: string;
+};
+
+export type BreathDurationSec = 60 | 120 | 180;
+
+export type BreathPractice = {
+  id: string;
+  kind: "breath";
+  durationSec: BreathDurationSec;
+  completed: boolean;
+  notice: string;
+  createdAt: string;
+};
+
 export type PracticeEntry =
   | MoodPractice
   | GratitudePractice
   | EmotionsPractice
   | AbcPractice
-  | QuestionsPractice;
+  | QuestionsPractice
+  | WheelPractice
+  | BreathPractice;
 
 export type AppState = {
   version: 2;
@@ -123,10 +150,12 @@ export type Screen =
   | "emotions"
   | "abc"
   | "questions"
+  | "wheel"
+  | "breath"
   | "practice-log"
   | "new-situation"
   | "filter"
-  | "questions"
+  | "decision-questions"
   | "summary"
   | "decision"
   | "feedback"

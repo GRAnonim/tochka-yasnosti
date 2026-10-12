@@ -55,11 +55,36 @@ export const PRACTICE_META = {
     title: "ABC-дневник",
     blurb: "A — событие, B — мысль, C — чувства и поведение (КПТ).",
   },
+  wheel: {
+    title: "Колесо баланса",
+    blurb: "Оцените сферы жизни от 1 до 10 и заметьте, куда тянет внимание.",
+  },
+  breath: {
+    title: "Практика дыхания",
+    blurb: "1–3 минуты спокойного дыхания и короткая заметка после.",
+  },
   decision: {
     title: "Разобрать решение",
     blurb: "Ситуация → вопросы → мягкое резюме → фиксация выбора.",
   },
 } as const;
+
+export const WHEEL_AREAS = [
+  { id: "health", label: "Здоровье" },
+  { id: "work", label: "Работа / учёба" },
+  { id: "money", label: "Финансы" },
+  { id: "relations", label: "Отношения" },
+  { id: "friends", label: "Друзья / окружение" },
+  { id: "growth", label: "Рост / развитие" },
+  { id: "rest", label: "Отдых / восстановление" },
+  { id: "meaning", label: "Смысл / ценности" },
+] as const;
+
+export const BREATH_DURATIONS = [
+  { sec: 60 as const, label: "1 минута" },
+  { sec: 120 as const, label: "2 минуты" },
+  { sec: 180 as const, label: "3 минуты" },
+];
 
 export type QuestionTopicId =
   | "values"
