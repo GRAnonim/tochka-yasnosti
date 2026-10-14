@@ -32,6 +32,12 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
+
+# bot admin stats (local, never commit)
+/data/*.json
+/data/*.tmp
+/data/*.json.tmp
 
 # vercel
 .vercel

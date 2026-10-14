@@ -1,5 +1,5 @@
 {
   "$schema": "https://unpkg.com/knip@5/schema.json",
-  "ignore": ["scripts/e2e-*.mjs"],
+  "ignore": ["scripts/e2e-*.mjs", "scripts/bot-stats.selftest.mjs"],
   "ignoreDependencies": ["eslint-config-next", "playwright"]
 }

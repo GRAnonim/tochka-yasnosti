@@ -35,6 +35,7 @@ jobs:
           GITHUB_PAGES: "true"
           # Must match the GitHub repository name
           GITHUB_PAGES_BASE: /tochka-yasnosti
+          NEXT_PUBLIC_STATS_URL: ${{ secrets.STATS_INGEST_URL }}
         run: npm run build
 
       - name: Upload Pages artifact

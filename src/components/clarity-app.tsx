@@ -25,6 +25,7 @@ import {
   syncTelegramBackButton,
   syncTelegramChrome,
 } from "@/lib/telegram";
+import { reportAppOpen, reportAppScreen } from "@/lib/usage-beacon";
 import {
   applyAtmosphere,
   atmosphereMeta,
@@ -236,6 +237,7 @@ export function ClarityApp() {
             ? "Telegram Mini App"
             : "Браузерный режим",
       );
+      if (wa.initData) reportAppOpen();
     };
     syncTg();
     const t = window.setTimeout(syncTg, 800);
@@ -716,6 +718,10 @@ export function ClarityApp() {
   const goBack = () => {
     if (backScreen) setScreen(backScreen);
   };
+
+  useEffect(() => {
+    reportAppScreen(screen);
+  }, [screen]);
 
   // Native Telegram header back — hide duplicate in-app «Назад» when available
   useEffect(() => {
