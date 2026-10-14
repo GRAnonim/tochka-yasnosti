@@ -143,22 +143,34 @@ export function PracticesMenu({
     onFavoritesChange(next);
   };
 
+  const groupTone: Record<string, string> = {
+    day: "bg-[color-mix(in_oklab,#d8ebe4_55%,white)] border-[color-mix(in_oklab,var(--primary)_22%,transparent)]",
+    thoughts:
+      "bg-[color-mix(in_oklab,#d9e4ec_55%,white)] border-[color-mix(in_oklab,#7aa3ae_28%,transparent)]",
+    body: "bg-[color-mix(in_oklab,#e4eee6_55%,white)] border-[color-mix(in_oklab,#8eb8a8_28%,transparent)]",
+  };
+
   return (
-    <section className="space-y-5" data-testid="practices-menu">
-      <div>
+    <section
+      className="-mx-1 space-y-4 sm:-mx-2"
+      data-testid="practices-menu"
+    >
+      <div className="px-0.5">
         <h2 className="font-display text-lg text-[var(--ink)]">Практики</h2>
         <p className="mt-1 text-[1.02rem] leading-relaxed text-[var(--ink-muted)]">
-          Откройте нужный раздел. Звезда — на главный экран в избранное.
-          Разбор решения остаётся на главной.
+          Откройте раздел. Звезда — на главный экран в избранное.
         </p>
       </div>
 
       {favorites.length > 0 && (
-        <div className="space-y-2" data-testid="favorites-in-menu">
-          <p className="px-0.5 text-[11px] font-medium tracking-[0.08em] text-[var(--ink-muted)] uppercase">
+        <div
+          className="space-y-2 rounded-2xl border border-[color-mix(in_oklab,var(--primary)_20%,transparent)] bg-[color-mix(in_oklab,var(--primary)_8%,white)] p-2.5"
+          data-testid="favorites-in-menu"
+        >
+          <p className="px-1 text-[11px] font-medium tracking-[0.08em] text-[var(--ink-muted)] uppercase">
             Избранное
           </p>
-          <div className="grid gap-1.5">
+          <div className="grid gap-2">
             {favorites.map((key) => (
               <PracticeRow
                 key={key}
@@ -172,24 +184,24 @@ export function PracticesMenu({
         </div>
       )}
 
-      <div className="space-y-3">
+      <div className="space-y-3.5">
         {PRACTICE_MENU_GROUPS.map((group) => {
           const open = Boolean(openGroups[group.id]);
           return (
             <div
               key={group.id}
-              className="rounded-2xl border border-[var(--line)] bg-[var(--surface)]"
+              className={`overflow-hidden rounded-2xl border ${groupTone[group.id] ?? "border-[var(--line)] bg-[var(--surface)]"}`}
               data-testid={`practice-group-${group.id}`}
             >
               <button
                 type="button"
                 data-testid={`practice-group-toggle-${group.id}`}
-                className="flex w-full items-center justify-between gap-3 px-3.5 py-3.5 text-left"
+                className="flex w-full items-center justify-between gap-3 px-3.5 py-4 text-left"
                 aria-expanded={open}
                 onClick={() => toggleGroup(group.id)}
               >
                 <span className="min-w-0">
-                  <span className="block text-base font-semibold text-[var(--ink)]">
+                  <span className="block text-[1.05rem] font-semibold text-[var(--ink)]">
                     {group.title}
                   </span>
                   <span className="mt-1 block text-[0.95rem] text-[var(--ink-muted)]">
@@ -198,9 +210,8 @@ export function PracticesMenu({
                 </span>
                 <span
                   aria-hidden
-                  className="shrink-0 text-lg text-[var(--ink-muted)] transition-transform"
+                  className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_oklab,white_70%,transparent)] text-[var(--ink-muted)] transition-transform"
                   style={{
-                    display: "inline-block",
                     transform: open ? "rotate(90deg)" : "rotate(0deg)",
                   }}
                 >
@@ -208,15 +219,23 @@ export function PracticesMenu({
                 </span>
               </button>
               {open && (
-                <div className="-mx-px grid gap-2 border-t border-[var(--line)] px-1.5 py-2.5 sm:px-2">
-                  {group.items.map((key) => (
-                    <PracticeRow
+                <div className="space-y-0 border-t border-[color-mix(in_oklab,var(--ink)_10%,transparent)] bg-[color-mix(in_oklab,white_72%,transparent)] px-2 py-2">
+                  {group.items.map((key, index) => (
+                    <div
                       key={key}
-                      practiceKey={key}
-                      favorite={favorites.includes(key)}
-                      onOpen={() => onOpen(key)}
-                      onToggleFavorite={() => toggleFavorite(key)}
-                    />
+                      className={
+                        index > 0
+                          ? "mt-2 border-t border-[color-mix(in_oklab,var(--ink)_8%,transparent)] pt-2"
+                          : undefined
+                      }
+                    >
+                      <PracticeRow
+                        practiceKey={key}
+                        favorite={favorites.includes(key)}
+                        onOpen={() => onOpen(key)}
+                        onToggleFavorite={() => toggleFavorite(key)}
+                      />
+                    </div>
                   ))}
                 </div>
               )}
@@ -228,7 +247,7 @@ export function PracticesMenu({
       <button
         type="button"
         data-testid="practice-log"
-        className="inline-flex h-12 w-full items-center justify-center gap-2.5 rounded-xl bg-[var(--secondary)] px-4 text-sm font-medium text-[var(--ink)]"
+        className="inline-flex h-12 w-full items-center justify-center gap-2.5 rounded-2xl border border-[color-mix(in_oklab,var(--primary)_20%,transparent)] bg-[color-mix(in_oklab,var(--primary)_8%,white)] px-4 text-sm font-medium text-[var(--ink)]"
         onClick={onLog}
       >
         <PracticeIconMark

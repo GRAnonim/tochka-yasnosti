@@ -178,6 +178,17 @@ export function IconStar({
   );
 }
 
+/** Soft brand mark — point of clarity */
+export function IconBrand(props: IconProps) {
+  return (
+    <BaseIcon {...props}>
+      <circle cx="12" cy="12" r="8.2" opacity={0.35} />
+      <circle cx="12" cy="12" r="4.2" opacity={0.55} />
+      <circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none" />
+    </BaseIcon>
+  );
+}
+
 export const PRACTICE_ICONS = {
   mood: IconMood,
   gratitude: IconGratitude,

@@ -139,13 +139,13 @@
 }
 
 .clarity-panel {
-  border-radius: 1.5rem;
-  background: color-mix(in oklab, #ffffff 66%, transparent);
-  border: 1px solid color-mix(in oklab, #2a3f45 7%, transparent);
+  border-radius: 1.35rem;
+  background: color-mix(in oklab, #ffffff 72%, transparent);
+  border: 1px solid color-mix(in oklab, #2a3f45 8%, transparent);
   box-shadow:
     0 1px 0 color-mix(in oklab, #ffffff 70%, transparent) inset,
-    0 22px 48px color-mix(in oklab, #2a3f45 6%, transparent);
-  padding: 1.35rem;
+    0 18px 40px color-mix(in oklab, #2a3f45 5%, transparent);
+  padding: 1.1rem 0.85rem;
   backdrop-filter: blur(14px);
 }
 
@@ -161,7 +161,7 @@
 
 @media (min-width: 640px) {
   .clarity-panel {
-    padding: 1.65rem;
+    padding: 1.35rem 1.15rem;
   }
 }
 

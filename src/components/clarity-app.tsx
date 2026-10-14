@@ -51,7 +51,7 @@ import {
   IdealDayPracticeForm,
 } from "@/components/package4-practices";
 import { WheelResultView } from "@/components/wheel-chart";
-import { PracticeGlyph } from "@/components/practice-icons";
+import { IconBrand, PracticeGlyph } from "@/components/practice-icons";
 import {
   loadPracticeFavorites,
   QUESTION_TOPICS,
@@ -622,7 +622,7 @@ export function ClarityApp() {
   };
 
   return (
-    <div className="clarity-shell relative mx-auto flex min-h-dvh w-full max-w-2xl flex-col px-3 pb-10 pt-5 sm:px-5">
+    <div className="clarity-shell relative mx-auto flex min-h-dvh w-full max-w-2xl flex-col px-2.5 pb-10 pt-5 sm:px-4">
       <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
         <div className="clarity-orb clarity-orb-a" />
         <div className="clarity-orb clarity-orb-b" />
@@ -630,15 +630,16 @@ export function ClarityApp() {
       </div>
 
       <header className="mb-5 space-y-3">
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <p className="font-display text-[0.7rem] tracking-[0.18em] text-[var(--ink-muted)] uppercase">
-              {tgHint}
-            </p>
-            <h1 className="font-display mt-1 text-2xl leading-tight text-[var(--ink)] sm:text-[1.75rem]">
-              Точка ясности
-            </h1>
-          </div>
+        <div className="flex flex-col items-center text-center">
+          <span className="mb-2 inline-flex h-11 w-11 items-center justify-center rounded-full bg-[color-mix(in_oklab,var(--primary)_18%,white)] text-[var(--accent-ink)]">
+            <IconBrand className="h-6 w-6" />
+          </span>
+          <h1 className="font-display text-2xl leading-tight text-[var(--ink)] sm:text-[1.8rem]">
+            Точка ясности
+          </h1>
+          <p className="mt-1 text-[0.7rem] tracking-[0.16em] text-[var(--ink-muted)] uppercase">
+            {tgHint}
+          </p>
         </div>
         {backScreen && (
           <div className="flex items-center gap-2">
@@ -759,11 +760,11 @@ export function ClarityApp() {
               </button>
             </div>
 
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-2.5">
               <button
                 type="button"
                 data-testid="new-situation"
-                className="inline-flex h-12 w-full items-center justify-center gap-2.5 rounded-xl bg-[var(--primary)] px-4 text-[1.05rem] font-medium text-[var(--primary-foreground)] transition hover:opacity-95"
+                className="inline-flex h-12 w-full items-center justify-center gap-2.5 rounded-2xl bg-[var(--primary)] px-4 text-[1.05rem] font-medium text-[var(--primary-foreground)] transition hover:opacity-95"
                 onClick={startNew}
               >
                 <PracticeGlyph name="decision" className="h-5 w-5 opacity-95" />
@@ -772,7 +773,7 @@ export function ClarityApp() {
               <button
                 type="button"
                 data-testid="open-practices"
-                className="inline-flex h-11 w-full items-center justify-center gap-2.5 rounded-xl bg-[var(--secondary)] px-4 text-[1.05rem] font-medium text-[var(--secondary-foreground)] transition hover:opacity-95"
+                className="inline-flex h-12 w-full items-center justify-center gap-2.5 rounded-2xl border border-[color-mix(in_oklab,var(--primary)_28%,transparent)] bg-[color-mix(in_oklab,var(--primary)_10%,white)] px-4 text-[1.05rem] font-medium text-[var(--ink)] transition hover:bg-[color-mix(in_oklab,var(--primary)_16%,white)]"
                 onClick={() => setScreen("practices")}
               >
                 <PracticeGlyph
@@ -784,7 +785,7 @@ export function ClarityApp() {
               <button
                 type="button"
                 data-testid="open-stats"
-                className="inline-flex h-11 w-full items-center justify-center gap-2.5 rounded-xl bg-[var(--secondary)] px-4 text-[1.05rem] font-medium text-[var(--secondary-foreground)] transition hover:opacity-95"
+                className="inline-flex h-12 w-full items-center justify-center gap-2.5 rounded-2xl border border-[color-mix(in_oklab,var(--primary)_22%,transparent)] bg-[color-mix(in_oklab,var(--primary)_7%,white)] px-4 text-[1.05rem] font-medium text-[var(--ink)] transition hover:bg-[color-mix(in_oklab,var(--primary)_14%,white)]"
                 onClick={() => setScreen("stats")}
               >
                 <PracticeGlyph
