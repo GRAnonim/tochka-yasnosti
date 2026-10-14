@@ -60,43 +60,44 @@
     Soft sage / mist blue-green for stressed or low-mood users:
     low glare, gentle contrast, no purple neon, no harsh black/white.
   */
-  --ink: #2a3f45;
-  --ink-soft: #3d5a61;
-  --ink-muted: #6a858c;
-  --accent: #5f9e95;
-  --accent-ink: #3f7a73;
-  --surface: color-mix(in oklab, #ffffff 78%, #d7ebe6);
-  --surface-strong: color-mix(in oklab, #ffffff 88%, #dceeea);
-  --line: color-mix(in oklab, #2a3f45 10%, transparent);
+  --ink: #24383e;
+  --ink-soft: #3a5259;
+  --ink-muted: #6e868d;
+  --accent: #3f7f76;
+  --accent-ink: #2f625b;
+  --surface: color-mix(in oklab, #ffffff 82%, #d7ebe6);
+  --surface-strong: color-mix(in oklab, #ffffff 92%, #dceeea);
+  --line: color-mix(in oklab, #24383e 9%, transparent);
   --danger-soft: #9a5b5b;
 
   --background: #eef4f2;
-  --foreground: #2a3f45;
-  --card: color-mix(in oklab, #ffffff 86%, #dff0eb);
-  --card-foreground: #2a3f45;
+  --foreground: #24383e;
+  --card: color-mix(in oklab, #ffffff 90%, #dff0eb);
+  --card-foreground: #24383e;
   --popover: #f7fbfa;
-  --popover-foreground: #2a3f45;
-  --primary: #4f8f87;
-  --primary-foreground: #f7fffd;
-  --secondary: color-mix(in oklab, #ffffff 62%, #cfe4df);
-  --secondary-foreground: #2a3f45;
-  --muted: #ddeae6;
-  --muted-foreground: #6a858c;
-  --accent-foreground: #f7fffd;
+  --popover-foreground: #24383e;
+  /* Deeper primary so the one CTA reads as the only action */
+  --primary: #2f6b63;
+  --primary-foreground: #f4fffc;
+  --secondary: color-mix(in oklab, #ffffff 70%, #d5e6e1);
+  --secondary-foreground: #3a5259;
+  --muted: #e2ece9;
+  --muted-foreground: #6e868d;
+  --accent-foreground: #f4fffc;
   --destructive: oklch(0.55 0.12 25);
-  --border: color-mix(in oklab, #2a3f45 12%, transparent);
-  --input: color-mix(in oklab, #2a3f45 12%, transparent);
-  --ring: #5f9e95;
-  --chart-1: #5f9e95;
+  --border: color-mix(in oklab, #24383e 11%, transparent);
+  --input: color-mix(in oklab, #24383e 11%, transparent);
+  --ring: #3f7f76;
+  --chart-1: #3f7f76;
   --chart-2: #7aa3ae;
   --chart-3: #8eb8a8;
   --chart-4: #5d7a82;
   --chart-5: #a7c4be;
   --radius: 1rem;
   --sidebar: #f7fbfa;
-  --sidebar-foreground: #2a3f45;
-  --sidebar-primary: #4f8f87;
-  --sidebar-primary-foreground: #f7fffd;
+  --sidebar-foreground: #24383e;
+  --sidebar-primary: #2f6b63;
+  --sidebar-primary-foreground: #f4fffc;
   --sidebar-accent: #ddeae6;
   --sidebar-accent-foreground: #2a3f45;
   --sidebar-border: color-mix(in oklab, #2a3f45 10%, transparent);
@@ -231,4 +232,36 @@
 
 .practice-tile:hover {
   transform: translateY(-1px);
+}
+
+.clarity-cta-primary {
+  background: linear-gradient(180deg, #3a7d74 0%, #2f6b63 100%);
+  color: var(--primary-foreground);
+  box-shadow:
+    0 1px 0 color-mix(in oklab, #ffffff 28%, transparent) inset,
+    0 10px 24px color-mix(in oklab, #2f6b63 22%, transparent);
+}
+
+.clarity-link-quiet {
+  color: var(--ink-muted);
+  transition: color 0.15s ease;
+}
+
+.clarity-link-quiet:hover {
+  color: var(--accent-ink);
+}
+
+.clarity-step-rail {
+  height: 3px;
+  border-radius: 9999px;
+  background: color-mix(in oklab, var(--ink) 8%, transparent);
+  overflow: hidden;
+}
+
+.clarity-step-rail > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--primary);
+  transition: width 0.45s ease;
 }

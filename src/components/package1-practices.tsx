@@ -167,8 +167,8 @@ export function PracticesMenu({
     >
       <div className="px-0.5">
         <h2 className="font-display text-lg text-[var(--ink)]">Практики</h2>
-        <p className="mt-1 text-[1.02rem] leading-relaxed text-[var(--ink-muted)]">
-          Откройте раздел. Звезда — в избранное внизу и на главную.
+        <p className="mt-1 text-[0.95rem] leading-relaxed text-[var(--ink-muted)]">
+          Выберите раздел. Звезда — на главную.
         </p>
       </div>
 

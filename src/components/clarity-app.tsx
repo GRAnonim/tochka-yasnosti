@@ -63,6 +63,31 @@ import {
 
 const FILTERS: LifeFilter[] = ["work", "close", "friends"];
 
+const DECISION_STEPS: Screen[] = [
+  "new-situation",
+  "filter",
+  "decision-questions",
+  "summary",
+  "decision",
+];
+
+function DecisionFlowProgress({ screen }: { screen: Screen }) {
+  const index = DECISION_STEPS.indexOf(screen);
+  if (index < 0) return null;
+  const step = index + 1;
+  const total = DECISION_STEPS.length;
+  return (
+    <div className="mb-4 space-y-1.5" data-testid="decision-flow-progress">
+      <p className="text-[0.8rem] tracking-wide text-[var(--ink-muted)]">
+        Шаг {step} из {total}
+      </p>
+      <div className="clarity-step-rail" aria-hidden>
+        <span style={{ width: `${(step / total) * 100}%` }} />
+      </div>
+    </div>
+  );
+}
+
 export function ClarityApp() {
   const [state, setState] = useState<AppState>(() => emptyState());
   const [screen, setScreen] = useState<Screen>("onboarding");
@@ -629,18 +654,38 @@ export function ClarityApp() {
         <div className="clarity-grain" />
       </div>
 
-      <header className="mb-5 space-y-3">
-        <div className="flex flex-col items-center text-center">
-          <span className="mb-2 inline-flex h-11 w-11 items-center justify-center rounded-full bg-[color-mix(in_oklab,var(--primary)_18%,white)] text-[var(--accent-ink)]">
-            <IconBrand className="h-6 w-6" />
-          </span>
-          <h1 className="font-display text-2xl leading-tight text-[var(--ink)] sm:text-[1.8rem]">
-            Точка ясности
-          </h1>
-          <p className="mt-1 text-[0.7rem] tracking-[0.16em] text-[var(--ink-muted)] uppercase">
-            {tgHint}
-          </p>
-        </div>
+      <header className="mb-4 space-y-2.5">
+        {screen === "onboarding" ? (
+          <div className="flex flex-col items-center text-center">
+            <span className="mb-2 inline-flex h-11 w-11 items-center justify-center rounded-full bg-[color-mix(in_oklab,var(--primary)_18%,white)] text-[var(--accent-ink)]">
+              <IconBrand className="h-6 w-6" />
+            </span>
+            <h1 className="font-display text-2xl leading-tight text-[var(--ink)] sm:text-[1.8rem]">
+              Точка ясности
+            </h1>
+            <p className="mt-1 max-w-xs text-[0.95rem] leading-snug text-[var(--ink-muted)]">
+              Спокойный помощник для решений — без давления
+            </p>
+          </div>
+        ) : (
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex min-w-0 items-center gap-2.5">
+              <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_oklab,var(--primary)_16%,white)] text-[var(--accent-ink)]">
+                <IconBrand className="h-5 w-5" />
+              </span>
+              <div className="min-w-0">
+                <h1 className="font-display truncate text-[1.15rem] leading-tight text-[var(--ink)]">
+                  Точка ясности
+                </h1>
+                {screen === "home" && (
+                  <p className="truncate text-[0.78rem] text-[var(--ink-muted)]">
+                    {tgHint}
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
         {backScreen && (
           <div className="flex items-center gap-2">
             <button
@@ -715,7 +760,7 @@ export function ClarityApp() {
             <button
               type="button"
               data-testid="start-onboarding"
-              className="inline-flex h-12 w-full items-center justify-center rounded-2xl bg-[var(--primary)] px-4 text-base font-medium text-[var(--primary-foreground)] transition hover:opacity-95"
+              className="clarity-cta-primary inline-flex h-12 w-full items-center justify-center rounded-2xl px-4 text-base font-semibold transition hover:opacity-95"
               onClick={saveGoals}
             >
               {screen === "edit-goals" ? "Сохранить ориентиры" : "Начать"}
@@ -740,61 +785,82 @@ export function ClarityApp() {
         )}
 
         {screen === "home" && (
-          <section className="space-y-6">
-            <div className="space-y-2">
-              <p className="leading-snug text-[var(--ink)]">
-                Здесь можно мягко разобрать день и решения — без давления и без
-                оценок.
-              </p>
-              <p className="text-[1.02rem] leading-relaxed text-[var(--ink-muted)]">
-                Ваши ориентиры:{" "}
-                {state.goals.map((g) => g.text).join(" · ") || "не заданы"}
-              </p>
-              <button
-                type="button"
-                data-testid="edit-goals"
-                className="text-left text-[1.02rem] text-[var(--accent-ink)] underline-offset-4 hover:underline"
-                onClick={openEditGoals}
-              >
-                Изменить ориентиры
-              </button>
-            </div>
-
-            <div className="flex flex-col gap-2.5">
+          <section className="space-y-7" data-testid="home-screen">
+            <div className="space-y-4">
+              <h2 className="font-display text-[1.55rem] leading-tight text-[var(--ink)] sm:text-[1.7rem]">
+                Что сейчас не даёт покоя?
+              </h2>
               <button
                 type="button"
                 data-testid="new-situation"
-                className="inline-flex h-12 w-full items-center justify-center gap-2.5 rounded-2xl bg-[var(--primary)] px-4 text-[1.05rem] font-medium text-[var(--primary-foreground)] transition hover:opacity-95"
+                className="clarity-cta-primary inline-flex h-14 w-full items-center justify-center gap-2.5 rounded-2xl px-4 text-[1.1rem] font-semibold transition hover:opacity-95"
                 onClick={startNew}
               >
                 <PracticeGlyph name="decision" className="h-5 w-5 opacity-95" />
                 Разобрать решение
               </button>
-              <button
-                type="button"
-                data-testid="open-practices"
-                className="inline-flex h-12 w-full items-center justify-center gap-2.5 rounded-2xl border border-[color-mix(in_oklab,var(--primary)_28%,transparent)] bg-[color-mix(in_oklab,var(--primary)_10%,white)] px-4 text-[1.05rem] font-medium text-[var(--ink)] transition hover:bg-[color-mix(in_oklab,var(--primary)_16%,white)]"
-                onClick={() => setScreen("practices")}
-              >
-                <PracticeGlyph
-                  name="practices"
-                  className="h-5 w-5 text-[var(--accent-ink)]"
-                />
-                Все практики
-              </button>
-              <button
-                type="button"
-                data-testid="open-stats"
-                className="inline-flex h-12 w-full items-center justify-center gap-2.5 rounded-2xl border border-[color-mix(in_oklab,var(--primary)_22%,transparent)] bg-[color-mix(in_oklab,var(--primary)_7%,white)] px-4 text-[1.05rem] font-medium text-[var(--ink)] transition hover:bg-[color-mix(in_oklab,var(--primary)_14%,white)]"
-                onClick={() => setScreen("stats")}
-              >
-                <PracticeGlyph
-                  name="stats"
-                  className="h-5 w-5 text-[var(--accent-ink)]"
-                />
-                Статистика
-              </button>
+              <div className="flex items-center justify-center gap-5 text-[0.98rem]">
+                <button
+                  type="button"
+                  data-testid="open-practices"
+                  className="clarity-link-quiet inline-flex items-center gap-1.5 font-medium"
+                  onClick={() => setScreen("practices")}
+                >
+                  <PracticeGlyph name="practices" className="h-4 w-4" />
+                  Практики
+                </button>
+                <span className="text-[var(--line)]" aria-hidden>
+                  ·
+                </span>
+                <button
+                  type="button"
+                  data-testid="open-stats"
+                  className="clarity-link-quiet inline-flex items-center gap-1.5 font-medium"
+                  onClick={() => setScreen("stats")}
+                >
+                  <PracticeGlyph name="stats" className="h-4 w-4" />
+                  Статистика
+                </button>
+              </div>
             </div>
+
+            <p className="text-[0.92rem] leading-snug text-[var(--ink-muted)]">
+              Ориентиры:{" "}
+              <span className="text-[var(--ink-soft)]">
+                {state.goals.map((g) => g.text).join(" · ") || "не заданы"}
+              </span>{" "}
+              <button
+                type="button"
+                data-testid="edit-goals"
+                className="text-[var(--accent-ink)] underline-offset-2 hover:underline"
+                onClick={openEditGoals}
+              >
+                изменить
+              </button>
+            </p>
+
+            <button
+              type="button"
+              data-testid="home-recommend-breath"
+              className="flex w-full items-center gap-3 rounded-2xl border border-[color-mix(in_oklab,var(--primary)_16%,transparent)] bg-[color-mix(in_oklab,var(--primary)_6%,white)] px-3.5 py-3 text-left transition hover:border-[color-mix(in_oklab,var(--primary)_28%,transparent)]"
+              onClick={() => openPractice("breath")}
+            >
+              <PracticeGlyph
+                name="breath"
+                className="h-5 w-5 shrink-0 text-[var(--accent-ink)]"
+              />
+              <span className="min-w-0 flex-1">
+                <span className="block text-[0.78rem] tracking-[0.06em] text-[var(--ink-muted)] uppercase">
+                  Сегодня
+                </span>
+                <span className="mt-0.5 block text-[1.02rem] font-medium text-[var(--ink)]">
+                  Дыхание на 1 минуту — мягкий сброс
+                </span>
+              </span>
+              <span className="text-[var(--ink-muted)]" aria-hidden>
+                ›
+              </span>
+            </button>
 
             <HomeFavorites
               favorites={favorites}
@@ -802,34 +868,29 @@ export function ClarityApp() {
             />
 
             {favorites.length === 0 && (
-              <p className="text-[1.02rem] leading-relaxed text-[var(--ink-muted)]">
-                В «Все практики» можно отметить звёздочкой то, чем пользуетесь
-                часто — оно появится здесь.
+              <p className="text-[0.92rem] text-[var(--ink-muted)]">
+                Звёздочка в практиках — и частое появится здесь.
               </p>
             )}
 
             {pendingFeedback.length > 0 && (
-              <div className="space-y-3 border-t border-[var(--line)] pt-4">
-                <h2 className="font-display text-lg text-[var(--ink)]">
+              <div className="space-y-2.5 border-t border-[var(--line)] pt-4">
+                <h3 className="font-display text-base text-[var(--ink)]">
                   Обратная связь
-                </h2>
-                <p className="text-[1.02rem] leading-relaxed text-[var(--ink-muted)]">
-                  В тесте можно ответить сразу. В жизни — через 1–3 дня после
-                  решения.
-                </p>
+                </h3>
                 <ul className="space-y-2">
-                  {pendingFeedback.slice(0, 5).map((s) => (
+                  {pendingFeedback.slice(0, 3).map((s) => (
                     <li key={s.id}>
                       <button
                         type="button"
-                        className="w-full rounded-xl border border-[var(--line)] bg-[var(--surface)] px-3 py-3 text-left transition hover:border-[var(--accent)]"
+                        className="w-full rounded-xl border border-[var(--line)] bg-[var(--surface)] px-3 py-2.5 text-left transition hover:border-[var(--accent)]"
                         onClick={() => openFeedback(s.id)}
                       >
-                        <span className="line-clamp-2 text-[1.02rem] text-[var(--ink)]">
+                        <span className="line-clamp-2 text-[0.98rem] text-[var(--ink)]">
                           {s.text}
                         </span>
-                        <span className="mt-1 block text-[0.98rem] text-[var(--ink-muted)]">
-                          Решение: {DECISION_LABELS[s.decision]}
+                        <span className="mt-0.5 block text-[0.88rem] text-[var(--ink-muted)]">
+                          {DECISION_LABELS[s.decision]}
                         </span>
                       </button>
                     </li>
@@ -838,67 +899,53 @@ export function ClarityApp() {
               </div>
             )}
 
-            <div className="space-y-2 border-t border-[var(--line)] pt-4">
-              <h2 className="font-display text-lg text-[var(--ink)]">
-                Мой специалист
-              </h2>
-              <p className="text-[1.02rem] leading-relaxed text-[var(--ink-muted)]">
-                Тихий блок — не мешает рефлексии. Сейчас можно сохранить своего
-                специалиста; позже здесь появятся контакты доверенных
-                психологов.
-              </p>
-              {state.specialist ? (
-                <div className="rounded-xl bg-[var(--surface)] px-3 py-3 text-[1.02rem]">
-                  <p className="font-medium text-[var(--ink)]">
-                    {state.specialist.name}
-                  </p>
-                  {state.specialist.contact && (
-                    <p className="text-[var(--ink-soft)]">
-                      {state.specialist.contact}
-                    </p>
-                  )}
-                  {state.specialist.note && (
-                    <p className="mt-1 text-[var(--ink-muted)]">
-                      {state.specialist.note}
-                    </p>
-                  )}
-                </div>
-              ) : (
-                <p className="text-[1.02rem] text-[var(--ink-muted)]">
-                  Пока не указан.
-                </p>
-              )}
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setScreen("specialist")}
+            <details className="border-t border-[var(--line)] pt-3 text-[0.95rem] text-[var(--ink-muted)]">
+              <summary
+                className="cursor-pointer list-none font-medium text-[var(--ink-soft)] marker:content-none [&::-webkit-details-marker]:hidden"
+                data-testid="home-more"
               >
-                {state.specialist ? "Изменить" : "Указать контакты"}
-              </Button>
-            </div>
-
-            <div className="flex flex-wrap gap-3 pt-2 text-[1.02rem]">
-              <button
-                type="button"
-                className="text-[var(--ink-muted)] underline-offset-4 hover:underline"
-                onClick={() => {
-                  const next = emptyState();
-                  persist(next);
-                  fillGoalInputs([]);
-                  setScreen("onboarding");
-                }}
-              >
-                Сбросить данные
-              </button>
-            </div>
-            <details className="rounded-xl bg-[var(--surface)] px-3 py-2 text-sm text-[var(--ink-muted)]">
-              <summary className="cursor-pointer text-[var(--accent-ink)]">
-                Disclaimer
+                Ещё
               </summary>
-              <div className="mt-2 space-y-2 leading-relaxed">
-                <p>
-                  «Точка ясности» не ставит диагнозов и не заменяет врача или
-                  психолога. При тяжёлом состоянии обратитесь к специалисту.
+              <div className="mt-3 space-y-4">
+                <div className="space-y-2">
+                  <p className="font-medium text-[var(--ink)]">Мой специалист</p>
+                  {state.specialist ? (
+                    <div className="rounded-xl bg-[var(--surface)] px-3 py-2.5">
+                      <p className="font-medium text-[var(--ink)]">
+                        {state.specialist.name}
+                      </p>
+                      {state.specialist.contact && (
+                        <p className="text-[var(--ink-soft)]">
+                          {state.specialist.contact}
+                        </p>
+                      )}
+                    </div>
+                  ) : (
+                    <p>Пока не указан.</p>
+                  )}
+                  <button
+                    type="button"
+                    className="text-[var(--accent-ink)] underline-offset-2 hover:underline"
+                    onClick={() => setScreen("specialist")}
+                  >
+                    {state.specialist ? "Изменить контакты" : "Указать контакты"}
+                  </button>
+                </div>
+                <button
+                  type="button"
+                  className="clarity-link-quiet underline-offset-2 hover:underline"
+                  onClick={() => {
+                    const next = emptyState();
+                    persist(next);
+                    fillGoalInputs([]);
+                    setScreen("onboarding");
+                  }}
+                >
+                  Сбросить данные
+                </button>
+                <p className="leading-relaxed">
+                  Не ставит диагнозов и не заменяет врача или психолога. При
+                  тяжёлом состоянии — к специалисту.
                 </p>
               </div>
             </details>
@@ -1061,6 +1108,7 @@ export function ClarityApp() {
 
         {screen === "new-situation" && (
           <section className="space-y-4">
+            <DecisionFlowProgress screen={screen} />
             <h2 className="font-display text-xl text-[var(--ink)]">
               Что происходит?
             </h2>
@@ -1078,7 +1126,7 @@ export function ClarityApp() {
             <button
               type="button"
               data-testid="situation-next"
-              className="inline-flex h-11 w-full items-center justify-center rounded-xl bg-[var(--primary)] px-4 text-sm font-medium text-[var(--primary-foreground)] disabled:opacity-40"
+              className="clarity-cta-primary inline-flex h-12 w-full items-center justify-center rounded-xl px-4 text-sm font-medium disabled:opacity-40"
               disabled={draftText.trim().length < 8}
               onClick={() => setScreen("filter")}
             >
@@ -1089,6 +1137,7 @@ export function ClarityApp() {
 
         {screen === "filter" && (
           <section className="space-y-4">
+            <DecisionFlowProgress screen={screen} />
             <h2 className="font-display text-xl text-[var(--ink)]">
               Какой это круг?
             </h2>
@@ -1113,12 +1162,12 @@ export function ClarityApp() {
 
         {screen === "decision-questions" && draftFilter && (
           <section className="space-y-4">
+            <DecisionFlowProgress screen={screen} />
             <p className="text-xs tracking-wide text-[var(--ink-muted)] uppercase">
               Вопрос {qIndex + 1} из {questions.length}
             </p>
-            <div className="h-1.5 overflow-hidden rounded-full bg-[var(--line)]">
-              <div
-                className="h-full rounded-full bg-[var(--accent)] transition-all duration-500"
+            <div className="clarity-step-rail" aria-hidden>
+              <span
                 style={{
                   width: `${((qIndex + 1) / questions.length) * 100}%`,
                 }}
@@ -1145,6 +1194,7 @@ export function ClarityApp() {
 
         {screen === "summary" && (
           <section className="space-y-4">
+            <DecisionFlowProgress screen={screen} />
             <h2 className="font-display text-xl text-[var(--ink)]">
               Мягкое резюме
             </h2>
@@ -1162,6 +1212,7 @@ export function ClarityApp() {
 
         {screen === "decision" && (
           <section className="space-y-4">
+            <DecisionFlowProgress screen={screen} />
             <h2 className="font-display text-xl text-[var(--ink)]">
               Зафиксировать решение
             </h2>
