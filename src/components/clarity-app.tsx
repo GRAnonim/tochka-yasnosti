@@ -15,7 +15,8 @@ import {
   feedbackDueAt,
   suggestDecisions,
 } from "@/lib/summary";
-import { computeStats, statsLines } from "@/lib/stats";
+import { computeStats } from "@/lib/stats";
+import { StatsView } from "@/components/stats-view";
 import { emptyState, loadState, saveState, uid } from "@/lib/storage";
 import { initTelegram } from "@/lib/telegram";
 import type {
@@ -799,29 +800,28 @@ export function ClarityApp() {
                 <PracticeGlyph name="decision" className="h-5 w-5 opacity-95" />
                 Разобрать решение
               </button>
-              <div className="flex items-center justify-center gap-5 text-[0.98rem]">
-                <button
-                  type="button"
-                  data-testid="open-practices"
-                  className="clarity-link-quiet inline-flex items-center gap-1.5 font-medium"
-                  onClick={() => setScreen("practices")}
-                >
-                  <PracticeGlyph name="practices" className="h-4 w-4" />
-                  Практики
-                </button>
-                <span className="text-[var(--line)]" aria-hidden>
-                  ·
+              <button
+                type="button"
+                data-testid="open-practices"
+                className="clarity-path-card flex w-full items-center gap-3 rounded-2xl border border-[color-mix(in_oklab,var(--primary)_18%,transparent)] bg-[color-mix(in_oklab,var(--primary)_6%,white)] px-3.5 py-3.5 text-left hover:border-[color-mix(in_oklab,var(--primary)_30%,transparent)]"
+                onClick={() => setScreen("practices")}
+              >
+                <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[color-mix(in_oklab,white_72%,transparent)] text-[var(--accent-ink)]">
+                  <PracticeGlyph name="practices" className="h-5 w-5" />
                 </span>
-                <button
-                  type="button"
-                  data-testid="open-stats"
-                  className="clarity-link-quiet inline-flex items-center gap-1.5 font-medium"
-                  onClick={() => setScreen("stats")}
-                >
-                  <PracticeGlyph name="stats" className="h-4 w-4" />
-                  Статистика
-                </button>
-              </div>
+                <span className="min-w-0 flex-1">
+                  <span className="block text-[1.05rem] font-semibold text-[var(--ink)]">
+                    Практики для себя
+                  </span>
+                  <span className="mt-0.5 block text-[0.92rem] leading-snug text-[var(--ink-muted)]">
+                    Настроение, дыхание, мысли — когда нет решения, а есть
+                    чувство
+                  </span>
+                </span>
+                <span className="text-[var(--ink-muted)]" aria-hidden>
+                  ›
+                </span>
+              </button>
             </div>
 
             <p className="text-[0.92rem] leading-snug text-[var(--ink-muted)]">
@@ -839,29 +839,6 @@ export function ClarityApp() {
               </button>
             </p>
 
-            <button
-              type="button"
-              data-testid="home-recommend-breath"
-              className="flex w-full items-center gap-3 rounded-2xl border border-[color-mix(in_oklab,var(--primary)_16%,transparent)] bg-[color-mix(in_oklab,var(--primary)_6%,white)] px-3.5 py-3 text-left transition hover:border-[color-mix(in_oklab,var(--primary)_28%,transparent)]"
-              onClick={() => openPractice("breath")}
-            >
-              <PracticeGlyph
-                name="breath"
-                className="h-5 w-5 shrink-0 text-[var(--accent-ink)]"
-              />
-              <span className="min-w-0 flex-1">
-                <span className="block text-[0.78rem] tracking-[0.06em] text-[var(--ink-muted)] uppercase">
-                  Сегодня
-                </span>
-                <span className="mt-0.5 block text-[1.02rem] font-medium text-[var(--ink)]">
-                  Дыхание на 1 минуту — мягкий сброс
-                </span>
-              </span>
-              <span className="text-[var(--ink-muted)]" aria-hidden>
-                ›
-              </span>
-            </button>
-
             <HomeFavorites
               favorites={favorites}
               onOpen={(key) => openPractice(key)}
@@ -869,9 +846,19 @@ export function ClarityApp() {
 
             {favorites.length === 0 && (
               <p className="text-[0.92rem] text-[var(--ink-muted)]">
-                Звёздочка в практиках — и частое появится здесь.
+                Звёздочка в практиках — частое появится здесь.
               </p>
             )}
+
+            <button
+              type="button"
+              data-testid="open-stats"
+              className="clarity-link-quiet inline-flex items-center gap-1.5 text-[0.95rem] font-medium"
+              onClick={() => setScreen("stats")}
+            >
+              <PracticeGlyph name="stats" className="h-4 w-4" />
+              Что уже заметили
+            </button>
 
             {pendingFeedback.length > 0 && (
               <div className="space-y-2.5 border-t border-[var(--line)] pt-4">
@@ -1307,44 +1294,13 @@ export function ClarityApp() {
         )}
 
         {screen === "stats" && (
-          <section className="space-y-4">
-            <h2 className="font-display text-xl text-[var(--ink)]">
-              Статистика
-            </h2>
-            <ul className="space-y-3">
-              {statsLines(stats).map((line) => (
-                <li
-                  key={line}
-                  className="rounded-xl bg-[var(--surface)] px-3 py-3 text-sm leading-relaxed text-[var(--ink-soft)]"
-                >
-                  {line}
-                </li>
-              ))}
-            </ul>
-            {state.situations.length > 0 && (
-              <div className="space-y-2">
-                <h3 className="text-sm font-medium text-[var(--ink)]">
-                  Недавние
-                </h3>
-                <ul className="space-y-2">
-                  {state.situations.slice(0, 6).map((s) => (
-                    <li
-                      key={s.id}
-                      className="border-b border-[var(--line)] pb-2 text-sm last:border-0"
-                    >
-                      <p className="line-clamp-2 text-[var(--ink)]">{s.text}</p>
-                      <p className="text-xs text-[var(--ink-muted)]">
-                        {FILTER_LABELS[s.filter]} · {DECISION_LABELS[s.decision]}
-                        {s.feedback
-                          ? ` · отзыв: ${s.feedback.worthIt ? "стоило" : "не стоило"}`
-                          : " · ждёт отзыва"}
-                      </p>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-          </section>
+          <StatsView
+            stats={stats}
+            situations={state.situations}
+            practices={state.practices}
+            onOpenPractices={() => setScreen("practices")}
+            onStartDecision={startNew}
+          />
         )}
 
         {screen === "specialist" && (

@@ -265,3 +265,14 @@
   background: var(--primary);
   transition: width 0.45s ease;
 }
+
+.clarity-path-card {
+  transition:
+    border-color 0.2s ease,
+    transform 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.clarity-path-card:hover {
+  transform: translateY(-1px);
+}
