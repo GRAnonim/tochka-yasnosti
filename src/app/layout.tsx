@@ -26,7 +26,7 @@ export default function RootLayout({
       <head>
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var k='tochka-atmosphere-v2';var v=localStorage.getItem(k);if(v==='original'||v==='dark'||v==='white'){document.documentElement.dataset.atmosphere=v;}}catch(e){}})();`,
+            __html: `(function(){try{var k='tochka-atmosphere-v2';var v=localStorage.getItem(k);if(v==='original'||v==='dark'){document.documentElement.dataset.atmosphere=v;}}catch(e){}})();`,
           }}
         />
       </head>

@@ -1,4 +1,4 @@
-export type AtmosphereId = "original" | "dark" | "white";
+export type AtmosphereId = "original" | "dark";
 
 export type AtmosphereOption = {
   id: AtmosphereId;
@@ -25,19 +25,12 @@ export const ATMOSPHERES: AtmosphereOption[] = [
     swatch: "#1a211f",
     telegramBg: "#161c1b",
   },
-  {
-    id: "white",
-    label: "Белый",
-    hint: "светлая бумага",
-    swatch: "#f7f8f7",
-    telegramBg: "#f7f8f7",
-  },
 ];
 
 const DEFAULT_ATMOSPHERE: AtmosphereId = "original";
 
 function isAtmosphereId(value: unknown): value is AtmosphereId {
-  return value === "original" || value === "dark" || value === "white";
+  return value === "original" || value === "dark";
 }
 
 export function loadAtmosphere(): AtmosphereId {

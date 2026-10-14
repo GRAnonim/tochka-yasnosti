@@ -120,38 +120,6 @@ html[data-atmosphere="original"] {
   --sidebar-ring: #5f9e95;
 }
 
-html[data-atmosphere="white"] {
-  --surface: #ffffff;
-  --surface-strong: #ffffff;
-  --line: color-mix(in oklab, #24383e 12%, transparent);
-  --panel: #ffffff;
-  --field: #f3f6f5;
-  --group-day: #f3f8f6;
-  --group-thoughts: #f2f6f8;
-  --group-body: #f4f8f5;
-  --icon-mark: #eef3f1;
-
-  --bg-base: #f7f8f7;
-  --bg-wash-a: #eef4f1;
-  --bg-wash-b: #eef2f5;
-  --bg-wash-c: #f2f5f2;
-  --bg-grad-from: #fcfdfc;
-  --bg-grad-mid: #f5f7f6;
-  --bg-grad-to: #f2f4f4;
-  --orb-a: #d7e8e2;
-  --orb-b: #d5dfe6;
-
-  --background: #f7f8f7;
-  --card: #ffffff;
-  --popover: #ffffff;
-  --secondary: #eef3f1;
-  --muted: #eef2f1;
-  --border: color-mix(in oklab, #24383e 12%, transparent);
-  --input: color-mix(in oklab, #24383e 12%, transparent);
-  --sidebar: #ffffff;
-  --sidebar-accent: #eef3f1;
-}
-
 html[data-atmosphere="dark"] {
   --ink: #e4eeea;
   --ink-soft: #c5d4cf;

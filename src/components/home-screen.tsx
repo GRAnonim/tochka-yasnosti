@@ -270,9 +270,9 @@ export function HomeScreen({
           <div className="space-y-2" data-testid="atmosphere-picker">
             <p className="font-medium text-[var(--ink)]">Фон</p>
             <p className="text-[0.88rem] leading-snug text-[var(--ink-muted)]">
-              Основной, тёмный или белый.
+              Основной или тёмный.
             </p>
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-2 gap-2">
               {ATMOSPHERES.map((option) => {
                 const selected = atmosphere === option.id;
                 return (
