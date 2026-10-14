@@ -256,23 +256,15 @@ export function PracticesMenu({
                 </span>
               </button>
               {open && (
-                <div className="space-y-0 border-t border-[color-mix(in_oklab,var(--ink)_10%,transparent)] bg-[color-mix(in_oklab,white_72%,transparent)] px-2 py-2">
-                  {group.items.map((key, index) => (
-                    <div
+                <div className="space-y-2 border-t border-[color-mix(in_oklab,var(--ink)_10%,transparent)] bg-[color-mix(in_oklab,white_72%,transparent)] px-2 py-2">
+                  {group.items.map((key) => (
+                    <PracticeRow
                       key={key}
-                      className={
-                        index > 0
-                          ? "mt-2 border-t border-[color-mix(in_oklab,var(--ink)_8%,transparent)] pt-2"
-                          : undefined
-                      }
-                    >
-                      <PracticeRow
-                        practiceKey={key}
-                        favorite={favorites.includes(key)}
-                        onOpen={() => onOpen(key)}
-                        onToggleFavorite={() => toggleFavorite(key)}
-                      />
-                    </div>
+                      practiceKey={key}
+                      favorite={favorites.includes(key)}
+                      onOpen={() => onOpen(key)}
+                      onToggleFavorite={() => toggleFavorite(key)}
+                    />
                   ))}
                 </div>
               )}
