@@ -55,37 +55,101 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-:root {
+:root,
+html[data-atmosphere="dusk"] {
   /*
-    Soft sage / mist blue-green for stressed or low-mood users:
-    low glare, gentle contrast, no purple neon, no harsh black/white.
+    Default «Сумерки»: slightly dimmer sage-slate, less office-white glare.
   */
+  --ink: #1f3338;
+  --ink-soft: #334a51;
+  --ink-muted: #53686f;
+  --accent: #3a756e;
+  --accent-ink: #2a5a54;
+  --surface: color-mix(in oklab, #d7e3df 78%, #9eb4ae);
+  --surface-strong: color-mix(in oklab, #e4eeea 86%, #b7c9c3);
+  --line: color-mix(in oklab, #1f3338 12%, transparent);
+  --danger-soft: #9a5b5b;
+  --panel: color-mix(in oklab, #dce8e4 70%, transparent);
+  --field: color-mix(in oklab, #e8f0ed 88%, #b8cac4);
+
+  --bg-base: #cfdad6;
+  --bg-wash-a: #b7cdc4;
+  --bg-wash-b: #b4c4ce;
+  --bg-wash-c: #c5d2c9;
+  --bg-grad-from: #d5e0dc;
+  --bg-grad-mid: #c7d4d0;
+  --bg-grad-to: #c2ced4;
+  --orb-a: #8fb5ab;
+  --orb-b: #8fa3b3;
+
+  --background: var(--bg-base);
+  --foreground: #1f3338;
+  --card: var(--surface-strong);
+  --card-foreground: #1f3338;
+  --popover: var(--surface-strong);
+  --popover-foreground: #1f3338;
+  --primary: #2a615a;
+  --primary-foreground: #f2fffb;
+  --secondary: color-mix(in oklab, #c9d8d3 72%, #8fa49d);
+  --secondary-foreground: #334a51;
+  --muted: #c2d0cb;
+  --muted-foreground: #53686f;
+  --accent-foreground: #f2fffb;
+  --destructive: oklch(0.55 0.12 25);
+  --border: color-mix(in oklab, #1f3338 13%, transparent);
+  --input: color-mix(in oklab, #1f3338 13%, transparent);
+  --ring: #3a756e;
+  --chart-1: #3a756e;
+  --chart-2: #6f93a0;
+  --chart-3: #7da897;
+  --chart-4: #516870;
+  --chart-5: #93b0a9;
+  --radius: 1rem;
+  --sidebar: var(--surface-strong);
+  --sidebar-foreground: #1f3338;
+  --sidebar-primary: #2a615a;
+  --sidebar-primary-foreground: #f2fffb;
+  --sidebar-accent: #c5d4cf;
+  --sidebar-accent-foreground: #24383e;
+  --sidebar-border: color-mix(in oklab, #24383e 12%, transparent);
+  --sidebar-ring: #568f86;
+}
+
+html[data-atmosphere="mist"] {
   --ink: #24383e;
   --ink-soft: #3a5259;
-  /* Darker muted text so secondary copy passes WCAG AA on soft surfaces */
   --ink-muted: #5a7279;
   --accent: #3f7f76;
   --accent-ink: #2f625b;
-  --surface: color-mix(in oklab, #ffffff 82%, #d7ebe6);
-  --surface-strong: color-mix(in oklab, #ffffff 92%, #dceeea);
-  --line: color-mix(in oklab, #24383e 9%, transparent);
-  --danger-soft: #9a5b5b;
+  --surface: color-mix(in oklab, #ffffff 78%, #d0e6e0);
+  --surface-strong: color-mix(in oklab, #ffffff 88%, #d8ebe6);
+  --line: color-mix(in oklab, #24383e 10%, transparent);
+  --panel: color-mix(in oklab, #f4faf8 68%, transparent);
+  --field: color-mix(in oklab, #ffffff 90%, #d8ebe6);
 
-  --background: #eef4f2;
+  --bg-base: #e4eeea;
+  --bg-wash-a: #c9e0d7;
+  --bg-wash-b: #c5d6e0;
+  --bg-wash-c: #d7e6dc;
+  --bg-grad-from: #eaf2ef;
+  --bg-grad-mid: #dde8e4;
+  --bg-grad-to: #d7e2e6;
+  --orb-a: #a8cfc4;
+  --orb-b: #a9bfd0;
+
+  --background: var(--bg-base);
   --foreground: #24383e;
-  --card: color-mix(in oklab, #ffffff 90%, #dff0eb);
+  --card: var(--surface-strong);
   --card-foreground: #24383e;
-  --popover: #f7fbfa;
+  --popover: var(--surface-strong);
   --popover-foreground: #24383e;
-  /* Deeper primary so the one CTA reads as the only action */
   --primary: #2f6b63;
   --primary-foreground: #f4fffc;
-  --secondary: color-mix(in oklab, #ffffff 70%, #d5e6e1);
+  --secondary: color-mix(in oklab, #ffffff 62%, #c9ddd7);
   --secondary-foreground: #3a5259;
-  --muted: #e2ece9;
+  --muted: #d7e4df;
   --muted-foreground: #5a7279;
   --accent-foreground: #f4fffc;
-  --destructive: oklch(0.55 0.12 25);
   --border: color-mix(in oklab, #24383e 11%, transparent);
   --input: color-mix(in oklab, #24383e 11%, transparent);
   --ring: #3f7f76;
@@ -94,15 +158,67 @@
   --chart-3: #8eb8a8;
   --chart-4: #5d7a82;
   --chart-5: #a7c4be;
-  --radius: 1rem;
-  --sidebar: #f7fbfa;
+  --sidebar: var(--surface-strong);
   --sidebar-foreground: #24383e;
   --sidebar-primary: #2f6b63;
   --sidebar-primary-foreground: #f4fffc;
-  --sidebar-accent: #ddeae6;
+  --sidebar-accent: #d5e6e1;
   --sidebar-accent-foreground: #2a3f45;
   --sidebar-border: color-mix(in oklab, #2a3f45 10%, transparent);
   --sidebar-ring: #5f9e95;
+}
+
+html[data-atmosphere="warm"] {
+  --ink: #2c2823;
+  --ink-soft: #4a433b;
+  --ink-muted: #6b6258;
+  --accent: #6d7a63;
+  --accent-ink: #4f5a47;
+  --surface: color-mix(in oklab, #e4ddd3 80%, #b8afa1);
+  --surface-strong: color-mix(in oklab, #eee7dc 88%, #c9c0b2);
+  --line: color-mix(in oklab, #2c2823 11%, transparent);
+  --panel: color-mix(in oklab, #ebe4d9 72%, transparent);
+  --field: color-mix(in oklab, #f2ebe1 90%, #cfc5b6);
+
+  --bg-base: #d8d0c4;
+  --bg-wash-a: #cfc3bc;
+  --bg-wash-b: #c5c8bc;
+  --bg-wash-c: #d4c9b8;
+  --bg-grad-from: #e0d8cc;
+  --bg-grad-mid: #d4ccc0;
+  --bg-grad-to: #cdc8bc;
+  --orb-a: #b8a898;
+  --orb-b: #a8b09c;
+
+  --background: var(--bg-base);
+  --foreground: #2c2823;
+  --card: var(--surface-strong);
+  --card-foreground: #2c2823;
+  --popover: var(--surface-strong);
+  --popover-foreground: #2c2823;
+  --primary: #55614d;
+  --primary-foreground: #f7f4ee;
+  --secondary: color-mix(in oklab, #ddd5c8 70%, #aea492);
+  --secondary-foreground: #4a433b;
+  --muted: #ccc3b6;
+  --muted-foreground: #6b6258;
+  --accent-foreground: #f7f4ee;
+  --border: color-mix(in oklab, #2c2823 12%, transparent);
+  --input: color-mix(in oklab, #2c2823 12%, transparent);
+  --ring: #6d7a63;
+  --chart-1: #6d7a63;
+  --chart-2: #8a7d6d;
+  --chart-3: #7d8a72;
+  --chart-4: #655c52;
+  --chart-5: #a89c8c;
+  --sidebar: var(--surface-strong);
+  --sidebar-foreground: #2c2823;
+  --sidebar-primary: #55614d;
+  --sidebar-primary-foreground: #f7f4ee;
+  --sidebar-accent: #d6cec2;
+  --sidebar-accent-foreground: #2c2823;
+  --sidebar-border: color-mix(in oklab, #2c2823 11%, transparent);
+  --sidebar-ring: #6d7a63;
 }
 
 @layer base {
@@ -114,16 +230,23 @@
     -webkit-text-size-adjust: 100%;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply text-foreground;
     font-family: var(--font-sans);
+    background-color: var(--bg-base);
     background-image:
-      radial-gradient(1000px 520px at 8% -8%, #d5ebe4 0%, transparent 58%),
-      radial-gradient(880px 480px at 100% 0%, #d2e2ea 0%, transparent 52%),
-      radial-gradient(700px 420px at 50% 110%, #e4efe8 0%, transparent 55%),
-      linear-gradient(168deg, #f4f8f6 0%, #e8f0ed 48%, #e4ecef 100%);
+      radial-gradient(1000px 520px at 8% -8%, var(--bg-wash-a) 0%, transparent 58%),
+      radial-gradient(880px 480px at 100% 0%, var(--bg-wash-b) 0%, transparent 52%),
+      radial-gradient(700px 420px at 50% 110%, var(--bg-wash-c) 0%, transparent 55%),
+      linear-gradient(
+        168deg,
+        var(--bg-grad-from) 0%,
+        var(--bg-grad-mid) 48%,
+        var(--bg-grad-to) 100%
+      );
     min-height: 100dvh;
     font-size: 1.0625rem;
     line-height: 1.55;
+    transition: background-color 0.35s ease;
   }
   ::selection {
     background: color-mix(in oklab, var(--primary) 28%, white);
@@ -166,11 +289,11 @@
 
 .clarity-panel {
   border-radius: 1.35rem;
-  background: color-mix(in oklab, #ffffff 72%, transparent);
-  border: 1px solid color-mix(in oklab, #2a3f45 8%, transparent);
+  background: var(--panel);
+  border: 1px solid var(--line);
   box-shadow:
-    0 1px 0 color-mix(in oklab, #ffffff 70%, transparent) inset,
-    0 18px 40px color-mix(in oklab, #2a3f45 5%, transparent);
+    0 1px 0 color-mix(in oklab, var(--surface-strong) 55%, transparent) inset,
+    0 18px 40px color-mix(in oklab, var(--ink) 6%, transparent);
   padding: 1.1rem 0.85rem;
   backdrop-filter: blur(14px);
 }
@@ -204,7 +327,7 @@
   height: 300px;
   left: -90px;
   top: 8%;
-  background: #b7d8d0;
+  background: var(--orb-a);
 }
 
 .clarity-orb-b {
@@ -212,7 +335,7 @@
   height: 240px;
   right: -70px;
   top: 52%;
-  background: #b8c9d4;
+  background: var(--orb-b);
   animation-delay: -5s;
 }
 
@@ -260,11 +383,15 @@
 }
 
 .clarity-cta-primary {
-  background: linear-gradient(180deg, #3a7d74 0%, #2f6b63 100%);
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--primary) 88%, white) 0%,
+    var(--primary) 100%
+  );
   color: var(--primary-foreground);
   box-shadow:
-    0 1px 0 color-mix(in oklab, #ffffff 28%, transparent) inset,
-    0 10px 24px color-mix(in oklab, #2f6b63 22%, transparent);
+    0 1px 0 color-mix(in oklab, white 22%, transparent) inset,
+    0 10px 24px color-mix(in oklab, var(--primary) 22%, transparent);
 }
 
 .clarity-link-quiet {

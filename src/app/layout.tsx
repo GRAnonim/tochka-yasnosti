@@ -13,7 +13,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   // Allow pinch-zoom for low-vision users (Lighthouse/axe fail on maximum-scale=1)
-  themeColor: "#1f6f6b",
+  themeColor: "#cfdad6",
 };
 
 export default function RootLayout({
@@ -22,7 +22,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ru">
+    <html lang="ru" data-atmosphere="dusk">
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var k='tochka-atmosphere-v1';var v=localStorage.getItem(k);if(v==='mist'||v==='dusk'||v==='warm'){document.documentElement.dataset.atmosphere=v;}}catch(e){}})();`,
+          }}
+        />
+      </head>
       <body className="antialiased">
         <Script
           src="https://telegram.org/js/telegram-web-app.js"

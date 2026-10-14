@@ -23,7 +23,15 @@ import {
   hasTelegramBackButton,
   initTelegram,
   syncTelegramBackButton,
+  syncTelegramChrome,
 } from "@/lib/telegram";
+import {
+  applyAtmosphere,
+  atmosphereMeta,
+  loadAtmosphere,
+  saveAtmosphere,
+  type AtmosphereId,
+} from "@/lib/theme";
 import type {
   AbcPractice,
   AppState,
@@ -119,6 +127,7 @@ export function ClarityApp() {
   const [fbFeeling, setFbFeeling] = useState<Feeling>("same");
   const [fbWorth, setFbWorth] = useState<boolean | null>(null);
   const [tgHint, setTgHint] = useState("Браузерный режим");
+  const [atmosphere, setAtmosphere] = useState<AtmosphereId>("dusk");
   const [moodValue, setMoodValue] = useState<MoodLevel | null>(null);
   const [moodActivities, setMoodActivities] = useState<string[]>([]);
   const [moodNote, setMoodNote] = useState("");
@@ -203,11 +212,15 @@ export function ClarityApp() {
       setSpecNote(loaded.specialist.note);
     }
     setFavorites(loadPracticeFavorites());
+    const savedAtmosphere = loadAtmosphere();
+    setAtmosphere(savedAtmosphere);
+    applyAtmosphere(savedAtmosphere);
 
     // Telegram script may load later (lazyOnload)
     let stopSafeArea = () => {};
     const syncTg = () => {
-      const wa = initTelegram();
+      const chrome = atmosphereMeta(loadAtmosphere()).telegramBg;
+      const wa = initTelegram(chrome);
       stopSafeArea();
       stopSafeArea = applyTelegramSafeArea();
       setTgNativeBack(hasTelegramBackButton());
@@ -875,6 +888,13 @@ export function ClarityApp() {
             }
             favorites={favorites}
             pendingFeedback={pendingFeedback}
+            atmosphere={atmosphere}
+            onAtmosphereChange={(id) => {
+              setAtmosphere(id);
+              applyAtmosphere(id);
+              saveAtmosphere(id);
+              syncTelegramChrome(atmosphereMeta(id).telegramBg);
+            }}
             onStartDecision={() => startNew()}
             onOpenPractice={(key) => openPractice(key)}
             onOpenPracticeLog={() => setScreen("practice-log")}

@@ -51,16 +51,24 @@ function isInsideTelegram(): boolean {
   );
 }
 
-export function initTelegram(): TelegramWebApp | null {
+export function syncTelegramChrome(bgHex: string): void {
+  const wa = getTelegramWebApp();
+  if (!wa || !isInsideTelegram()) return;
+  try {
+    wa.setHeaderColor?.(bgHex);
+    wa.setBackgroundColor?.(bgHex);
+  } catch {
+    /* ignore */
+  }
+}
+
+export function initTelegram(bgHex = "#cfdad6"): TelegramWebApp | null {
   const wa = getTelegramWebApp();
   if (!wa) return null;
   try {
     wa.ready();
     wa.expand();
-    if (isInsideTelegram()) {
-      wa.setHeaderColor?.("#eef4f2");
-      wa.setBackgroundColor?.("#eef4f2");
-    }
+    syncTelegramChrome(bgHex);
   } catch {
     // ignore — still usable as a regular web app in browser
   }

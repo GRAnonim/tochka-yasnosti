@@ -16,11 +16,17 @@ import {
   type MenuPracticeKey,
 } from "@/lib/practices";
 import type { SituationRecord } from "@/lib/types";
+import {
+  ATMOSPHERES,
+  type AtmosphereId,
+} from "@/lib/theme";
 
 type Props = {
   goalsLabel: string;
   favorites: MenuPracticeKey[];
   pendingFeedback: SituationRecord[];
+  atmosphere: AtmosphereId;
+  onAtmosphereChange: (id: AtmosphereId) => void;
   onStartDecision: () => void;
   onOpenPractice: (key: MenuPracticeKey) => void;
   onOpenPracticeLog: () => void;
@@ -51,6 +57,8 @@ export function HomeScreen({
   goalsLabel,
   favorites,
   pendingFeedback,
+  atmosphere,
+  onAtmosphereChange,
   onStartDecision,
   onOpenPractice,
   onOpenPracticeLog,
@@ -259,6 +267,43 @@ export function HomeScreen({
           Ещё
         </summary>
         <div className="mt-3 space-y-4">
+          <div className="space-y-2" data-testid="atmosphere-picker">
+            <p className="font-medium text-[var(--ink)]">Фон</p>
+            <p className="text-[0.88rem] leading-snug text-[var(--ink-muted)]">
+              Выберите оттенок, который приятнее для чтения и заполнения.
+            </p>
+            <div className="grid grid-cols-3 gap-2">
+              {ATMOSPHERES.map((option) => {
+                const selected = atmosphere === option.id;
+                return (
+                  <button
+                    type="button"
+                    key={option.id}
+                    data-testid={`atmosphere-${option.id}`}
+                    aria-pressed={selected}
+                    className={
+                      selected
+                        ? "rounded-xl border border-[color-mix(in_oklab,var(--primary)_40%,transparent)] bg-[var(--surface-strong)] px-2 py-2.5 text-left"
+                        : "rounded-xl border border-[var(--line)] bg-[var(--surface)] px-2 py-2.5 text-left"
+                    }
+                    onClick={() => onAtmosphereChange(option.id)}
+                  >
+                    <span
+                      aria-hidden
+                      className="mb-2 block h-8 w-full rounded-lg border border-[color-mix(in_oklab,var(--ink)_10%,transparent)]"
+                      style={{ background: option.swatch }}
+                    />
+                    <span className="block text-[0.9rem] font-medium text-[var(--ink)]">
+                      {option.label}
+                    </span>
+                    <span className="mt-0.5 block text-[0.78rem] leading-snug text-[var(--ink-muted)]">
+                      {option.hint}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
           <div className="space-y-2">
             <p className="font-medium text-[var(--ink)]">Мой специалист</p>
             {hasSpecialist ? (
