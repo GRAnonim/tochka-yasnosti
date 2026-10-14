@@ -100,10 +100,10 @@ export const PRACTICE_MENU_GROUPS = [
 export type MenuPracticeKey =
   (typeof PRACTICE_MENU_GROUPS)[number]["items"][number];
 
-export const MENU_PRACTICE_KEYS: MenuPracticeKey[] =
+const MENU_PRACTICE_KEYS: MenuPracticeKey[] =
   PRACTICE_MENU_GROUPS.flatMap((g) => [...g.items]);
 
-export const PRACTICE_FAVORITES_KEY = "tochka-practice-favorites-v1";
+const PRACTICE_FAVORITES_KEY = "tochka-practice-favorites-v1";
 
 export function loadPracticeFavorites(): MenuPracticeKey[] {
   if (typeof window === "undefined") return [];
@@ -165,7 +165,7 @@ export const BREATH_RHYTHMS = [
 
 export type BreathRhythmId = (typeof BREATH_RHYTHMS)[number]["id"];
 
-export const BREATH_SETTINGS_KEY = "tochka-breath-settings-v1";
+const BREATH_SETTINGS_KEY = "tochka-breath-settings-v1";
 
 export type BreathUiSettings = {
   rhythmId: BreathRhythmId;

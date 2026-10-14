@@ -1,12 +1,12 @@
 import type { DecisionChoice, Goal, LifeFilter, QuestionAnswer } from "./types";
 import { FILTER_LABELS } from "./questions";
 
-export function scoreAnswers(answers: QuestionAnswer[]): number {
+function scoreAnswers(answers: QuestionAnswer[]): number {
   if (answers.length === 0) return 0;
   return answers.reduce((sum, a) => sum + a.value, 0) / answers.length;
 }
 
-export function leanFromScore(score: number): "accept" | "decline" | "mixed" {
+function leanFromScore(score: number): "accept" | "decline" | "mixed" {
   if (score >= 0.55) return "accept";
   if (score <= -0.55) return "decline";
   return "mixed";

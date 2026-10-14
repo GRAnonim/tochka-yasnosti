@@ -20,7 +20,7 @@ function BaseIcon({ children, ...props }: IconProps & { children: ReactNode }) {
 }
 
 /** Soft horizon — mood / day tone */
-export function IconMood(props: IconProps) {
+function IconMood(props: IconProps) {
   return (
     <BaseIcon {...props}>
       <path d="M4 14c2.5-3 5-4.5 8-4.5S17.5 11 20 14" />
@@ -30,7 +30,7 @@ export function IconMood(props: IconProps) {
 }
 
 /** Open bowl / receiving — gratitude */
-export function IconGratitude(props: IconProps) {
+function IconGratitude(props: IconProps) {
   return (
     <BaseIcon {...props}>
       <path d="M6.5 11c0 4 2.5 6.5 5.5 6.5s5.5-2.5 5.5-6.5" />
@@ -40,7 +40,7 @@ export function IconGratitude(props: IconProps) {
 }
 
 /** Nested soft rings — emotions */
-export function IconEmotions(props: IconProps) {
+function IconEmotions(props: IconProps) {
   return (
     <BaseIcon {...props}>
       <circle cx="12" cy="12" r="7.5" />
@@ -51,7 +51,7 @@ export function IconEmotions(props: IconProps) {
 }
 
 /** Three quiet marks — questions */
-export function IconQuestions(props: IconProps) {
+function IconQuestions(props: IconProps) {
   return (
     <BaseIcon {...props}>
       <path d="M7 8h7" />
@@ -62,7 +62,7 @@ export function IconQuestions(props: IconProps) {
 }
 
 /** Three descending steps — ABC */
-export function IconAbc(props: IconProps) {
+function IconAbc(props: IconProps) {
   return (
     <BaseIcon {...props}>
       <path d="M5 8h5v3H5z" />
@@ -73,7 +73,7 @@ export function IconAbc(props: IconProps) {
 }
 
 /** Soft radar octagon — wheel of life */
-export function IconWheel(props: IconProps) {
+function IconWheel(props: IconProps) {
   return (
     <BaseIcon {...props}>
       <path d="M12 4.5 17.2 7.2 19.5 12 17.2 16.8 12 19.5 6.8 16.8 4.5 12 6.8 7.2Z" />
@@ -85,7 +85,7 @@ export function IconWheel(props: IconProps) {
 }
 
 /** Expanding breath rings */
-export function IconBreath(props: IconProps) {
+function IconBreath(props: IconProps) {
   return (
     <BaseIcon {...props}>
       <circle cx="12" cy="12" r="3" />
@@ -96,7 +96,7 @@ export function IconBreath(props: IconProps) {
 }
 
 /** Soft path toward light — ideal day */
-export function IconIdealDay(props: IconProps) {
+function IconIdealDay(props: IconProps) {
   return (
     <BaseIcon {...props}>
       <path d="M5 17c2.5-1 4.2-3.2 5.5-5.5C12 8.8 13.5 7 16 6.5" />
@@ -107,7 +107,7 @@ export function IconIdealDay(props: IconProps) {
 }
 
 /** Nested depth — five whys */
-export function IconFiveWhys(props: IconProps) {
+function IconFiveWhys(props: IconProps) {
   return (
     <BaseIcon {...props}>
       <path d="M6 7h12" />
@@ -119,7 +119,7 @@ export function IconFiveWhys(props: IconProps) {
 }
 
 /** Soft fork — decision */
-export function IconDecision(props: IconProps) {
+function IconDecision(props: IconProps) {
   return (
     <BaseIcon {...props}>
       <path d="M12 19V11" />
@@ -130,7 +130,7 @@ export function IconDecision(props: IconProps) {
 }
 
 /** Quiet notebook — practice log */
-export function IconLog(props: IconProps) {
+function IconLog(props: IconProps) {
   return (
     <BaseIcon {...props}>
       <path d="M7 5.5h10a1.5 1.5 0 0 1 1.5 1.5v10a1.5 1.5 0 0 1-1.5 1.5H7A1.5 1.5 0 0 1 5.5 17V7A1.5 1.5 0 0 1 7 5.5Z" />
@@ -175,7 +175,7 @@ export function IconGroupBody(props: IconProps) {
 }
 
 /** Soft bars — stats */
-export function IconStats(props: IconProps) {
+function IconStats(props: IconProps) {
   return (
     <BaseIcon {...props}>
       <path d="M6 17V11" />
@@ -186,7 +186,7 @@ export function IconStats(props: IconProps) {
 }
 
 /** Stacked soft leaves / layers — practices hub */
-export function IconPractices(props: IconProps) {
+function IconPractices(props: IconProps) {
   return (
     <BaseIcon {...props}>
       <path d="M7 15.5c2.8-3.8 5.2-5.2 8.5-5.8" />
@@ -223,7 +223,7 @@ export function IconBrand(props: IconProps) {
   );
 }
 
-export const PRACTICE_ICONS = {
+const PRACTICE_ICONS = {
   mood: IconMood,
   gratitude: IconGratitude,
   emotions: IconEmotions,

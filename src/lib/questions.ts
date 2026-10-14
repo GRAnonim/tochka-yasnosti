@@ -1,6 +1,6 @@
 import type { LifeFilter } from "./types";
 
-export type QuestionOption = {
+type QuestionOption = {
   label: string;
   /** Positive leans toward accept/agree; negative toward decline/protect energy */
   value: number;

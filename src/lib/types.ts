@@ -15,7 +15,7 @@ export type Goal = {
   text: string;
 };
 
-export type TrustedSpecialist = {
+type TrustedSpecialist = {
   name: string;
   contact: string;
   note: string;
@@ -27,7 +27,7 @@ export type QuestionAnswer = {
   label: string;
 };
 
-export type Feedback = {
+type Feedback = {
   gained: string;
   spent: string;
   feeling: Feeling;
@@ -83,7 +83,7 @@ export type AbcPractice = {
   createdAt: string;
 };
 
-export type ReflectionQa = {
+type ReflectionQa = {
   questionId: string;
   question: string;
   answer: string;
@@ -135,7 +135,7 @@ export type IdealDayPractice = {
   createdAt: string;
 };
 
-export type FiveWhysStep = {
+type FiveWhysStep = {
   index: number;
   why: string;
 };

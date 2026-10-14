@@ -1,5 +1,5 @@
 /** Russian plural: 1 запись, 2 записи, 5 записей */
-export function pluralRu(
+function pluralRu(
   n: number,
   one: string,
   few: string,

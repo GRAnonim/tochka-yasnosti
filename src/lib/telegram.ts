@@ -36,13 +36,13 @@ declare global {
   }
 }
 
-export function getTelegramWebApp(): TelegramWebApp | null {
+function getTelegramWebApp(): TelegramWebApp | null {
   if (typeof window === "undefined") return null;
   return window.Telegram?.WebApp ?? null;
 }
 
 /** True only inside a real Telegram client (not desktop browser with the script loaded). */
-export function isInsideTelegram(): boolean {
+function isInsideTelegram(): boolean {
   const wa = getTelegramWebApp();
   if (!wa) return false;
   return Boolean(

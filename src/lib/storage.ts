@@ -44,12 +44,6 @@ export function saveState(state: AppState): void {
   localStorage.setItem(KEY, JSON.stringify({ ...state, version: 2 }));
 }
 
-export function resetState(): AppState {
-  const next = emptyState();
-  saveState(next);
-  return next;
-}
-
 export function uid(prefix = "id"): string {
   return `${prefix}_${Math.random().toString(36).slice(2, 10)}${Date.now().toString(36).slice(-4)}`;
 }

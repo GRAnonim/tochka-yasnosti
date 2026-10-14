@@ -1,10 +1,10 @@
 import { moodLabel } from "./practices";
-import { countLabel, pluralRu } from "./plural";
+import { countLabel } from "./plural";
 import { DECISION_LABELS } from "./questions";
 import type { StatsSnapshot } from "./stats";
 import type { DecisionChoice, PracticeEntry, SituationRecord } from "./types";
 
-export type InsightTone = "calm" | "soft" | "empty";
+type InsightTone = "calm" | "soft" | "empty";
 
 export type StatsInsight = {
   id: string;
@@ -30,12 +30,6 @@ const PRACTICE_LABELS: Record<string, string> = {
   "ideal-day": "Идеальный день",
   "five-whys": "5 почему",
 };
-
-function decisionParts(stats: StatsSnapshot): string[] {
-  return (Object.keys(stats.decisions) as DecisionChoice[])
-    .filter((k) => stats.decisions[k] > 0)
-    .map((k) => `${DECISION_LABELS[k].toLowerCase()} — ${stats.decisions[k]}`);
-}
 
 export function buildHeroInsight(
   stats: StatsSnapshot,
@@ -144,12 +138,3 @@ export function decisionChips(stats: StatsSnapshot): PracticeChip[] {
 export function recentPracticeLabel(entry: PracticeEntry): string {
   return PRACTICE_LABELS[entry.kind] ?? entry.kind;
 }
-
-/** Keep for any legacy callers */
-export function decisionSummaryLine(stats: StatsSnapshot): string | null {
-  const parts = decisionParts(stats);
-  return parts.length ? parts.join("; ") : null;
-}
-
-// re-export for tests / callers that imported from here historically
-export { pluralRu };

@@ -1,5 +1,3 @@
-import { moodLabel } from "./practices";
-import { DECISION_LABELS } from "./questions";
 import type {
   DecisionChoice,
   PracticeEntry,
@@ -100,55 +98,4 @@ export function computeStats(
     fiveWhysCount,
     lastMood,
   };
-}
-
-export function statsLines(stats: StatsSnapshot): string[] {
-  const lines: string[] = [];
-
-  if (stats.practiceTotal > 0) {
-    lines.push(
-      `Практик: ${stats.practiceTotal} (настроение — ${stats.moodCount}, благодарность — ${stats.gratitudeCount}, эмоции — ${stats.emotionsCount}, вопросы — ${stats.questionsCount}, ABC — ${stats.abcCount}, колесо — ${stats.wheelCount}, дыхание — ${stats.breathCount}, идеальный день — ${stats.idealDayCount}, 5 почему — ${stats.fiveWhysCount}).`,
-    );
-    if (stats.lastMood !== undefined) {
-      lines.push(`Последнее настроение: ${moodLabel(stats.lastMood)}.`);
-    }
-  }
-
-  if (stats.total === 0 && stats.practiceTotal === 0) {
-    return [
-      "Пока записей нет — начните с практики настроения или разбора решения.",
-    ];
-  }
-
-  if (stats.total === 0) {
-    lines.push(
-      "Разборов решений пока нет — можно добавить, когда появится выбор.",
-    );
-    return lines;
-  }
-
-  lines.push(`Всего зафиксированных решений: ${stats.total}.`);
-
-  const parts = (Object.keys(stats.decisions) as DecisionChoice[])
-    .filter((k) => stats.decisions[k] > 0)
-    .map((k) => `${DECISION_LABELS[k].toLowerCase()} — ${stats.decisions[k]}`);
-  if (parts.length) lines.push(`Среди них: ${parts.join("; ")}.`);
-
-  if (stats.declineWithFeedback > 0) {
-    lines.push(
-      `Из ${stats.declineWithFeedback} отказов с обратной связью облегчение отметили в ${stats.declineFeltLighter} случаях.`,
-    );
-  }
-
-  if (stats.withFeedback > 0) {
-    lines.push(
-      `После факта «стоило того»: да — ${stats.worthItYes}, нет — ${stats.worthItNo}.`,
-    );
-  } else {
-    lines.push(
-      "Обратная связь по решениям ещё не собрана — можно ответить сразу в тесте.",
-    );
-  }
-
-  return lines;
 }
