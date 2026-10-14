@@ -47,7 +47,7 @@ export function AbcPracticeForm({
       </div>
 
       <div className="space-y-1.5">
-        <Label htmlFor="abc-a">A — активирующее событие</Label>
+        <Label htmlFor="abc-a">A: активирующее событие</Label>
         <Textarea
           id="abc-a"
           data-testid="abc-a"
@@ -58,7 +58,7 @@ export function AbcPracticeForm({
         />
       </div>
       <div className="space-y-1.5">
-        <Label htmlFor="abc-b">B — мысли / убеждения</Label>
+        <Label htmlFor="abc-b">B: мысли / убеждения</Label>
         <Textarea
           id="abc-b"
           data-testid="abc-b"
@@ -69,7 +69,7 @@ export function AbcPracticeForm({
         />
       </div>
       <div className="space-y-1.5">
-        <Label htmlFor="abc-c">C — последствия</Label>
+        <Label htmlFor="abc-c">C: последствия</Label>
         <Textarea
           id="abc-c"
           data-testid="abc-c"
@@ -87,7 +87,7 @@ export function AbcPracticeForm({
           rows={3}
           value={reframe}
           onChange={(e) => setReframe(e.target.value)}
-          placeholder="Как ещё можно посмотреть на это — мягко и реалистично?"
+          placeholder="Как ещё можно посмотреть на это, мягко и реалистично?"
         />
       </div>
 
@@ -129,7 +129,7 @@ export function QuestionsPracticeForm({
           {PRACTICE_META.questions.title}
         </h2>
         <p className="mt-1 text-sm text-[var(--ink-muted)]">
-          Выберите тему — появятся 3 открытых вопроса. Отвечайте коротко, своими
+          Выберите тему, появятся 3 открытых вопроса. Отвечайте коротко, своими
           словами.
         </p>
       </div>

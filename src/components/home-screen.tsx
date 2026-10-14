@@ -64,34 +64,39 @@ export function HomeScreen({
   specialistContact,
 }: Props) {
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
+  const [confirmReset, setConfirmReset] = useState(false);
 
   return (
     <section className="space-y-6" data-testid="home-screen">
-      <div className="space-y-2">
-        <h2 className="font-display text-[1.5rem] leading-tight text-[var(--ink)]">
-          Практики
-        </h2>
-        <p className="text-[0.95rem] leading-relaxed text-[var(--ink-muted)]">
-          Три раздела — по три упражнения. Откройте нужный и выберите.
-        </p>
-        <p
-          className="text-[0.88rem] leading-snug text-[var(--ink-muted)]"
+      <div className="space-y-3">
+        <div className="space-y-1.5">
+          <h2 className="font-display text-[1.5rem] leading-tight text-[var(--ink)]">
+            Практики
+          </h2>
+          <p className="text-[0.95rem] leading-relaxed text-[var(--ink-muted)]">
+            Короткие упражнения, чтобы заметить себя. Откройте раздел и выберите
+            нужное.
+          </p>
+        </div>
+        <div
+          className="space-y-1"
           data-testid="home-goals"
         >
-          Сейчас берегу:{" "}
-          <span className="text-[var(--ink-soft)]">{goalsLabel}</span>
-          <span aria-hidden className="mx-1.5 text-[var(--line)]">
-            ·
-          </span>
-          <button
-            type="button"
-            data-testid="edit-goals"
-            className="text-[var(--accent-ink)] underline-offset-2 hover:underline"
-            onClick={onEditGoals}
-          >
-            изменить
-          </button>
-        </p>
+          <p className="text-[0.82rem] text-[var(--ink-muted)]">Сейчас берегу</p>
+          <div className="flex items-start justify-between gap-3">
+            <p className="min-w-0 flex-1 text-[0.95rem] leading-snug text-[var(--ink-soft)]">
+              {goalsLabel}
+            </p>
+            <button
+              type="button"
+              data-testid="edit-goals"
+              className="shrink-0 pt-0.5 text-[0.88rem] text-[var(--accent-ink)] underline-offset-2 hover:underline"
+              onClick={onEditGoals}
+            >
+              Изменить
+            </button>
+          </div>
+        </div>
       </div>
 
       <div className="space-y-3" data-testid="home-practice-groups">
@@ -171,10 +176,7 @@ export function HomeScreen({
         })}
       </div>
 
-      <div className="space-y-2 border-t border-[var(--line)] pt-4">
-        <p className="text-[0.78rem] tracking-[0.06em] text-[var(--ink-muted)] uppercase">
-          Отдельно
-        </p>
+      <div className="border-t border-[var(--line)] pt-4">
         <button
           type="button"
           data-testid="new-situation"
@@ -189,7 +191,7 @@ export function HomeScreen({
               Разобрать решение
             </span>
             <span className="mt-0.5 block text-[0.92rem] leading-snug text-[var(--ink-muted)]">
-              Когда есть конкретный выбор — мягкий разбор по шагам
+              Когда есть конкретный выбор: мягкий разбор по шагам
             </span>
           </span>
           <span className="mt-1 text-[var(--ink-muted)]" aria-hidden>
@@ -277,17 +279,50 @@ export function HomeScreen({
               {hasSpecialist ? "Изменить контакты" : "Указать контакты"}
             </button>
           </div>
-          <button
-            type="button"
-            className="clarity-link-quiet underline-offset-2 hover:underline"
-            onClick={onReset}
-          >
-            Сбросить данные
-          </button>
           <p className="leading-relaxed">
             Не ставит диагнозов и не заменяет врача или психолога. При тяжёлом
-            состоянии — к специалисту.
+            состоянии обратитесь к специалисту.
           </p>
+          {confirmReset ? (
+            <div
+              className="space-y-2 rounded-xl border border-[var(--line)] bg-[var(--surface)] px-3 py-3"
+              data-testid="reset-confirm"
+            >
+              <p className="leading-snug text-[var(--ink)]">
+                Удалить все записи на этом устройстве? Это нельзя отменить.
+              </p>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  data-testid="reset-confirm-yes"
+                  className="rounded-lg border border-[color-mix(in_oklab,var(--destructive)_35%,transparent)] bg-[color-mix(in_oklab,var(--destructive)_8%,white)] px-3 py-2 text-[0.92rem] font-medium text-[var(--destructive)]"
+                  onClick={() => {
+                    setConfirmReset(false);
+                    onReset();
+                  }}
+                >
+                  Сбросить
+                </button>
+                <button
+                  type="button"
+                  data-testid="reset-confirm-no"
+                  className="rounded-lg border border-[var(--line)] bg-[var(--surface-strong)] px-3 py-2 text-[0.92rem] font-medium text-[var(--ink)]"
+                  onClick={() => setConfirmReset(false)}
+                >
+                  Отмена
+                </button>
+              </div>
+            </div>
+          ) : (
+            <button
+              type="button"
+              data-testid="reset-data"
+              className="clarity-link-quiet underline-offset-2 hover:underline"
+              onClick={() => setConfirmReset(true)}
+            >
+              Сбросить данные
+            </button>
+          )}
         </div>
       </details>
     </section>

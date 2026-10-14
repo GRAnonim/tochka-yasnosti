@@ -47,7 +47,7 @@ export function StatsView({
           Что уже заметили
         </h2>
         <p className="text-[0.95rem] leading-relaxed text-[var(--ink-muted)]">
-          Не отчёт и не оценка — мягкое зеркало ваших записей. Можно показать
+          Не отчёт и не оценка, а мягкое зеркало ваших записей. Можно показать
           специалисту или просто посмотреть на себя без давления.
         </p>
       </div>
@@ -99,7 +99,7 @@ export function StatsView({
               </p>
               <p className="mt-1 text-[0.85rem] leading-snug text-[var(--ink-muted)]">
                 {stats.withFeedback > 0
-                  ? `с отзывом — ${stats.withFeedback}`
+                  ? `с отзывом: ${stats.withFeedback}`
                   : "отзывы ещё впереди"}
               </p>
             </div>
@@ -136,7 +136,7 @@ export function StatsView({
               </div>
               {stats.withFeedback === 0 && (
                 <p className="text-[0.9rem] text-[var(--ink-muted)]">
-                  Когда появится отзыв «как отозвалось» — здесь станет яснее,
+                  Когда появится отзыв «как отозвалось», здесь станет яснее,
                   что вам подходит.
                 </p>
               )}

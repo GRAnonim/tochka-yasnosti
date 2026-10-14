@@ -239,7 +239,7 @@ export function BreathPracticeForm({
           {PRACTICE_META.breath.title}
         </h2>
         <p className="mt-1 text-sm text-[var(--ink-muted)]">
-          Ритм {inhaleSec} с вдох · {exhaleSec} с выдох. Можно закрыть глаза —
+          Ритм {inhaleSec} с вдох · {exhaleSec} с выдох. Можно закрыть глаза:
           мягкие сигналы подскажут фазу. Остановить можно раньше.
         </p>
       </div>
@@ -301,7 +301,7 @@ export function BreathPracticeForm({
                   Звук фаз
                 </p>
                 <p className="text-xs text-[var(--ink-muted)]">
-                  Тихий сигнал на вдох и другой — на выдох
+                  Тихий сигнал на вдох и другой на выдох
                 </p>
               </div>
               <button

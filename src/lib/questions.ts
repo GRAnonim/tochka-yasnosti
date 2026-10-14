@@ -17,15 +17,15 @@ const sharedTail: GuidedQuestion[] = [
     id: "energy",
     prompt: "Сколько сил и внимания это реально потребует сейчас?",
     options: [
-      { label: "Почти ничего — справлюсь спокойно", value: 2 },
-      { label: "Умеренно — впишится в день", value: 1 },
-      { label: "Заметно — придётся чем-то пожертвовать", value: -1 },
-      { label: "Много — на грани или за ней", value: -2 },
+      { label: "Почти ничего: справлюсь спокойно", value: 2 },
+      { label: "Умеренно: впишится в день", value: 1 },
+      { label: "Заметно: придётся чем-то пожертвовать", value: -1 },
+      { label: "Много: на грани или за ней", value: -2 },
     ],
   },
   {
     id: "aftertaste",
-    prompt: "Если согласитесь — каким, скорее всего, будет послевкусие?",
+    prompt: "Если согласитесь, каким, скорее всего, будет послевкусие?",
     options: [
       { label: "Лёгкость или удовлетворение", value: 2 },
       { label: "Нейтрально, без сильных эмоций", value: 0 },
@@ -65,7 +65,7 @@ export const QUESTIONS_BY_FILTER: Record<LifeFilter, GuidedQuestion[]> = {
     },
     {
       id: "work-want",
-      prompt: "Если убрать долг и ожидания других — вы сами этого хотите?",
+      prompt: "Если убрать долг и ожидания других, вы сами этого хотите?",
       options: [
         { label: "Да, это мой интерес", value: 2 },
         { label: "Скорее да, с оговорками", value: 1 },
@@ -91,7 +91,7 @@ export const QUESTIONS_BY_FILTER: Record<LifeFilter, GuidedQuestion[]> = {
       prompt: "Останется ли место для ваших потребностей, если сказать «да»?",
       options: [
         { label: "Да, баланс сохранится", value: 2 },
-        { label: "Придётся чуть подвинуть планы — приемлемо", value: 1 },
+        { label: "Придётся чуть подвинуть планы: приемлемо", value: 1 },
         { label: "Мои нужды отойдут на второй план", value: -1 },
         { label: "Я снова полностью растворюсь в другом", value: -2 },
       ],
@@ -100,7 +100,7 @@ export const QUESTIONS_BY_FILTER: Record<LifeFilter, GuidedQuestion[]> = {
       id: "close-honest",
       prompt: "Какой ответ был бы честным, если бы не боялись обидеть?",
       options: [
-        { label: "Согласиться — это и правда моё «да»", value: 2 },
+        { label: "Согласиться: это и правда моё «да»", value: 2 },
         { label: "Согласиться частично / на условиях", value: 1 },
         { label: "Перенести или предложить другое", value: -1 },
         { label: "Отказаться", value: -2 },
@@ -111,7 +111,7 @@ export const QUESTIONS_BY_FILTER: Record<LifeFilter, GuidedQuestion[]> = {
   friends: [
     {
       id: "friends-want",
-      prompt: "Вам самим хочется участвовать — или страшно выпасть из круга?",
+      prompt: "Вам самим хочется участвовать, или страшно выпасть из круга?",
       options: [
         { label: "Хочу, это живой интерес", value: 2 },
         { label: "Интересно наполовину", value: 1 },
@@ -133,8 +133,8 @@ export const QUESTIONS_BY_FILTER: Record<LifeFilter, GuidedQuestion[]> = {
       id: "friends-cost",
       prompt: "Что вы отдадите взамен (время, деньги, восстановление)?",
       options: [
-        { label: "Отдам мало — обмен честный", value: 2 },
-        { label: "Отдам умеренно — ок", value: 1 },
+        { label: "Отдам мало: обмен честный", value: 2 },
+        { label: "Отдам умеренно: ок", value: 1 },
         { label: "Отдам заметно больше, чем получу", value: -1 },
         { label: "Отдам то, чего сейчас критически не хватает", value: -2 },
       ],

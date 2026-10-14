@@ -36,10 +36,10 @@ function escapeHtml(s: string): string {
 
 function abcSections(entry: AbcPractice): { title: string; body: string }[] {
   const sections = [
-    { title: "A — Активирующее событие", body: entry.activating },
-    { title: "B — Убеждения / мысли", body: entry.beliefs },
+    { title: "A: Активирующее событие", body: entry.activating },
+    { title: "B: Убеждения / мысли", body: entry.beliefs },
     {
-      title: "C — Последствия (чувства, поведение)",
+      title: "C: Последствия (чувства, поведение)",
       body: entry.consequences,
     },
   ];
@@ -67,7 +67,7 @@ function abcPrintableHtml(entry: AbcPractice): string {
 <html lang="ru">
 <head>
   <meta charset="utf-8" />
-  <title>ABC-дневник — Точка ясности</title>
+  <title>ABC-дневник · Точка ясности</title>
   <style>
     body { font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif; color: #24383e; max-width: 720px; margin: 40px auto; padding: 0 20px; line-height: 1.5; }
     h1 { font-size: 1.5rem; margin: 0 0 0.35rem; }
@@ -81,7 +81,7 @@ function abcPrintableHtml(entry: AbcPractice): string {
 <body>
   <h1>ABC-дневник</h1>
   <p class="meta">Точка ясности · ${escapeHtml(formatPracticeDate(entry.createdAt))}<br/>
-  Не диагноз и не терапия — запись для себя или для специалиста.</p>
+  Не диагноз и не терапия: запись для себя или для специалиста.</p>
   ${blocks}
   <footer>«Точка ясности» не заменяет врача или психолога.</footer>
   <script>window.onload = function () { window.focus(); window.print(); };</script>
@@ -129,7 +129,7 @@ export async function exportAbcWord(entry: AbcPractice): Promise<void> {
     new Paragraph({
       children: [
         new TextRun({
-          text: "Не диагноз и не терапия — запись для себя или для специалиста.",
+          text: "Не диагноз и не терапия: запись для себя или для специалиста.",
           size: 20,
           color: "5A7279",
         }),

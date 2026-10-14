@@ -39,7 +39,7 @@ export function buildHeroInsight(
     return {
       id: "empty",
       title: "Пока тихо",
-      body: "Здесь появится мягкая картина ваших разборов и практик. Можно начать с одного маленького шага — без оценки и без спешки.",
+      body: "Здесь появится мягкая картина ваших разборов и практик. Можно начать с одного маленького шага, без оценки и без спешки.",
       tone: "empty",
     };
   }
@@ -56,8 +56,8 @@ export function buildHeroInsight(
       title: "Вы уже замечаете себя",
       body:
         stats.lastMood !== undefined
-          ? `Есть ${practicePhrase}. Последнее настроение: ${moodLabel(stats.lastMood)}. Решений ещё нет — это нормально, если сейчас важнее просто быть с собой.`
-          : `Есть ${practicePhrase}. Когда появится сложный выбор — разбор решения тоже оставит здесь след.`,
+          ? `Есть ${practicePhrase}. Последнее настроение: ${moodLabel(stats.lastMood)}. Решений ещё нет: это нормально, если сейчас важнее просто быть с собой.`
+          : `Есть ${practicePhrase}. Когда появится сложный выбор, разбор решения тоже оставит здесь след.`,
       tone: "soft",
     };
   }
@@ -66,7 +66,7 @@ export function buildHeroInsight(
     return {
       id: "decisions-no-feedback",
       title: "Вы фиксируете выборы",
-      body: `${countLabel(stats.total, "решение", "решения", "решений")} уже записано. Если позже ответите, как отозвалось — картина станет теплее и точнее.`,
+      body: `${countLabel(stats.total, "решение", "решения", "решений")} уже записано. Если позже ответите, как отозвалось, картина станет теплее и точнее.`,
       tone: "calm",
     };
   }
@@ -79,7 +79,7 @@ export function buildHeroInsight(
   if (stats.worthItYes > 0 && stats.worthItNo === 0) {
     parts.push("В отзывах чаще звучит: «стоило того».");
   } else if (stats.worthItNo > 0 && stats.worthItYes === 0) {
-    parts.push("В отзывах пока чаще тяжело — это тоже важный сигнал для себя.");
+    parts.push("В отзывах пока чаще тяжело: это тоже важный сигнал для себя.");
   } else if (stats.worthItYes > 0 && stats.worthItNo > 0) {
     parts.push(
       `Иногда выбор отзывался тепло (${stats.worthItYes}), иногда тяжелее (${stats.worthItNo}).`,
@@ -89,12 +89,12 @@ export function buildHeroInsight(
   if (stats.declineWithFeedback > 0 && stats.declineFeltLighter > 0) {
     parts.push(
       stats.declineFeltLighter === stats.declineWithFeedback
-        ? "После отказов вы отмечали облегчение — похоже, границы работают на вас."
+        ? "После отказов вы отмечали облегчение: похоже, границы работают на вас."
         : `После части отказов приходило облегчение (${stats.declineFeltLighter} из ${stats.declineWithFeedback}).`,
     );
   }
 
-  parts.push("Это не оценка «хорошо/плохо» — скорее зеркало ощущений.");
+  parts.push("Это не оценка «хорошо/плохо», а скорее зеркало ощущений.");
 
   return {
     id: "full",

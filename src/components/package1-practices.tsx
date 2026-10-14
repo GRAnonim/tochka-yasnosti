@@ -164,7 +164,7 @@ export function PracticesMenu({
     key: MenuPracticeKey;
     why: string;
   }[] = [
-    { key: "breath", why: "Если тяжело в теле — 1 минута дыхания" },
+    { key: "breath", why: "Если тяжело в теле: 1 минута дыхания" },
     { key: "mood", why: "Если просто нужно назвать фон дня" },
     { key: "abc", why: "Если мысли крутятся по кругу" },
   ];
@@ -177,7 +177,7 @@ export function PracticesMenu({
       <div className="px-0.5">
         <h2 className="font-display text-lg text-[var(--ink)]">Практики</h2>
         <p className="mt-1 text-[0.95rem] leading-relaxed text-[var(--ink-muted)]">
-          Можно начать с короткого шага ниже — или открыть раздел.
+          Можно начать с короткого шага ниже или открыть раздел.
         </p>
       </div>
 
@@ -462,7 +462,7 @@ export function GratitudePracticeForm({
         {PRACTICE_META.gratitude.title}
       </h2>
       <p className="text-sm text-[var(--ink-muted)]">
-        Запишите 1–3 вещи — даже совсем маленькие.
+        Запишите 1–3 вещи, даже совсем маленькие.
       </p>
       {[0, 1, 2].map((i) => (
         <div key={i} className="space-y-1.5">
@@ -644,7 +644,7 @@ export function PracticeLog({
       <h2 className="font-display text-xl text-[var(--ink)]">Журнал практик</h2>
       {entries.length === 0 ? (
         <p className="text-sm text-[var(--ink-muted)]">
-          Пока пусто — сохраните практику из меню.
+          Пока пусто. Сохраните практику из меню.
         </p>
       ) : (
         <ul className="space-y-2">

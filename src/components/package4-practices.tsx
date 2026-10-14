@@ -54,7 +54,7 @@ export function IdealDayPracticeForm({
         </h2>
         <p className="mt-1 text-sm text-[var(--ink-muted)]">
           Не идеал «на витрину», а день, в котором вам по-настоящему хорошо.
-          Потом — один маленький шаг ближе к нему.
+          Потом один маленький шаг ближе к нему.
         </p>
       </div>
 
@@ -183,7 +183,7 @@ export function FiveWhysPracticeForm({
           {PRACTICE_META["five-whys"].title}
         </h2>
         <p className="mt-1 text-sm text-[var(--ink-muted)]">
-          Идём вглубь мягко. Достаточно 2–5 ответов. Если становится тяжело —
+          Идём вглубь мягко. Достаточно 2–5 ответов. Если становится тяжело,
           остановитесь и ответьте, что нужно сейчас. Это не копание «до дна».
         </p>
       </div>

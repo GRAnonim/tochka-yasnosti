@@ -562,7 +562,7 @@ export function ClarityApp() {
       .slice(0, 3)
       .map((text) => ({ id: uid("goal"), text }));
     if (goals.length < 1) {
-      setGoalError("Напишите хотя бы одно — что сейчас важнее беречь.");
+      setGoalError("Напишите хотя бы одно: что сейчас важнее беречь.");
       return;
     }
     setGoalError(null);
@@ -733,7 +733,7 @@ export function ClarityApp() {
               Точка ясности
             </h1>
             <p className="mt-1 max-w-xs text-[0.95rem] leading-snug text-[var(--ink-muted)]">
-              Спокойный помощник для решений — без давления
+              Спокойный помощник для решений, без давления
             </p>
           </div>
         ) : (
@@ -797,7 +797,7 @@ export function ClarityApp() {
               </h2>
               <p className="text-[0.98rem] leading-relaxed text-[var(--ink-muted)]">
                 {screen === "edit-goals"
-                  ? "Можно стереть и написать заново — одним словом или короткой фразой."
+                  ? "Можно стереть и написать заново: одним словом или короткой фразой."
                   : "Одно слово или короткая фраза. Потом можно изменить. Не терапия и не диагноз."}
               </p>
             </div>
@@ -816,7 +816,7 @@ export function ClarityApp() {
                       ? "Например: сон"
                       : i === 1
                         ? "Например: свои границы"
-                        : "Ещё — по желанию"
+                        : "Ещё, по желанию"
                   }
                   onChange={(e) => {
                     const next = [...goalInputs];
@@ -850,7 +850,7 @@ export function ClarityApp() {
                 className="inline-flex h-10 w-full items-center justify-center text-sm text-[var(--accent-ink)]"
                 onClick={skipOnboarding}
               >
-                Пропустить — заполню позже
+                Пропустить, заполню позже
               </button>
             )}
             {screen === "edit-goals" && (
@@ -871,7 +871,7 @@ export function ClarityApp() {
         {screen === "home" && (
           <HomeScreen
             goalsLabel={
-              state.goals.map((g) => g.text).join(" · ") || "не заданы"
+              state.goals.map((g) => g.text).join(", ") || "не заданы"
             }
             favorites={favorites}
             pendingFeedback={pendingFeedback}
@@ -1077,7 +1077,7 @@ export function ClarityApp() {
                 {lastDoneTitle || "Практика"}
               </p>
               <p className="text-[1.02rem] leading-relaxed text-[var(--ink-soft)]">
-                Можно остановиться на этом — уже достаточно. Или вернуться на
+                Можно остановиться на этом: уже достаточно. Или вернуться на
                 главную и выбрать следующий маленький шаг.
               </p>
             </div>
@@ -1090,7 +1090,7 @@ export function ClarityApp() {
                   Отправить специалисту или сохранить
                 </p>
                 <p className="text-[0.9rem] text-[var(--ink-muted)]">
-                  Word — файл .docx. PDF — через печать («Сохранить как PDF»).
+                  Word: файл .docx. PDF: через печать («Сохранить как PDF»).
                 </p>
                 <div className="flex flex-col gap-2 sm:flex-row">
                   <button
@@ -1204,7 +1204,7 @@ export function ClarityApp() {
               Какой это круг?
             </h2>
             <p className="text-sm text-[var(--ink-muted)]">
-              От фильтра зависят вопросы — работа, близкие или друзья.
+              От фильтра зависят вопросы: работа, близкие или друзья.
             </p>
             <div className="grid gap-2">
               {FILTERS.map((f) => (
@@ -1384,7 +1384,7 @@ export function ClarityApp() {
               Мой специалист
             </h2>
             <p className="text-sm text-[var(--ink-muted)]">
-              Сейчас — ваш личный контакт, отдельно от рефлексии. В дальнейшем
+              Сейчас это ваш личный контакт, вне рефлексии. В дальнейшем
               здесь появятся контакты доверенных психологов.
             </p>
             <div className="space-y-3">
