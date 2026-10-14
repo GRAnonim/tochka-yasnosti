@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "npx next dev --turbopack --port 3000 --hostname 0.0.0.0",
     "build": "npx next build",
+    "build:pages": "GITHUB_PAGES=true GITHUB_PAGES_BASE=/tochka-yasnosti npx next build",
     "start": "npx next start --port 3000 --hostname 0.0.0.0",
     "bot": "node scripts/telegram-bot.mjs",
     "lint": "eslint"

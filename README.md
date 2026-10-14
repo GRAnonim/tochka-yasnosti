@@ -54,21 +54,34 @@ npm run dev
 **Важно:** временный Cloudflare-туннель для теста работает только пока крутится Cursor.  
 Чтобы мини-приложение жило постоянно (как Time Filter) — нужен хостинг, см. ниже.
 
-## Постоянный хостинг (как Time Filter)
+## Постоянный хостинг — как Time Filter (GitHub Pages)
 
-У Time Filter мини-приложение открывается без Cursor, потому что сайт лежит на **постоянном HTTPS** (обычно Vercel).  
-Бот (`/start`, ответы в чате) при этом часто всё равно завязан на Cursor — это отдельный процесс.
+У [Time Filter](https://granonim.github.io/timefilter-mini/) мини-приложение — обычные файлы сайта на **GitHub Pages**.  
+Их раздаёт GitHub, а не ноутбук. Кнопка в боте просто открывает эту ссылку.  
+Данные остаются на телефоне (`localStorage` / Telegram CloudStorage).  
+На ноутбуке крутится только бот (`/start`, админка) — без ноутбука чат молчит, а Mini App открывается.
 
-Для «Точки ясности» тот же путь:
+«Точка ясности» настроена так же: `next build` собирает **статику** в папку `out/`, GitHub Actions выкладывает её на Pages.
 
-1. Создайте **приватный** репозиторий на GitHub и залейте этот код.
-2. Зайдите на [vercel.com](https://vercel.com) → Import Project → выберите репозиторий → Deploy.
-3. Скопируйте URL вида `https://tochka-yasnosti.vercel.app`.
-4. В Telegram у бота укажите этот URL как Web App / Menu Button  
-   (BotFather или уже настроенная кнопка меню).
-5. Готово: мини-приложение открывается **без Cursor**.
+### Что сделать один раз
 
-Ответы бота на `/start` без Cursor появятся только когда вынесем бота на сервер/webhook — это следующий шаг. Кнопка меню Mini App от Telegram работает и без работающего Cursor.
+1. Создайте репозиторий **`tochka-yasnosti`** у пользователя `GRAnonim`  
+   (имя важно: от него зависит адрес `/tochka-yasnosti/`).
+2. Залейте этот код в `main` (можно сделать репозиторий **private**, но для GitHub Pages на бесплатном плане обычно нужен **public** — как у Time Filter; либо GitHub Pro).
+3. В репозитории: **Settings → Pages → Source: GitHub Actions**.
+4. После пуша Actions соберёт сайт. Адрес будет:  
+   **https://granonim.github.io/tochka-yasnosti/**
+5. В боте «Точка ясности» укажите этот URL как Web App / Menu Button.
+
+Локальная проверка сборки Pages:
+
+```bash
+npm run build:pages
+```
+
+Откроется содержимое в `out/`.
+
+Бот (`/start`) по-прежнему может жить на ноутбуке/в Cursor — как у Time Filter.
 
 ## Стек фазы 1
 
