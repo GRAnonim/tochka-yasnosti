@@ -1,13 +1,21 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { WheelChartCard } from "@/components/wheel-chart";
 import {
+  playBreathPhaseCue,
+  unlockBreathAudio,
+} from "@/lib/breath-audio";
+import {
   BREATH_DURATIONS,
+  BREATH_RHYTHMS,
+  loadBreathSettings,
   PRACTICE_META,
+  saveBreathSettings,
   WHEEL_AREAS,
+  type BreathRhythmId,
 } from "@/lib/practices";
 import type { BreathDurationSec, WheelPractice } from "@/lib/types";
 
@@ -133,6 +141,7 @@ export function WheelPracticeForm({
 }
 
 type BreathPhase = "idle" | "running" | "done";
+type BreathCycle = "inhale" | "exhale";
 
 export function BreathPracticeForm({
   durationSec,
@@ -149,38 +158,79 @@ export function BreathPracticeForm({
 }) {
   const [phase, setPhase] = useState<BreathPhase>("idle");
   const [remaining, setRemaining] = useState<number>(durationSec);
-  const [cycleLabel, setCycleLabel] = useState("Вдох");
+  const [cycle, setCycle] = useState<BreathCycle>("inhale");
   const [completedFull, setCompletedFull] = useState(false);
+  const [rhythmId, setRhythmId] = useState<BreathRhythmId>("4-6");
+  const [soundOn, setSoundOn] = useState(true);
+  const [settingsReady, setSettingsReady] = useState(false);
+  const lastCycleRef = useRef<BreathCycle | null>(null);
+
+  const rhythm =
+    BREATH_RHYTHMS.find((r) => r.id === rhythmId) ?? BREATH_RHYTHMS[1];
+  const inhaleSec = rhythm.inhale;
+  const exhaleSec = rhythm.exhale;
+  const cycleLen = inhaleSec + exhaleSec;
+
+  useEffect(() => {
+    const saved = loadBreathSettings();
+    setRhythmId(saved.rhythmId);
+    setSoundOn(saved.soundOn);
+    setSettingsReady(true);
+  }, []);
+
+  useEffect(() => {
+    if (!settingsReady) return;
+    saveBreathSettings({ rhythmId, soundOn });
+  }, [rhythmId, soundOn, settingsReady]);
 
   useEffect(() => {
     if (phase !== "running") return;
     setRemaining(durationSec);
     setCompletedFull(false);
+    setCycle("inhale");
+    lastCycleRef.current = null;
   }, [durationSec, phase]);
 
   useEffect(() => {
     if (phase !== "running") return;
     const started = Date.now();
-    const tick = window.setInterval(() => {
-      const left = Math.max(
-        0,
-        durationSec - Math.floor((Date.now() - started) / 1000),
-      );
+
+    const applyTick = () => {
+      const elapsed = Math.floor((Date.now() - started) / 1000);
+      const left = Math.max(0, durationSec - elapsed);
       setRemaining(left);
-      // 4s inhale / 4s exhale cycle
-      const beat = Math.floor((Date.now() - started) / 1000) % 8;
-      setCycleLabel(beat < 4 ? "Вдох" : "Выдох");
+
+      const beat = elapsed % cycleLen;
+      const next: BreathCycle = beat < inhaleSec ? "inhale" : "exhale";
+      setCycle(next);
+
+      if (lastCycleRef.current !== next) {
+        lastCycleRef.current = next;
+        if (soundOn) {
+          playBreathPhaseCue(next);
+        }
+      }
+
       if (left <= 0) {
-        window.clearInterval(tick);
         setCompletedFull(true);
         setPhase("done");
-        setCycleLabel("Готово");
       }
-    }, 250);
-    return () => window.clearInterval(tick);
-  }, [phase, durationSec]);
+    };
 
-  const expand = phase === "running" && cycleLabel === "Вдох";
+    applyTick();
+    const tick = window.setInterval(applyTick, 200);
+    return () => window.clearInterval(tick);
+  }, [phase, durationSec, cycleLen, inhaleSec, soundOn]);
+
+  const expand = phase === "running" && cycle === "inhale";
+  const cycleLabel =
+    phase === "done" ? "Готово" : cycle === "inhale" ? "Вдох" : "Выдох";
+
+  const startSession = async () => {
+    if (soundOn) await unlockBreathAudio();
+    lastCycleRef.current = null;
+    setPhase("running");
+  };
 
   return (
     <section className="space-y-4" data-testid="breath-form">
@@ -189,8 +239,8 @@ export function BreathPracticeForm({
           {PRACTICE_META.breath.title}
         </h2>
         <p className="mt-1 text-sm text-[var(--ink-muted)]">
-          Спокойный ритм: примерно 4 секунды вдох и 4 секунды выдох. Можно
-          остановить раньше.
+          Ритм {inhaleSec} с вдох · {exhaleSec} с выдох. Можно закрыть глаза —
+          мягкие сигналы подскажут фазу. Остановить можно раньше.
         </p>
       </div>
 
@@ -213,11 +263,89 @@ export function BreathPracticeForm({
               </button>
             ))}
           </div>
+
+          <div
+            className="space-y-3 rounded-2xl border border-[var(--line)] bg-[var(--surface)] px-3 py-3"
+            data-testid="breath-settings"
+          >
+            <div className="flex items-baseline justify-between gap-2">
+              <p className="text-sm font-medium text-[var(--ink)]">Ритм</p>
+              <p className="text-xs text-[var(--ink-muted)]">
+                вдох / выдох, сек
+              </p>
+            </div>
+            <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-4">
+              {BREATH_RHYTHMS.map((r) => (
+                <button
+                  type="button"
+                  key={r.id}
+                  data-testid={`breath-rhythm-${r.id}`}
+                  className={
+                    rhythmId === r.id
+                      ? "rounded-xl bg-[var(--primary)] px-2 py-2.5 text-center text-sm font-medium text-[var(--primary-foreground)]"
+                      : "rounded-xl bg-[var(--secondary)] px-2 py-2.5 text-center text-sm font-medium text-[var(--ink-soft)]"
+                  }
+                  onClick={() => setRhythmId(r.id)}
+                >
+                  <span className="block">{r.label}</span>
+                  <span className="mt-0.5 block text-[10px] font-normal opacity-80">
+                    {r.hint}
+                  </span>
+                </button>
+              ))}
+            </div>
+
+            <div className="flex items-center justify-between gap-3 border-t border-[var(--line)] pt-3">
+              <div className="min-w-0">
+                <p className="text-sm font-medium text-[var(--ink)]">
+                  Звук фаз
+                </p>
+                <p className="text-xs text-[var(--ink-muted)]">
+                  Тихий сигнал на вдох и другой — на выдох
+                </p>
+              </div>
+              <button
+                type="button"
+                role="switch"
+                aria-checked={soundOn}
+                data-testid="breath-sound-toggle"
+                className={
+                  soundOn
+                    ? "relative h-7 w-12 shrink-0 rounded-full bg-[var(--primary)] transition"
+                    : "relative h-7 w-12 shrink-0 rounded-full bg-[var(--secondary)] transition"
+                }
+                onClick={() => setSoundOn((v) => !v)}
+              >
+                <span
+                  className={
+                    soundOn
+                      ? "absolute top-0.5 left-[22px] h-6 w-6 rounded-full bg-white transition"
+                      : "absolute top-0.5 left-0.5 h-6 w-6 rounded-full bg-white transition"
+                  }
+                />
+              </button>
+            </div>
+            {soundOn && (
+              <button
+                type="button"
+                data-testid="breath-sound-preview"
+                className="text-left text-xs text-[var(--accent-ink)] underline-offset-2 hover:underline"
+                onClick={async () => {
+                  await unlockBreathAudio();
+                  playBreathPhaseCue("inhale");
+                  window.setTimeout(() => playBreathPhaseCue("exhale"), 700);
+                }}
+              >
+                Прослушать сигналы
+              </button>
+            )}
+          </div>
+
           <button
             type="button"
             data-testid="breath-start"
             className="inline-flex h-11 w-full items-center justify-center rounded-xl bg-[var(--primary)] px-4 text-sm font-medium text-[var(--primary-foreground)]"
-            onClick={() => setPhase("running")}
+            onClick={() => void startSession()}
           >
             Начать
           </button>
@@ -226,10 +354,17 @@ export function BreathPracticeForm({
 
       {phase === "running" && (
         <div className="flex flex-col items-center gap-4 py-4">
+          <p className="text-xs text-[var(--ink-muted)]">
+            {inhaleSec} с вдох · {exhaleSec} с выдох
+            {soundOn ? " · звук включён" : " · без звука"}
+          </p>
           <div
-            className="flex h-40 w-40 items-center justify-center rounded-full transition-transform duration-1000 ease-in-out"
+            className="flex h-40 w-40 items-center justify-center rounded-full ease-in-out"
             style={{
               transform: expand ? "scale(1.12)" : "scale(0.9)",
+              transitionProperty: "transform",
+              transitionTimingFunction: "ease-in-out",
+              transitionDuration: `${expand ? inhaleSec : exhaleSec}s`,
               background:
                 "color-mix(in oklab, var(--primary) 35%, white)",
             }}

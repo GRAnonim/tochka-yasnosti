@@ -127,6 +127,49 @@ export const BREATH_DURATIONS = [
   { sec: 180 as const, label: "3 минуты" },
 ];
 
+/** Inhale / exhale length presets (seconds) */
+export const BREATH_RHYTHMS = [
+  { id: "4-4", inhale: 4, exhale: 4, label: "4 / 4", hint: "ровный" },
+  { id: "4-6", inhale: 4, exhale: 6, label: "4 / 6", hint: "длиннее выдох" },
+  { id: "3-5", inhale: 3, exhale: 5, label: "3 / 5", hint: "мягче" },
+  { id: "5-5", inhale: 5, exhale: 5, label: "5 / 5", hint: "медленнее" },
+] as const;
+
+export type BreathRhythmId = (typeof BREATH_RHYTHMS)[number]["id"];
+
+export const BREATH_SETTINGS_KEY = "tochka-breath-settings-v1";
+
+export type BreathUiSettings = {
+  rhythmId: BreathRhythmId;
+  soundOn: boolean;
+};
+
+export function loadBreathSettings(): BreathUiSettings {
+  const fallback: BreathUiSettings = { rhythmId: "4-6", soundOn: true };
+  if (typeof window === "undefined") return fallback;
+  try {
+    const raw = window.localStorage.getItem(BREATH_SETTINGS_KEY);
+    if (!raw) return fallback;
+    const parsed = JSON.parse(raw) as Partial<BreathUiSettings>;
+    const ok = BREATH_RHYTHMS.some((r) => r.id === parsed.rhythmId);
+    return {
+      rhythmId: ok ? (parsed.rhythmId as BreathRhythmId) : fallback.rhythmId,
+      soundOn: typeof parsed.soundOn === "boolean" ? parsed.soundOn : true,
+    };
+  } catch {
+    return fallback;
+  }
+}
+
+export function saveBreathSettings(settings: BreathUiSettings): void {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(BREATH_SETTINGS_KEY, JSON.stringify(settings));
+  } catch {
+    /* ignore */
+  }
+}
+
 export type QuestionTopicId =
   | "values"
   | "conflict"
