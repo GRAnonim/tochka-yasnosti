@@ -9,6 +9,7 @@ import {
 } from "@/lib/stats-insights";
 import type { StatsSnapshot } from "@/lib/stats";
 import { FILTER_LABELS, DECISION_LABELS } from "@/lib/questions";
+import { PRACTICE_META } from "@/lib/practices";
 import type { PracticeEntry, SituationRecord } from "@/lib/types";
 
 function formatShortDate(iso: string): string {
@@ -75,7 +76,7 @@ export function StatsView({
               className="clarity-cta-primary inline-flex h-11 items-center justify-center rounded-xl px-4 text-sm font-semibold"
               onClick={onStartDecision}
             >
-              Разобрать решение
+              {PRACTICE_META.decision.title}
             </button>
             <button
               type="button"

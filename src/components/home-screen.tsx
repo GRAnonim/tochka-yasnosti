@@ -82,8 +82,7 @@ export function HomeScreen({
             Практики
           </h2>
           <p className="text-[0.95rem] leading-relaxed text-[var(--ink-muted)]">
-            Короткие упражнения, чтобы заметить себя. Откройте раздел и выберите
-            нужное.
+            Короткие упражнения, чтобы заметить себя.
           </p>
         </div>
         <div
@@ -196,10 +195,10 @@ export function HomeScreen({
           </span>
           <span className="min-w-0 flex-1">
             <span className="block text-[1.05rem] font-semibold text-[var(--ink)]">
-              Разобрать решение
+              {PRACTICE_META.decision.title}
             </span>
             <span className="mt-0.5 block text-[0.92rem] leading-snug text-[var(--ink-muted)]">
-              Когда есть конкретный выбор: мягкий разбор по шагам
+              {PRACTICE_META.decision.blurb}
             </span>
           </span>
           <span className="mt-1 text-[var(--ink-muted)]" aria-hidden>
