@@ -125,7 +125,7 @@ export function HomeScreen({
                     <span className="block text-[1.05rem] font-semibold text-[var(--ink)]">
                       {group.title}
                     </span>
-                    <span className="mt-1 block text-[0.92rem] text-[var(--ink-muted)]">
+                    <span className="mt-1 block text-[0.92rem] text-[var(--ink-soft)]">
                       {group.items.map((k) => PRACTICE_META[k].title).join(" · ")}
                     </span>
                   </span>

@@ -40,7 +40,6 @@ import {
   PracticesMenu,
 } from "@/components/package1-practices";
 import { HomeScreen } from "@/components/home-screen";
-import { exportAbcPdf, exportAbcWord } from "@/lib/export-practice";
 import {
   AbcPracticeForm,
   QuestionsPracticeForm,
@@ -1008,13 +1007,17 @@ export function ClarityApp() {
               const entry = state.practices.find(
                 (p) => p.id === id && p.kind === "abc",
               );
-              if (entry && entry.kind === "abc") await exportAbcWord(entry);
+              if (!entry || entry.kind !== "abc") return;
+              const { exportAbcWord } = await import("@/lib/export-practice");
+              await exportAbcWord(entry);
             }}
-            onExportAbcPdf={(id) => {
+            onExportAbcPdf={async (id) => {
               const entry = state.practices.find(
                 (p) => p.id === id && p.kind === "abc",
               );
-              if (entry && entry.kind === "abc") exportAbcPdf(entry);
+              if (!entry || entry.kind !== "abc") return;
+              const { exportAbcPdf } = await import("@/lib/export-practice");
+              exportAbcPdf(entry);
             }}
           />
         )}
@@ -1056,6 +1059,9 @@ export function ClarityApp() {
                       const entry = latestAbc();
                       if (!entry) return;
                       try {
+                        const { exportAbcWord } = await import(
+                          "@/lib/export-practice"
+                        );
                         await exportAbcWord(entry);
                         setExportNotice("Word-файл скачан");
                       } catch {
@@ -1069,9 +1075,12 @@ export function ClarityApp() {
                     type="button"
                     data-testid="export-abc-pdf"
                     className="inline-flex h-11 flex-1 items-center justify-center rounded-xl border border-[var(--line)] bg-[var(--surface-strong)] px-3 text-sm font-medium text-[var(--ink)]"
-                    onClick={() => {
+                    onClick={async () => {
                       const entry = latestAbc();
                       if (!entry) return;
+                      const { exportAbcPdf } = await import(
+                        "@/lib/export-practice"
+                      );
                       exportAbcPdf(entry);
                       setExportNotice(
                         "Откройте печать и выберите «Сохранить как PDF»",
