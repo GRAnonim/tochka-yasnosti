@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useState } from "react";
 import {
   IconGroupBody,
   IconGroupDay,
@@ -12,6 +12,13 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  PracticeCard,
+  PracticeChip,
+  PracticeChoice,
+  PracticeHeader,
+  PracticeSave,
+} from "@/components/practice-ui";
 import {
   ACTIVITY_TAGS,
   EMOTION_TAGS,
@@ -35,33 +42,6 @@ import type {
   QuestionsPractice,
   WheelPractice,
 } from "@/lib/types";
-
-function Chip({
-  active,
-  children,
-  onClick,
-  testId,
-}: {
-  active: boolean;
-  children: ReactNode;
-  onClick: () => void;
-  testId?: string;
-}) {
-  return (
-    <button
-      type="button"
-      data-testid={testId}
-      onClick={onClick}
-      className={
-        active
-          ? "rounded-full bg-[var(--primary)] px-3 py-1.5 text-sm text-[var(--primary-foreground)]"
-          : "rounded-full bg-[var(--secondary)] px-3 py-1.5 text-sm text-[var(--secondary-foreground)]"
-      }
-    >
-      {children}
-    </button>
-  );
-}
 
 export type PracticeMenuKey = MenuPracticeKey;
 
@@ -349,6 +329,14 @@ export function HomeFavorites({
   );
 }
 
+const MOOD_TONE = [
+  "color-mix(in oklab, var(--ink) 42%, var(--primary))",
+  "color-mix(in oklab, var(--primary) 70%, var(--ink))",
+  "var(--primary)",
+  "color-mix(in oklab, var(--primary) 70%, white)",
+  "color-mix(in oklab, var(--primary) 45%, white)",
+];
+
 export function MoodPracticeForm({
   mood,
   setMood,
@@ -375,68 +363,90 @@ export function MoodPracticeForm({
   };
 
   return (
-    <section className="space-y-4" data-testid="mood-form">
-      <h2 className="font-display text-xl text-[var(--ink)]">
-        {PRACTICE_META.mood.title}
-      </h2>
-      <p className="text-sm text-[var(--ink-muted)]">
-        Как общий фон прямо сейчас?
-      </p>
-      <div className="grid gap-2">
-        {MOOD_OPTIONS.map((opt) => (
-          <button
-            type="button"
-            key={opt.value}
-            data-testid={`mood-${opt.value}`}
-            className={
-              mood === opt.value
-                ? "rounded-xl bg-[var(--primary)] px-4 py-3 text-left text-sm font-medium text-[var(--primary-foreground)]"
-                : "rounded-xl bg-[var(--secondary)] px-4 py-3 text-left text-sm font-medium"
-            }
-            onClick={() => setMood(opt.value)}
-          >
-            {opt.hint}. {opt.label}
-          </button>
-        ))}
-      </div>
-      <div className="space-y-2">
-        <Label>Чем были заняты? (по желанию)</Label>
+    <section className="practice-sheet" data-testid="mood-form">
+      <PracticeHeader
+        practiceKey="mood"
+        intro="Как общий фон прямо сейчас? Без оценки, просто название."
+      />
+      <PracticeCard step={1} title="Фон" hint="Выберите одно, ближайшее">
+        <div className="grid gap-2">
+          {MOOD_OPTIONS.map((opt) => (
+            <PracticeChoice
+              key={opt.value}
+              testId={`mood-${opt.value}`}
+              active={mood === opt.value}
+              onClick={() => setMood(opt.value)}
+              title={opt.label}
+              leading={
+                <span
+                  className="practice-tone"
+                  style={{ background: MOOD_TONE[opt.value - 1] }}
+                />
+              }
+            />
+          ))}
+        </div>
+      </PracticeCard>
+      <PracticeCard
+        step={2}
+        title="Чем были заняты"
+        hint="Можно несколько или пропустить"
+      >
         <div className="flex flex-wrap gap-2">
           {ACTIVITY_TAGS.map((tag) => (
-            <Chip
+            <PracticeChip
               key={tag}
               testId={`activity-${tag}`}
               active={activities.includes(tag)}
               onClick={() => toggle(tag)}
             >
               {tag}
-            </Chip>
+            </PracticeChip>
           ))}
         </div>
-      </div>
-      <div className="space-y-1.5">
-        <Label htmlFor="mood-note">Короткая заметка</Label>
+      </PracticeCard>
+      <PracticeCard
+        step={3}
+        title="Короткая заметка"
+        hint="По желанию: что повлияло"
+      >
+        <Label htmlFor="mood-note" className="sr-only">
+          Короткая заметка
+        </Label>
         <Textarea
           id="mood-note"
           data-testid="mood-note"
           rows={3}
+          className="min-h-[5.5rem]"
           value={note}
           onChange={(e) => setNote(e.target.value)}
-          placeholder="Что повлияло на настроение…"
+          placeholder="Что повлияло на настроение"
         />
-      </div>
-      <button
-        type="button"
-        data-testid="mood-save"
-        disabled={mood === null}
-        className="inline-flex h-11 w-full items-center justify-center rounded-xl bg-[var(--primary)] px-4 text-sm font-medium text-[var(--primary-foreground)] disabled:opacity-40"
-        onClick={onSave}
-      >
+      </PracticeCard>
+      <PracticeSave testId="mood-save" disabled={mood === null} onClick={onSave}>
         Сохранить
-      </button>
+      </PracticeSave>
     </section>
   );
 }
+
+const GRATITUDE_PROMPTS = [
+  {
+    title: "Сначала это",
+    hint: "Даже совсем маленькое",
+    placeholder: "Например: тёплый чай утром",
+  },
+  {
+    title: "Ещё",
+    hint: "Если всплывает второе",
+    placeholder: "Например: сообщение от друга",
+  },
+  {
+    title: "И ещё, если хочется",
+    hint: "Можно оставить пустым",
+    placeholder: "Ещё одно, по желанию",
+  },
+] as const;
 
 export function GratitudePracticeForm({
   items,
@@ -449,40 +459,41 @@ export function GratitudePracticeForm({
 }) {
   const filled = items.filter((i) => i.trim()).length;
   return (
-    <section className="space-y-4" data-testid="gratitude-form">
-      <h2 className="font-display text-xl text-[var(--ink)]">
-        {PRACTICE_META.gratitude.title}
-      </h2>
-      <p className="text-sm text-[var(--ink-muted)]">
-        Запишите 1–3 вещи, даже совсем маленькие.
-      </p>
-      {[0, 1, 2].map((i) => (
-        <div key={i} className="space-y-1.5">
-          <Label htmlFor={`gratitude-${i}`}>Пункт {i + 1}</Label>
+    <section className="practice-sheet" data-testid="gratitude-form">
+      <PracticeHeader
+        practiceKey="gratitude"
+        intro="Запишите одну, две или три вещи, за которые можно сказать спасибо. Хватит и одной."
+      />
+      {GRATITUDE_PROMPTS.map((prompt, i) => (
+        <PracticeCard
+          key={i}
+          step={i + 1}
+          title={prompt.title}
+          hint={prompt.hint}
+        >
+          <Label htmlFor={`gratitude-${i}`} className="sr-only">
+            {prompt.title}
+          </Label>
           <Input
             id={`gratitude-${i}`}
             data-testid={`gratitude-${i}`}
+            className="h-12"
             value={items[i]}
             onChange={(e) => setItem(i, e.target.value)}
-            placeholder={
-              i === 0
-                ? "Например: тёплый чай утром"
-                : i === 1
-                  ? "Например: сообщение от друга"
-                  : "Опционально"
-            }
+            placeholder={prompt.placeholder}
           />
-        </div>
+        </PracticeCard>
       ))}
-      <button
-        type="button"
-        data-testid="gratitude-save"
+      <p className="px-1 text-[0.88rem] text-[var(--ink-muted)]">
+        Заполнено {filled} из 3. Для сохранения достаточно одного.
+      </p>
+      <PracticeSave
+        testId="gratitude-save"
         disabled={filled < 1}
-        className="inline-flex h-11 w-full items-center justify-center rounded-xl bg-[var(--primary)] px-4 text-sm font-medium text-[var(--primary-foreground)] disabled:opacity-40"
         onClick={onSave}
       >
         Сохранить
-      </button>
+      </PracticeSave>
     </section>
   );
 }
@@ -512,66 +523,79 @@ export function EmotionsPracticeForm({
     );
   };
 
+  const intensityWords = ["едва", "чуть", "средне", "явно", "очень"] as const;
+
   return (
-    <section className="space-y-4" data-testid="emotions-form">
-      <h2 className="font-display text-xl text-[var(--ink)]">
-        {PRACTICE_META.emotions.title}
-      </h2>
-      <p className="text-sm text-[var(--ink-muted)]">
-        Какие чувства заметны сейчас? Можно выбрать несколько.
-      </p>
-      <div className="flex flex-wrap gap-2">
-        {EMOTION_TAGS.map((tag) => (
-          <Chip
-            key={tag}
-            testId={`emotion-${tag}`}
-            active={emotions.includes(tag)}
-            onClick={() => toggle(tag)}
-          >
-            {tag}
-          </Chip>
-        ))}
-      </div>
-      <div className="space-y-2">
-        <Label>Насколько сильно (1–5)</Label>
-        <div className="grid grid-cols-5 gap-2">
+    <section className="practice-sheet" data-testid="emotions-form">
+      <PracticeHeader
+        practiceKey="emotions"
+        intro="Какие чувства заметны сейчас? Можно несколько. Без оценки правильно это или нет."
+      />
+      <PracticeCard
+        step={1}
+        title="Чувства"
+        hint="Нажмите на те, что ближе"
+      >
+        <div className="flex flex-wrap gap-2">
+          {EMOTION_TAGS.map((tag) => (
+            <PracticeChip
+              key={tag}
+              testId={`emotion-${tag}`}
+              active={emotions.includes(tag)}
+              onClick={() => toggle(tag)}
+            >
+              {tag}
+            </PracticeChip>
+          ))}
+        </div>
+      </PracticeCard>
+      <PracticeCard
+        step={2}
+        title="Насколько сильно"
+        hint="Общая сила переживания"
+      >
+        <div className="practice-intensity">
           {([1, 2, 3, 4, 5] as MoodLevel[]).map((n) => (
             <button
               type="button"
               key={n}
               data-testid={`intensity-${n}`}
-              className={
-                intensity === n
-                  ? "h-11 rounded-xl bg-[var(--primary)] text-sm font-medium text-[var(--primary-foreground)]"
-                  : "h-11 rounded-xl bg-[var(--secondary)] text-sm font-medium"
-              }
+              data-active={intensity === n ? "true" : "false"}
               onClick={() => setIntensity(n)}
             >
-              {n}
+              <span className="text-[1.05rem] font-semibold">{n}</span>
+              <span className="text-[0.72rem] leading-none">
+                {intensityWords[n - 1]}
+              </span>
             </button>
           ))}
         </div>
-      </div>
-      <div className="space-y-1.5">
-        <Label htmlFor="emotion-note">Контекст (по желанию)</Label>
+      </PracticeCard>
+      <PracticeCard
+        step={3}
+        title="С чем связано"
+        hint="По желанию"
+      >
+        <Label htmlFor="emotion-note" className="sr-only">
+          Контекст
+        </Label>
         <Textarea
           id="emotion-note"
           data-testid="emotion-note"
           rows={3}
+          className="min-h-[5.5rem]"
           value={note}
           onChange={(e) => setNote(e.target.value)}
-          placeholder="С чем связано…"
+          placeholder="С чем связано"
         />
-      </div>
-      <button
-        type="button"
-        data-testid="emotions-save"
+      </PracticeCard>
+      <PracticeSave
+        testId="emotions-save"
         disabled={emotions.length === 0 || intensity === null}
-        className="inline-flex h-11 w-full items-center justify-center rounded-xl bg-[var(--primary)] px-4 text-sm font-medium text-[var(--primary-foreground)] disabled:opacity-40"
         onClick={onSave}
       >
         Сохранить
-      </button>
+      </PracticeSave>
     </section>
   );
 }

@@ -4,10 +4,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
+  PracticeCard,
+  PracticeChoice,
+  PracticeHeader,
+  PracticeSave,
+} from "@/components/practice-ui";
+import {
   FIVE_WHYS_MAX,
   FIVE_WHYS_MIN,
   IDEAL_DAY_HORIZONS,
-  PRACTICE_META,
 } from "@/lib/practices";
 
 export function IdealDayPracticeForm({
@@ -47,102 +52,107 @@ export function IdealDayPracticeForm({
     smallStep.trim().length >= 3;
 
   return (
-    <section className="space-y-4" data-testid="ideal-day-form">
-      <div>
-        <h2 className="font-display text-xl text-[var(--ink)]">
-          {PRACTICE_META["ideal-day"].title}
-        </h2>
-        <p className="mt-1 text-sm text-[var(--ink-muted)]">
-          Не идеал «на витрину», а день, в котором вам по-настоящему хорошо.
-          Потом один маленький шаг ближе к нему.
-        </p>
-      </div>
+    <section className="practice-sheet" data-testid="ideal-day-form">
+      <PracticeHeader
+        practiceKey="ideal-day"
+        intro="Не идеал на витрину, а день, в котором вам по-настоящему хорошо. Потом один маленький шаг ближе к нему."
+      />
 
-      <div className="space-y-2">
-        <Label>Горизонт</Label>
+      <PracticeCard step={1} title="Горизонт" hint="Какой день представляете">
         <div className="grid gap-2">
           {IDEAL_DAY_HORIZONS.map((h) => (
-            <button
-              type="button"
+            <PracticeChoice
               key={h}
-              data-testid={`ideal-horizon-${h}`}
-              className={
-                horizon === h
-                  ? "rounded-xl bg-[var(--primary)] px-4 py-3 text-left text-sm font-medium text-[var(--primary-foreground)]"
-                  : "rounded-xl bg-[var(--secondary)] px-4 py-3 text-left text-sm font-medium"
-              }
+              testId={`ideal-horizon-${h}`}
+              active={horizon === h}
               onClick={() => setHorizon(h)}
-            >
-              {h}
-            </button>
+              title={h}
+            />
           ))}
         </div>
-      </div>
+      </PracticeCard>
 
-      <div className="space-y-1.5">
-        <Label htmlFor="ideal-setting">Где вы и какая обстановка?</Label>
+      <PracticeCard step={2} title="Где вы" hint="Обстановка, свет, место">
+        <Label htmlFor="ideal-setting" className="sr-only">
+          Где вы и какая обстановка
+        </Label>
         <Textarea
           id="ideal-setting"
           data-testid="ideal-setting"
           rows={2}
+          className="min-h-[4.5rem]"
           value={setting}
           onChange={(e) => setSetting(e.target.value)}
-          placeholder="Например: утро дома, свет, тихо…"
+          placeholder="Например: утро дома, свет, тихо"
         />
-      </div>
-      <div className="space-y-1.5">
-        <Label htmlFor="ideal-actions">Что вы делаете в течение дня?</Label>
+      </PracticeCard>
+      <PracticeCard step={3} title="Что вы делаете" hint="Работа, отдых, движение">
+        <Label htmlFor="ideal-actions" className="sr-only">
+          Что вы делаете в течение дня
+        </Label>
         <Textarea
           id="ideal-actions"
           data-testid="ideal-actions"
           rows={3}
+          className="min-h-[5.5rem]"
           value={actions}
           onChange={(e) => setActions(e.target.value)}
-          placeholder="Работа, отдых, движение, творчество…"
+          placeholder="Без спешки, с паузами"
         />
-      </div>
-      <div className="space-y-1.5">
-        <Label htmlFor="ideal-feelings">Как вы себя чувствуете?</Label>
+      </PracticeCard>
+      <PracticeCard step={4} title="Как вы себя чувствуете" hint="Телом и эмоциями">
+        <Label htmlFor="ideal-feelings" className="sr-only">
+          Как вы себя чувствуете
+        </Label>
         <Textarea
           id="ideal-feelings"
           data-testid="ideal-feelings"
           rows={2}
+          className="min-h-[4.5rem]"
           value={feelings}
           onChange={(e) => setFeelings(e.target.value)}
-          placeholder="Телом и эмоциями…"
+          placeholder="Спокойно, собрано, тепло"
         />
-      </div>
-      <div className="space-y-1.5">
-        <Label htmlFor="ideal-people">С кем вы (или наедине с собой)?</Label>
+      </PracticeCard>
+      <PracticeCard step={5} title="С кем вы" hint="Или наедине с собой, по желанию">
+        <Label htmlFor="ideal-people" className="sr-only">
+          С кем вы
+        </Label>
         <Input
           id="ideal-people"
           data-testid="ideal-people"
+          className="h-12"
           value={people}
           onChange={(e) => setPeople(e.target.value)}
           placeholder="По желанию"
         />
-      </div>
-      <div className="space-y-1.5">
-        <Label htmlFor="ideal-step">Один маленький шаг на ближайшие дни</Label>
+      </PracticeCard>
+      <PracticeCard
+        step={6}
+        title="Один маленький шаг"
+        hint="Что реально сделать уже завтра"
+      >
+        <Label htmlFor="ideal-step" className="sr-only">
+          Один маленький шаг на ближайшие дни
+        </Label>
         <Textarea
           id="ideal-step"
           data-testid="ideal-step"
           rows={2}
+          className="min-h-[4.5rem]"
           value={smallStep}
           onChange={(e) => setSmallStep(e.target.value)}
-          placeholder="Что реально сделать уже завтра?"
+          placeholder="Конкретное и маленькое"
         />
-      </div>
+      </PracticeCard>
 
-      <button
-        type="button"
-        data-testid="ideal-day-save"
+      <PracticeSave
+        testId="ideal-day-save"
         disabled={!ready}
-        className="inline-flex h-11 w-full items-center justify-center rounded-xl bg-[var(--primary)] px-4 text-sm font-medium text-[var(--primary-foreground)] disabled:opacity-40"
         onClick={onSave}
       >
         Сохранить
-      </button>
+      </PracticeSave>
     </section>
   );
 }
@@ -176,82 +186,104 @@ export function FiveWhysPracticeForm({
     filledSteps >= FIVE_WHYS_MIN &&
     needNow.trim().length >= 2;
 
-  return (
-    <section className="space-y-4" data-testid="five-whys-form">
-      <div>
-        <h2 className="font-display text-xl text-[var(--ink)]">
-          {PRACTICE_META["five-whys"].title}
-        </h2>
-        <p className="mt-1 text-sm text-[var(--ink-muted)]">
-          Идём вглубь мягко. Достаточно 2–5 ответов. Если становится тяжело,
-          остановитесь и ответьте, что нужно сейчас. Это не копание «до дна».
-        </p>
-      </div>
+  const whyTitles = [
+    "Почему это так",
+    "А это откуда",
+    "Что стоит глубже",
+    "Ещё на слой ниже",
+    "Самое тихое «потому что»",
+  ];
 
-      <div className="space-y-1.5">
-        <Label htmlFor="five-start">С чего начинаем?</Label>
+  return (
+    <section className="practice-sheet" data-testid="five-whys-form">
+      <PracticeHeader
+        practiceKey="five-whys"
+        intro="Идём вглубь мягко. Достаточно двух-пяти ответов. Если становится тяжело, остановитесь и ответьте, что нужно сейчас."
+      />
+
+      <PracticeCard
+        step={1}
+        title="С чего начинаем"
+        hint="Ситуация, чувство или мысль"
+      >
+        <Label htmlFor="five-start" className="sr-only">
+          С чего начинаем
+        </Label>
         <Textarea
           id="five-start"
           data-testid="five-start"
           rows={3}
+          className="min-h-[5.5rem]"
           value={starting}
           onChange={(e) => setStarting(e.target.value)}
-          placeholder="Ситуация, чувство или мысль, которую хочется понять…"
+          placeholder="Что хочется понять"
         />
-      </div>
+      </PracticeCard>
 
-      {steps.map((step, index) => (
-        <div key={index} className="space-y-1.5">
-          <Label htmlFor={`five-why-${index}`}>
-            Почему {index + 1}?
-          </Label>
-          <Textarea
-            id={`five-why-${index}`}
-            data-testid={`five-why-${index}`}
-            rows={2}
-            value={step}
-            onChange={(e) => setStepWhy(index, e.target.value)}
-            placeholder={
-              index === 0
-                ? "Потому что…"
-                : "А это почему так важно / откуда берётся?"
-            }
-          />
-        </div>
-      ))}
+      <div className="practice-chain">
+        {steps.map((step, index) => (
+          <PracticeCard
+            key={index}
+            step={index + 2}
+            title={whyTitles[index] ?? `Ещё один слой`}
+            hint={index === 0 ? "Первый ответ, своими словами" : "Без давления докопаться"}
+          >
+            <Label htmlFor={`five-why-${index}`} className="sr-only">
+              {whyTitles[index]}
+            </Label>
+            <Textarea
+              id={`five-why-${index}`}
+              data-testid={`five-why-${index}`}
+              rows={2}
+              className="min-h-[4.5rem]"
+              value={step}
+              onChange={(e) => setStepWhy(index, e.target.value)}
+              placeholder={
+                index === 0
+                  ? "Потому что"
+                  : "А это почему так важно"
+              }
+            />
+          </PracticeCard>
+        ))}
+      </div>
 
       {canAdd && (
         <button
           type="button"
           data-testid="five-whys-add"
-          className="inline-flex h-10 w-full items-center justify-center rounded-xl bg-[var(--secondary)] px-4 text-sm font-medium"
+          className="inline-flex h-11 w-full items-center justify-center rounded-2xl border border-[var(--line)] bg-[var(--surface-strong)] px-4 text-[0.98rem] font-medium text-[var(--ink)]"
           onClick={addStep}
         >
-          Ещё одно «почему» ({steps.length}/{FIVE_WHYS_MAX})
+          Ещё один слой ({steps.length}/{FIVE_WHYS_MAX})
         </button>
       )}
 
-      <div className="space-y-1.5">
-        <Label htmlFor="five-need">Что мне нужно сейчас?</Label>
+      <PracticeCard
+        title="Что мне нужно сейчас"
+        hint="Опора, пауза, граница, вода, сон"
+      >
+        <Label htmlFor="five-need" className="sr-only">
+          Что мне нужно сейчас
+        </Label>
         <Textarea
           id="five-need"
           data-testid="five-need"
           rows={2}
+          className="min-h-[4.5rem]"
           value={needNow}
           onChange={(e) => setNeedNow(e.target.value)}
-          placeholder="Опора, пауза, разговор, граница, вода, сон…"
+          placeholder="Что поддержит прямо сейчас"
         />
-      </div>
+      </PracticeCard>
 
-      <button
-        type="button"
-        data-testid="five-whys-save"
+      <PracticeSave
+        testId="five-whys-save"
         disabled={!ready}
-        className="inline-flex h-11 w-full items-center justify-center rounded-xl bg-[var(--primary)] px-4 text-sm font-medium text-[var(--primary-foreground)] disabled:opacity-40"
         onClick={onSave}
       >
         Сохранить
-      </button>
+      </PracticeSave>
     </section>
   );
 }

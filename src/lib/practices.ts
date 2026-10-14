@@ -38,43 +38,53 @@ export const PRACTICE_META = {
   mood: {
     title: "Дневник настроения",
     blurb: "Отметьте фон дня и чем были заняты. Около 1–2 минут.",
+    pace: "Около двух минут",
   },
   gratitude: {
     title: "Благодарность",
     blurb: "1–3 вещи, за которые сегодня можно сказать «спасибо».",
+    pace: "Минута или две",
   },
   emotions: {
     title: "Эмоции",
     blurb: "Назовите чувства и силу переживания, без оценки «правильно/нет».",
+    pace: "Около двух минут",
   },
   questions: {
     title: "Генератор вопросов",
     blurb: "Три направляющих вопроса по теме, чтобы яснее увидеть мысль.",
+    pace: "Три коротких ответа",
   },
   abc: {
     title: "ABC-дневник",
     blurb: "A: событие. B: мысль. C: чувства и поведение (КПТ).",
+    pace: "Три шага",
   },
   wheel: {
     title: "Колесо баланса",
     blurb: "Оцените сферы жизни от 1 до 10 и заметьте, куда тянет внимание.",
+    pace: "Снимок восьми сфер",
   },
   breath: {
     title: "Практика дыхания",
     blurb: "1–3 минуты спокойного дыхания и короткая заметка после.",
+    pace: "1-3 минуты",
   },
   "ideal-day": {
     title: "Идеальный день",
     blurb: "Опишите желаемый день по шагам и один маленький шаг к нему.",
+    pace: "Несколько коротких картин",
   },
   "five-whys": {
     title: "5 почему",
     blurb:
       "Аккуратно дойдите до корня чувства и мягко закройте вопрос «что нужно сейчас».",
+    pace: "2-5 мягких шагов",
   },
   decision: {
     title: "Определиться с выбором",
     blurb: "Когда есть конкретный выбор: мягкий разбор по шагам.",
+    pace: "Короткий разбор",
   },
 } as const;
 
@@ -209,11 +219,13 @@ export type QuestionTopicId =
 export const QUESTION_TOPICS: {
   id: QuestionTopicId;
   label: string;
+  hint: string;
   questions: { id: string; text: string }[];
 }[] = [
   {
     id: "values",
     label: "Ценности и важное",
+    hint: "Что беречь в этом выборе",
     questions: [
       {
         id: "v1",
@@ -232,6 +244,7 @@ export const QUESTION_TOPICS: {
   {
     id: "conflict",
     label: "Конфликт / напряжение",
+    hint: "Что задело и чего хочется",
     questions: [
       {
         id: "c1",
@@ -250,6 +263,7 @@ export const QUESTION_TOPICS: {
   {
     id: "self",
     label: "О себе",
+    hint: "Какую историю вы себе рассказываете",
     questions: [
       {
         id: "s1",
@@ -268,6 +282,7 @@ export const QUESTION_TOPICS: {
   {
     id: "evening",
     label: "Вечерняя рефлексия",
+    hint: "Закрыть день без суда",
     questions: [
       {
         id: "e1",
@@ -286,6 +301,7 @@ export const QUESTION_TOPICS: {
   {
     id: "anxiety",
     label: "Тревожная мысль",
+    hint: "Отделить страх от факта",
     questions: [
       {
         id: "a1",

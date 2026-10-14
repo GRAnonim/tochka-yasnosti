@@ -5,6 +5,12 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { WheelChartCard } from "@/components/wheel-chart";
 import {
+  PracticeCard,
+  PracticeChoice,
+  PracticeHeader,
+  PracticeSave,
+} from "@/components/practice-ui";
+import {
   playBreathPhaseCue,
   unlockBreathAudio,
 } from "@/lib/breath-audio";
@@ -12,7 +18,6 @@ import {
   BREATH_DURATIONS,
   BREATH_RHYTHMS,
   loadBreathSettings,
-  PRACTICE_META,
   saveBreathSettings,
   WHEEL_AREAS,
   type BreathRhythmId,
@@ -59,83 +64,75 @@ export function WheelPracticeForm({
   }, [ready, scores, focusNote]);
 
   return (
-    <section className="space-y-4" data-testid="wheel-form">
-      <div>
-        <h2 className="font-display text-xl text-[var(--ink)]">
-          {PRACTICE_META.wheel.title}
-        </h2>
-        <p className="mt-1 text-sm text-[var(--ink-muted)]">
-          Оцените каждую сферу от 1 (совсем не устраивает) до 10 (устраивает).
-          Это снимок сейчас, не приговор.
-        </p>
-      </div>
+    <section className="practice-sheet" data-testid="wheel-form">
+      <PracticeHeader
+        practiceKey="wheel"
+        intro="Оцените каждую сферу от 1 (совсем не устраивает) до 10 (устраивает). Это снимок сейчас, не приговор."
+      />
 
-      <div className="space-y-4">
-        {WHEEL_AREAS.map((area) => (
-          <div key={area.id} className="space-y-2">
-            <div className="flex items-center justify-between gap-2">
-              <Label>{area.label}</Label>
-              <span className="text-sm text-[var(--ink-muted)]">
-                {scores[area.id] ?? "—"}
-              </span>
-            </div>
-            <div className="grid grid-cols-10 gap-1">
+      {WHEEL_AREAS.map((area, index) => {
+        const value = scores[area.id] ?? 0;
+        return (
+          <PracticeCard
+            key={area.id}
+            step={index + 1}
+            title={area.label}
+            hint={value ? `${value} из 10` : "Ещё не отмечено"}
+          >
+            <div className="practice-fill">
               {Array.from({ length: 10 }, (_, i) => i + 1).map((n) => (
                 <button
                   type="button"
                   key={n}
                   data-testid={`wheel-${area.id}-${n}`}
-                  className={
-                    scores[area.id] === n
-                      ? "h-8 rounded-lg bg-[var(--primary)] text-xs font-medium text-[var(--primary-foreground)]"
-                      : "h-8 rounded-lg bg-[var(--secondary)] text-xs font-medium text-[var(--ink-soft)]"
-                  }
+                  data-on={n <= value ? "true" : "false"}
+                  data-current={value === n ? "true" : "false"}
+                  className="practice-fill-cell"
                   onClick={() => setScore(area.id, n)}
                 >
                   {n}
                 </button>
               ))}
             </div>
-          </div>
-        ))}
-      </div>
+          </PracticeCard>
+        );
+      })}
 
       {lowest.length > 0 && (
-        <p className="rounded-2xl bg-[var(--surface)] px-3 py-3 text-sm text-[var(--ink-soft)]">
+        <p className="rounded-2xl border border-[var(--line)] bg-[var(--surface-strong)] px-3.5 py-3 text-[0.95rem] leading-relaxed text-[var(--ink-soft)]">
           Сейчас ниже всего:{" "}
           {lowest.map((a) => `${a.label} (${a.score})`).join(", ")}. Можно
           коротко отметить один мягкий шаг.
         </p>
       )}
 
-      <div className="space-y-1.5">
-        <Label htmlFor="wheel-note">Куда хочу чуть больше внимания</Label>
+      <PracticeCard
+        title="Куда хочу чуть больше внимания"
+        hint="Один маленький шаг, по желанию"
+      >
+        <Label htmlFor="wheel-note" className="sr-only">
+          Куда хочу чуть больше внимания
+        </Label>
         <Textarea
           id="wheel-note"
           data-testid="wheel-note"
           rows={3}
+          className="min-h-[5.5rem]"
           value={focusNote}
           onChange={(e) => setFocusNote(e.target.value)}
-          placeholder="Например: 15 минут прогулки завтра…"
+          placeholder="Например: 15 минут прогулки завтра"
         />
-      </div>
+      </PracticeCard>
 
       {previewEntry && (
-        <div className="space-y-2">
-          <p className="text-sm text-[var(--ink-muted)]">Предпросмотр круга</p>
+        <PracticeCard title="Предпросмотр круга">
           <WheelChartCard entry={previewEntry} showDownload={false} />
-        </div>
+        </PracticeCard>
       )}
 
-      <button
-        type="button"
-        data-testid="wheel-save"
-        disabled={!ready}
-        className="inline-flex h-11 w-full items-center justify-center rounded-2xl bg-[var(--primary)] px-4 text-sm font-medium text-[var(--primary-foreground)] disabled:opacity-40"
-        onClick={onSave}
-      >
+      <PracticeSave testId="wheel-save" disabled={!ready} onClick={onSave}>
         Сохранить колесо
-      </button>
+      </PracticeSave>
     </section>
   );
 }
@@ -233,39 +230,30 @@ export function BreathPracticeForm({
   };
 
   return (
-    <section className="space-y-4" data-testid="breath-form">
-      <div>
-        <h2 className="font-display text-xl text-[var(--ink)]">
-          {PRACTICE_META.breath.title}
-        </h2>
-        <p className="mt-1 text-sm text-[var(--ink-muted)]">
-          Ритм {inhaleSec} с вдох · {exhaleSec} с выдох. Можно закрыть глаза:
-          мягкие сигналы подскажут фазу. Остановить можно раньше.
-        </p>
-      </div>
+    <section className="practice-sheet" data-testid="breath-form">
+      <PracticeHeader
+        practiceKey="breath"
+        intro={`Ритм ${inhaleSec} с вдох, ${exhaleSec} с выдох. Можно закрыть глаза: мягкие сигналы подскажут фазу. Остановить можно раньше.`}
+      />
 
       {phase === "idle" && (
         <>
-          <div className="grid gap-2">
-            {BREATH_DURATIONS.map((d) => (
-              <button
-                type="button"
-                key={d.sec}
-                data-testid={`breath-duration-${d.sec}`}
-                className={
-                  durationSec === d.sec
-                    ? "rounded-xl bg-[var(--primary)] px-4 py-3 text-left text-sm font-medium text-[var(--primary-foreground)]"
-                    : "rounded-xl bg-[var(--secondary)] px-4 py-3 text-left text-sm font-medium"
-                }
-                onClick={() => setDurationSec(d.sec)}
-              >
-                {d.label}
-              </button>
-            ))}
-          </div>
+          <PracticeCard step={1} title="Сколько времени" hint="Короче часто лучше">
+            <div className="grid gap-2">
+              {BREATH_DURATIONS.map((d) => (
+                <PracticeChoice
+                  key={d.sec}
+                  testId={`breath-duration-${d.sec}`}
+                  active={durationSec === d.sec}
+                  onClick={() => setDurationSec(d.sec)}
+                  title={d.label}
+                />
+              ))}
+            </div>
+          </PracticeCard>
 
           <div
-            className="space-y-3 rounded-2xl border border-[var(--line)] bg-[var(--surface)] px-3 py-3"
+            className="practice-card space-y-3"
             data-testid="breath-settings"
           >
             <div className="flex items-baseline justify-between gap-2">
@@ -280,15 +268,14 @@ export function BreathPracticeForm({
                   type="button"
                   key={r.id}
                   data-testid={`breath-rhythm-${r.id}`}
-                  className={
-                    rhythmId === r.id
-                      ? "rounded-xl bg-[var(--primary)] px-2 py-2.5 text-center text-sm font-medium text-[var(--primary-foreground)]"
-                      : "rounded-xl bg-[var(--secondary)] px-2 py-2.5 text-center text-sm font-medium text-[var(--ink-soft)]"
-                  }
+                  data-active={rhythmId === r.id ? "true" : "false"}
+                  className="practice-chip w-full flex-col justify-center rounded-xl px-2 py-2.5 text-center"
                   onClick={() => setRhythmId(r.id)}
                 >
-                  <span className="block">{r.label}</span>
-                  <span className="mt-0.5 block text-[10px] font-normal opacity-80">
+                  <span className="block text-[0.98rem] font-semibold">
+                    {r.label}
+                  </span>
+                  <span className="mt-0.5 block text-[0.72rem] font-normal opacity-80">
                     {r.hint}
                   </span>
                 </button>
@@ -341,19 +328,14 @@ export function BreathPracticeForm({
             )}
           </div>
 
-          <button
-            type="button"
-            data-testid="breath-start"
-            className="inline-flex h-11 w-full items-center justify-center rounded-xl bg-[var(--primary)] px-4 text-sm font-medium text-[var(--primary-foreground)]"
-            onClick={() => void startSession()}
-          >
+          <PracticeSave testId="breath-start" onClick={() => void startSession()}>
             Начать
-          </button>
+          </PracticeSave>
         </>
       )}
 
       {phase === "running" && (
-        <div className="flex flex-col items-center gap-4 py-4">
+        <div className="flex flex-col items-center gap-4 rounded-2xl border border-[var(--line)] bg-[var(--surface-strong)] px-4 py-6">
           <p className="text-xs text-[var(--ink-muted)]">
             {inhaleSec} с вдох · {exhaleSec} с выдох
             {soundOn ? " · звук включён" : " · без звука"}
@@ -390,28 +372,29 @@ export function BreathPracticeForm({
 
       {phase === "done" && (
         <>
-          <p className="rounded-xl bg-[var(--surface)] px-3 py-3 text-sm text-[var(--ink-soft)]">
+          <p className="rounded-2xl border border-[var(--line)] bg-[var(--surface-strong)] px-3.5 py-3 text-[0.98rem] leading-relaxed text-[var(--ink-soft)]">
             Практика завершена. Что заметили в теле или настроении?
           </p>
-          <div className="space-y-1.5">
-            <Label htmlFor="breath-notice">Заметка после дыхания</Label>
+          <PracticeCard title="Заметка после дыхания" hint="По желанию">
+            <Label htmlFor="breath-notice" className="sr-only">
+              Заметка после дыхания
+            </Label>
             <Textarea
               id="breath-notice"
               data-testid="breath-notice"
               rows={3}
+              className="min-h-[5.5rem]"
               value={notice}
               onChange={(e) => setNotice(e.target.value)}
-              placeholder="Например: плечи чуть мягче…"
+              placeholder="Например: плечи чуть мягче"
             />
-          </div>
-          <button
-            type="button"
-            data-testid="breath-save"
-            className="inline-flex h-11 w-full items-center justify-center rounded-xl bg-[var(--primary)] px-4 text-sm font-medium text-[var(--primary-foreground)]"
+          </PracticeCard>
+          <PracticeSave
+            testId="breath-save"
             onClick={() => onSave(completedFull)}
           >
             Сохранить
-          </button>
+          </PracticeSave>
         </>
       )}
     </section>
