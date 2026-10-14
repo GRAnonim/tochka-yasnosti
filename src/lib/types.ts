@@ -185,6 +185,7 @@ export type Screen =
   | "ideal-day"
   | "five-whys"
   | "practice-log"
+  | "practice-done"
   | "new-situation"
   | "filter"
   | "decision-questions"

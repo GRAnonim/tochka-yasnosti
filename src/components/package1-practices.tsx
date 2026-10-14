@@ -160,6 +160,15 @@ export function PracticesMenu({
     body: IconGroupBody,
   } as const;
 
+  const startHere: {
+    key: MenuPracticeKey;
+    why: string;
+  }[] = [
+    { key: "breath", why: "Если тяжело в теле — 1 минута дыхания" },
+    { key: "mood", why: "Если просто нужно назвать фон дня" },
+    { key: "abc", why: "Если мысли крутятся по кругу" },
+  ];
+
   return (
     <section
       className="-mx-1 space-y-4 sm:-mx-2"
@@ -168,8 +177,41 @@ export function PracticesMenu({
       <div className="px-0.5">
         <h2 className="font-display text-lg text-[var(--ink)]">Практики</h2>
         <p className="mt-1 text-[0.95rem] leading-relaxed text-[var(--ink-muted)]">
-          Выберите раздел. Звезда — на главную.
+          Можно начать с короткого шага ниже — или открыть раздел.
         </p>
+      </div>
+
+      <div
+        className="space-y-2 rounded-2xl border border-[color-mix(in_oklab,var(--primary)_18%,transparent)] bg-[color-mix(in_oklab,var(--primary)_6%,white)] p-2.5"
+        data-testid="practices-start-here"
+      >
+        <p className="px-1 text-[0.78rem] font-medium tracking-[0.07em] text-[var(--ink-muted)] uppercase">
+          Начни здесь
+        </p>
+        <div className="grid gap-1.5">
+          {startHere.map((item) => (
+            <button
+              type="button"
+              key={item.key}
+              data-testid={`start-here-${item.key}`}
+              className="flex w-full items-center gap-3 rounded-xl bg-[color-mix(in_oklab,white_78%,transparent)] px-3 py-2.5 text-left transition hover:opacity-95"
+              onClick={() => onOpen(item.key)}
+            >
+              <PracticeIconMark name={item.key} className="h-9 w-9" />
+              <span className="min-w-0 flex-1">
+                <span className="block text-[1rem] font-semibold text-[var(--ink)]">
+                  {PRACTICE_META[item.key].title}
+                </span>
+                <span className="mt-0.5 block text-[0.9rem] leading-snug text-[var(--ink-muted)]">
+                  {item.why}
+                </span>
+              </span>
+              <span className="text-[var(--ink-muted)]" aria-hidden>
+                ›
+              </span>
+            </button>
+          ))}
+        </div>
       </div>
 
       <div className="space-y-3.5">
@@ -199,7 +241,7 @@ export function PracticesMenu({
                       {group.title}
                     </span>
                     <span className="mt-1 block text-[0.95rem] text-[var(--ink-muted)]">
-                      {group.items.length} практики · нажмите, чтобы открыть
+                      {group.items.length} практики
                     </span>
                   </span>
                 </span>

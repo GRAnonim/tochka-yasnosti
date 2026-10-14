@@ -1,4 +1,5 @@
 import { moodLabel } from "./practices";
+import { countLabel, pluralRu } from "./plural";
 import { DECISION_LABELS } from "./questions";
 import type { StatsSnapshot } from "./stats";
 import type { DecisionChoice, PracticeEntry, SituationRecord } from "./types";
@@ -50,13 +51,19 @@ export function buildHeroInsight(
   }
 
   if (stats.total === 0) {
+    const practicePhrase = countLabel(
+      stats.practiceTotal,
+      "запись практики",
+      "записи практик",
+      "записей практик",
+    );
     return {
       id: "practices-only",
       title: "Вы уже замечаете себя",
       body:
         stats.lastMood !== undefined
-          ? `Есть ${stats.practiceTotal} записей практик. Последнее настроение: ${moodLabel(stats.lastMood)}. Решений ещё нет — это нормально, если сейчас важнее просто быть с собой.`
-          : `Есть ${stats.practiceTotal} записей практик. Когда появится сложный выбор — разбор решения тоже оставит здесь след.`,
+          ? `Есть ${practicePhrase}. Последнее настроение: ${moodLabel(stats.lastMood)}. Решений ещё нет — это нормально, если сейчас важнее просто быть с собой.`
+          : `Есть ${practicePhrase}. Когда появится сложный выбор — разбор решения тоже оставит здесь след.`,
       tone: "soft",
     };
   }
@@ -65,14 +72,14 @@ export function buildHeroInsight(
     return {
       id: "decisions-no-feedback",
       title: "Вы фиксируете выборы",
-      body: `${stats.total} ${plural(stats.total, "решение", "решения", "решений")} уже записано. Если позже ответите, как отозвалось — картина станет теплее и точнее.`,
+      body: `${countLabel(stats.total, "решение", "решения", "решений")} уже записано. Если позже ответите, как отозвалось — картина станет теплее и точнее.`,
       tone: "calm",
     };
   }
 
   const parts: string[] = [];
   parts.push(
-    `У вас уже ${stats.total} ${plural(stats.total, "записанное решение", "записанных решения", "записанных решений")}.`,
+    `У вас уже ${countLabel(stats.total, "записанное решение", "записанных решения", "записанных решений")}.`,
   );
 
   if (stats.worthItYes > 0 && stats.worthItNo === 0) {
@@ -138,16 +145,11 @@ export function recentPracticeLabel(entry: PracticeEntry): string {
   return PRACTICE_LABELS[entry.kind] ?? entry.kind;
 }
 
-function plural(n: number, one: string, few: string, many: string): string {
-  const mod10 = n % 10;
-  const mod100 = n % 100;
-  if (mod10 === 1 && mod100 !== 11) return one;
-  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 10 || mod100 >= 20)) return few;
-  return many;
-}
-
 /** Keep for any legacy callers */
 export function decisionSummaryLine(stats: StatsSnapshot): string | null {
   const parts = decisionParts(stats);
   return parts.length ? parts.join("; ") : null;
 }
+
+// re-export for tests / callers that imported from here historically
+export { pluralRu };

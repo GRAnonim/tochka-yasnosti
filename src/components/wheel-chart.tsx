@@ -204,7 +204,7 @@ export function WheelResultView({
           className="inline-flex h-11 w-full items-center justify-center rounded-xl bg-[var(--secondary)] px-4 text-sm font-medium"
           onClick={onJournal}
         >
-          В журнал практик
+          Дальше
         </button>
         <button
           type="button"

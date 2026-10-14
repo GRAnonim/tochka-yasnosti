@@ -55,6 +55,7 @@ import { WheelResultView } from "@/components/wheel-chart";
 import { IconBrand, PracticeGlyph } from "@/components/practice-icons";
 import {
   loadPracticeFavorites,
+  PRACTICE_META,
   QUESTION_TOPICS,
   savePracticeFavorites,
   WHEEL_AREAS,
@@ -150,6 +151,12 @@ export function ClarityApp() {
   const [fiveSteps, setFiveSteps] = useState<string[]>([""]);
   const [fiveNeedNow, setFiveNeedNow] = useState("");
   const [favorites, setFavorites] = useState<MenuPracticeKey[]>([]);
+  const [lastDoneTitle, setLastDoneTitle] = useState("");
+
+  const finishPractice = (key: MenuPracticeKey) => {
+    setLastDoneTitle(PRACTICE_META[key]?.title ?? "Практика");
+    setScreen("practice-done");
+  };
 
   const fillGoalInputs = (goals: { text: string }[]) => {
     setGoalInputs([
@@ -278,7 +285,7 @@ export function ClarityApp() {
       ],
     });
     resetMoodDraft();
-    setScreen("practice-log");
+    finishPractice("mood");
   };
 
   const saveGratitude = () => {
@@ -297,7 +304,7 @@ export function ClarityApp() {
       ],
     });
     resetGratitudeDraft();
-    setScreen("practice-log");
+    finishPractice("gratitude");
   };
 
   const saveEmotions = () => {
@@ -317,7 +324,7 @@ export function ClarityApp() {
       ],
     });
     resetEmotionsDraft();
-    setScreen("practice-log");
+    finishPractice("emotions");
   };
 
   const saveAbc = () => {
@@ -344,7 +351,7 @@ export function ClarityApp() {
       ],
     });
     resetAbcDraft();
-    setScreen("practice-log");
+    finishPractice("abc");
   };
 
   const saveQuestionsPractice = () => {
@@ -371,7 +378,7 @@ export function ClarityApp() {
       ],
     });
     resetQuestionsDraft();
-    setScreen("practice-log");
+    finishPractice("questions");
   };
 
   const saveWheel = () => {
@@ -394,6 +401,7 @@ export function ClarityApp() {
     });
     resetWheelDraft();
     setActiveWheelId(entry.id);
+    setLastDoneTitle(PRACTICE_META.wheel.title);
     setScreen("wheel-result");
   };
 
@@ -419,7 +427,7 @@ export function ClarityApp() {
       ],
     });
     resetBreathDraft();
-    setScreen("practice-log");
+    finishPractice("breath");
   };
 
   const saveIdealDay = () => {
@@ -450,7 +458,7 @@ export function ClarityApp() {
       ],
     });
     resetIdealDayDraft();
-    setScreen("practice-log");
+    finishPractice("ideal-day");
   };
 
   const saveFiveWhys = () => {
@@ -475,7 +483,7 @@ export function ClarityApp() {
       ],
     });
     resetFiveWhysDraft();
-    setScreen("practice-log");
+    finishPractice("five-whys");
   };
 
   const questions = draftFilter ? QUESTIONS_BY_FILTER[draftFilter] : [];
@@ -517,10 +525,21 @@ export function ClarityApp() {
       .filter(Boolean)
       .slice(0, 3)
       .map((text) => ({ id: uid("goal"), text }));
-    if (goals.length < 2) {
-      setGoalError("Нужно минимум два ориентира — затем нажмите ещё раз.");
+    if (goals.length < 1) {
+      setGoalError("Напишите хотя бы одно — что сейчас важнее беречь.");
       return;
     }
+    setGoalError(null);
+    persist({ ...state, goals, onboardingDone: true });
+    setScreen("home");
+  };
+
+  const skipOnboarding = () => {
+    const goals = [
+      { id: uid("goal"), text: "Свои силы" },
+      { id: uid("goal"), text: "Честность с собой" },
+    ];
+    fillGoalInputs(goals);
     setGoalError(null);
     persist({ ...state, goals, onboardingDone: true });
     setScreen("home");
@@ -627,11 +646,12 @@ export function ClarityApp() {
     abc: "practices",
     questions: "practices",
     wheel: "practices",
-    "wheel-result": "practice-log",
+    "wheel-result": "practice-done",
     breath: "practices",
     "ideal-day": "practices",
     "five-whys": "practices",
     "practice-log": "practices",
+    "practice-done": "home",
     "new-situation": "home",
     filter: "new-situation",
     "decision-questions": "filter",
@@ -715,16 +735,19 @@ export function ClarityApp() {
       <main className="clarity-panel flex-1 animate-in fade-in duration-500">
         {(screen === "onboarding" || screen === "edit-goals") && (
           <section className="space-y-5" data-testid="goals-form">
-            <p className="text-[var(--ink-soft)]">
-              {screen === "edit-goals"
-                ? "Обновите ориентиры — можно стереть старые и написать новые."
-                : "Короткий помощник для решений и саморефлексии. Это не терапия и не диагноз — рядом с психологом или для спокойной ясности наедине с собой."}
-            </p>
-            <div className="space-y-3">
-              <Label>2–3 ориентира на ближайшее время</Label>
-              <p className="text-xs text-[var(--ink-muted)]">
-                Серый текст в поле — только подсказка. Нужно вписать свои слова.
+            <div className="space-y-2">
+              <h2 className="font-display text-[1.35rem] leading-tight text-[var(--ink)]">
+                {screen === "edit-goals"
+                  ? "Что сейчас важнее беречь?"
+                  : "Что сейчас важнее беречь?"}
+              </h2>
+              <p className="text-[0.98rem] leading-relaxed text-[var(--ink-muted)]">
+                {screen === "edit-goals"
+                  ? "Можно стереть и написать заново — одним словом или короткой фразой."
+                  : "Одно слово или короткая фраза. Потом можно изменить. Не терапия и не диагноз."}
               </p>
+            </div>
+            <div className="space-y-3">
               {goalInputs.map((g, i) => (
                 <Input
                   key={i}
@@ -736,10 +759,10 @@ export function ClarityApp() {
                   autoComplete="off"
                   placeholder={
                     i === 0
-                      ? "Свой ориентир №1"
+                      ? "Например: сон"
                       : i === 1
-                        ? "Свой ориентир №2"
-                        : "Ещё один — по желанию"
+                        ? "Например: свои границы"
+                        : "Ещё — по желанию"
                   }
                   onChange={(e) => {
                     const next = [...goalInputs];
@@ -764,8 +787,18 @@ export function ClarityApp() {
               className="clarity-cta-primary inline-flex h-12 w-full items-center justify-center rounded-2xl px-4 text-base font-semibold transition hover:opacity-95"
               onClick={saveGoals}
             >
-              {screen === "edit-goals" ? "Сохранить ориентиры" : "Начать"}
+              {screen === "edit-goals" ? "Сохранить" : "Дальше"}
             </button>
+            {screen === "onboarding" && (
+              <button
+                type="button"
+                data-testid="skip-onboarding"
+                className="inline-flex h-10 w-full items-center justify-center text-sm text-[var(--accent-ink)]"
+                onClick={skipOnboarding}
+              >
+                Пропустить — заполню позже
+              </button>
+            )}
             {screen === "edit-goals" && (
               <button
                 type="button"
@@ -778,10 +811,6 @@ export function ClarityApp() {
                 Отмена
               </button>
             )}
-            <p className="pt-2 text-xs leading-relaxed text-[var(--ink-muted)]">
-              Не терапия и не диагноз. При тяжёлом состоянии — к специалисту.
-              Данные теста остаются в этом браузере.
-            </p>
           </section>
         )}
 
@@ -1031,7 +1060,7 @@ export function ClarityApp() {
         {screen === "wheel-result" && activeWheel && (
           <WheelResultView
             entry={activeWheel}
-            onJournal={() => setScreen("practice-log")}
+            onJournal={() => setScreen("practice-done")}
             onHome={() => setScreen("home")}
           />
         )}
@@ -1091,6 +1120,52 @@ export function ClarityApp() {
               setScreen("wheel-result");
             }}
           />
+        )}
+
+        {screen === "practice-done" && (
+          <section className="space-y-5" data-testid="practice-done">
+            <div className="space-y-2">
+              <p className="text-[0.78rem] tracking-[0.07em] text-[var(--ink-muted)] uppercase">
+                Готово
+              </p>
+              <h2 className="font-display text-[1.45rem] leading-tight text-[var(--ink)]">
+                Записали
+              </h2>
+              <p className="text-[1.05rem] font-medium text-[var(--accent-ink)]">
+                {lastDoneTitle || "Практика"}
+              </p>
+              <p className="text-[1.02rem] leading-relaxed text-[var(--ink-soft)]">
+                Можно остановиться на этом — уже достаточно. Или вернуться на
+                главную и выбрать следующий маленький шаг.
+              </p>
+            </div>
+            <button
+              type="button"
+              data-testid="practice-done-home"
+              className="clarity-cta-primary inline-flex h-12 w-full items-center justify-center rounded-2xl px-4 text-base font-semibold"
+              onClick={() => setScreen("home")}
+            >
+              На главную
+            </button>
+            <div className="flex flex-col gap-2 sm:flex-row">
+              <button
+                type="button"
+                data-testid="practice-done-more"
+                className="inline-flex h-11 flex-1 items-center justify-center rounded-xl border border-[var(--line)] bg-[var(--surface-strong)] px-4 text-sm font-medium text-[var(--ink)]"
+                onClick={() => setScreen("practices")}
+              >
+                Ещё практика
+              </button>
+              <button
+                type="button"
+                data-testid="practice-done-log"
+                className="inline-flex h-11 flex-1 items-center justify-center rounded-xl text-sm font-medium text-[var(--accent-ink)]"
+                onClick={() => setScreen("practice-log")}
+              >
+                Журнал
+              </button>
+            </div>
+          </section>
         )}
 
         {screen === "new-situation" && (
