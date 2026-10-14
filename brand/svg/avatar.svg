@@ -1,4 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="">G:0 OA=>AB8">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <title>Tochka yasnosti</title>G:0 OA=>AB8">
   <!-- Telegram / app tile. Rounded square, sage field, light point. -->
   <rect width="512" height="512" rx="112" fill="#2f6b63"/>
   <circle cx="256" cy="256" r="168" fill="none" stroke="#e8f0ed" stroke-width="18" opacity="0.35"/>
