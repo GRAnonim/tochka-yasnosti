@@ -631,9 +631,13 @@ function practiceSummary(entry: PracticeEntry): string {
 export function PracticeLog({
   entries,
   onOpenWheel,
+  onExportAbcWord,
+  onExportAbcPdf,
 }: {
   entries: PracticeEntry[];
   onOpenWheel?: (id: string) => void;
+  onExportAbcWord?: (id: string) => void | Promise<void>;
+  onExportAbcPdf?: (id: string) => void;
 }) {
   return (
     <section className="space-y-4" data-testid="practice-log-view">
@@ -674,6 +678,31 @@ export function PracticeLog({
                 ) : (
                   <div className="rounded-2xl bg-[var(--surface)] px-3 py-3 text-sm">
                     {body}
+                    {entry.kind === "abc" &&
+                      (onExportAbcWord || onExportAbcPdf) && (
+                        <div className="mt-2.5 flex flex-wrap gap-2">
+                          {onExportAbcWord && (
+                            <button
+                              type="button"
+                              data-testid={`export-abc-word-${entry.id}`}
+                              className="rounded-lg border border-[var(--line)] bg-[var(--surface-strong)] px-2.5 py-1.5 text-[0.85rem] font-medium text-[var(--ink)]"
+                              onClick={() => void onExportAbcWord(entry.id)}
+                            >
+                              Word
+                            </button>
+                          )}
+                          {onExportAbcPdf && (
+                            <button
+                              type="button"
+                              data-testid={`export-abc-pdf-${entry.id}`}
+                              className="rounded-lg border border-[var(--line)] bg-[var(--surface-strong)] px-2.5 py-1.5 text-[0.85rem] font-medium text-[var(--ink)]"
+                              onClick={() => onExportAbcPdf(entry.id)}
+                            >
+                              PDF
+                            </button>
+                          )}
+                        </div>
+                      )}
                   </div>
                 )}
               </li>

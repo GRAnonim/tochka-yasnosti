@@ -20,6 +20,7 @@ import { StatsView } from "@/components/stats-view";
 import { emptyState, loadState, saveState, uid } from "@/lib/storage";
 import { initTelegram } from "@/lib/telegram";
 import type {
+  AbcPractice,
   AppState,
   BreathDurationSec,
   DecisionChoice,
@@ -38,12 +39,8 @@ import {
   PracticeLog,
   PracticesMenu,
 } from "@/components/package1-practices";
-import {
-  HomeScreen,
-  loadHomeVariant,
-  saveHomeVariant,
-  type HomeVariant,
-} from "@/components/home-screen";
+import { HomeScreen } from "@/components/home-screen";
+import { exportAbcPdf, exportAbcWord } from "@/lib/export-practice";
 import {
   AbcPracticeForm,
   QuestionsPracticeForm,
@@ -157,11 +154,19 @@ export function ClarityApp() {
   const [fiveNeedNow, setFiveNeedNow] = useState("");
   const [favorites, setFavorites] = useState<MenuPracticeKey[]>([]);
   const [lastDoneTitle, setLastDoneTitle] = useState("");
-  const [homeVariant, setHomeVariant] = useState<HomeVariant>("e");
+  const [lastDoneKey, setLastDoneKey] = useState<MenuPracticeKey | null>(null);
+  const [exportNotice, setExportNotice] = useState("");
 
   const finishPractice = (key: MenuPracticeKey) => {
     setLastDoneTitle(PRACTICE_META[key]?.title ?? "Практика");
+    setLastDoneKey(key);
+    setExportNotice("");
     setScreen("practice-done");
+  };
+
+  const latestAbc = (): AbcPractice | null => {
+    const found = state.practices.find((p) => p.kind === "abc");
+    return found && found.kind === "abc" ? found : null;
   };
 
   const fillGoalInputs = (goals: { text: string }[]) => {
@@ -193,9 +198,6 @@ export function ClarityApp() {
       setSpecNote(loaded.specialist.note);
     }
     setFavorites(loadPracticeFavorites());
-    const initialHome = loadHomeVariant();
-    setHomeVariant(initialHome);
-    saveHomeVariant(initialHome);
 
     // Telegram script may load later (lazyOnload)
     const syncTg = () => {
@@ -827,22 +829,16 @@ export function ClarityApp() {
 
         {screen === "home" && (
           <HomeScreen
-            variant={homeVariant}
-            onVariantChange={(v) => {
-              setHomeVariant(v);
-              saveHomeVariant(v);
-            }}
             goalsLabel={
               state.goals.map((g) => g.text).join(" · ") || "не заданы"
             }
             favorites={favorites}
             pendingFeedback={pendingFeedback}
-            onStartDecision={startNew}
-            onOpenPractices={() => setScreen("practices")}
-            onOpenBreath={() => openPractice("breath")}
+            onStartDecision={() => startNew()}
+            onOpenPractice={(key) => openPractice(key)}
+            onOpenPracticeLog={() => setScreen("practice-log")}
             onOpenStats={() => setScreen("stats")}
             onEditGoals={openEditGoals}
-            onOpenFavorite={(key) => openPractice(key)}
             onOpenFeedback={openFeedback}
             onOpenSpecialist={() => setScreen("specialist")}
             onReset={() => {
@@ -1008,6 +1004,18 @@ export function ClarityApp() {
               setActiveWheelId(id);
               setScreen("wheel-result");
             }}
+            onExportAbcWord={async (id) => {
+              const entry = state.practices.find(
+                (p) => p.id === id && p.kind === "abc",
+              );
+              if (entry && entry.kind === "abc") await exportAbcWord(entry);
+            }}
+            onExportAbcPdf={(id) => {
+              const entry = state.practices.find(
+                (p) => p.id === id && p.kind === "abc",
+              );
+              if (entry && entry.kind === "abc") exportAbcPdf(entry);
+            }}
           />
         )}
 
@@ -1028,6 +1036,58 @@ export function ClarityApp() {
                 главную и выбрать следующий маленький шаг.
               </p>
             </div>
+            {lastDoneKey === "abc" && latestAbc() && (
+              <div
+                className="space-y-2 rounded-2xl border border-[var(--line)] bg-[var(--surface)] px-3.5 py-3"
+                data-testid="abc-export"
+              >
+                <p className="text-[0.95rem] font-medium text-[var(--ink)]">
+                  Отправить специалисту или сохранить
+                </p>
+                <p className="text-[0.9rem] text-[var(--ink-muted)]">
+                  Word — файл .docx. PDF — через печать («Сохранить как PDF»).
+                </p>
+                <div className="flex flex-col gap-2 sm:flex-row">
+                  <button
+                    type="button"
+                    data-testid="export-abc-word"
+                    className="inline-flex h-11 flex-1 items-center justify-center rounded-xl border border-[var(--line)] bg-[var(--surface-strong)] px-3 text-sm font-medium text-[var(--ink)]"
+                    onClick={async () => {
+                      const entry = latestAbc();
+                      if (!entry) return;
+                      try {
+                        await exportAbcWord(entry);
+                        setExportNotice("Word-файл скачан");
+                      } catch {
+                        setExportNotice("Не удалось создать Word");
+                      }
+                    }}
+                  >
+                    Word
+                  </button>
+                  <button
+                    type="button"
+                    data-testid="export-abc-pdf"
+                    className="inline-flex h-11 flex-1 items-center justify-center rounded-xl border border-[var(--line)] bg-[var(--surface-strong)] px-3 text-sm font-medium text-[var(--ink)]"
+                    onClick={() => {
+                      const entry = latestAbc();
+                      if (!entry) return;
+                      exportAbcPdf(entry);
+                      setExportNotice(
+                        "Откройте печать и выберите «Сохранить как PDF»",
+                      );
+                    }}
+                  >
+                    PDF
+                  </button>
+                </div>
+                {exportNotice && (
+                  <p className="text-[0.88rem] text-[var(--accent-ink)]">
+                    {exportNotice}
+                  </p>
+                )}
+              </div>
+            )}
             <button
               type="button"
               data-testid="practice-done-home"
@@ -1041,7 +1101,7 @@ export function ClarityApp() {
                 type="button"
                 data-testid="practice-done-more"
                 className="inline-flex h-11 flex-1 items-center justify-center rounded-xl border border-[var(--line)] bg-[var(--surface-strong)] px-4 text-sm font-medium text-[var(--ink)]"
-                onClick={() => setScreen("practices")}
+                onClick={() => setScreen("home")}
               >
                 Ещё практика
               </button>
