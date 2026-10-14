@@ -34,11 +34,16 @@ import type {
 import {
   EmotionsPracticeForm,
   GratitudePracticeForm,
-  HomeFavorites,
   MoodPracticeForm,
   PracticeLog,
   PracticesMenu,
 } from "@/components/package1-practices";
+import {
+  HomeScreen,
+  loadHomeVariant,
+  saveHomeVariant,
+  type HomeVariant,
+} from "@/components/home-screen";
 import {
   AbcPracticeForm,
   QuestionsPracticeForm,
@@ -152,6 +157,7 @@ export function ClarityApp() {
   const [fiveNeedNow, setFiveNeedNow] = useState("");
   const [favorites, setFavorites] = useState<MenuPracticeKey[]>([]);
   const [lastDoneTitle, setLastDoneTitle] = useState("");
+  const [homeVariant, setHomeVariant] = useState<HomeVariant>("b");
 
   const finishPractice = (key: MenuPracticeKey) => {
     setLastDoneTitle(PRACTICE_META[key]?.title ?? "Практика");
@@ -187,6 +193,9 @@ export function ClarityApp() {
       setSpecNote(loaded.specialist.note);
     }
     setFavorites(loadPracticeFavorites());
+    const initialHome = loadHomeVariant();
+    setHomeVariant(initialHome);
+    saveHomeVariant(initialHome);
 
     // Telegram script may load later (lazyOnload)
     const syncTg = () => {
@@ -815,157 +824,34 @@ export function ClarityApp() {
         )}
 
         {screen === "home" && (
-          <section className="space-y-7" data-testid="home-screen">
-            <div className="space-y-4">
-              <h2 className="font-display text-[1.55rem] leading-tight text-[var(--ink)] sm:text-[1.7rem]">
-                Что сейчас не даёт покоя?
-              </h2>
-              <button
-                type="button"
-                data-testid="new-situation"
-                className="clarity-cta-primary inline-flex h-14 w-full items-center justify-center gap-2.5 rounded-2xl px-4 text-[1.1rem] font-semibold transition hover:opacity-95"
-                onClick={startNew}
-              >
-                <PracticeGlyph name="decision" className="h-5 w-5 opacity-95" />
-                Разобрать решение
-              </button>
-              <button
-                type="button"
-                data-testid="open-practices"
-                className="clarity-path-card flex w-full items-center gap-3 rounded-2xl border border-[color-mix(in_oklab,var(--primary)_18%,transparent)] bg-[color-mix(in_oklab,var(--primary)_6%,white)] px-3.5 py-3.5 text-left hover:border-[color-mix(in_oklab,var(--primary)_30%,transparent)]"
-                onClick={() => setScreen("practices")}
-              >
-                <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[color-mix(in_oklab,white_72%,transparent)] text-[var(--accent-ink)]">
-                  <PracticeGlyph name="practices" className="h-5 w-5" />
-                </span>
-                <span className="min-w-0 flex-1">
-                  <span className="block text-[1.05rem] font-semibold text-[var(--ink)]">
-                    Практики для себя
-                  </span>
-                  <span className="mt-0.5 block text-[0.92rem] leading-snug text-[var(--ink-muted)]">
-                    Настроение, дыхание, мысли — когда нет решения, а есть
-                    чувство
-                  </span>
-                </span>
-                <span className="text-[var(--ink-muted)]" aria-hidden>
-                  ›
-                </span>
-              </button>
-            </div>
-
-            <p className="text-[0.92rem] leading-snug text-[var(--ink-muted)]">
-              Ориентиры:{" "}
-              <span className="text-[var(--ink-soft)]">
-                {state.goals.map((g) => g.text).join(" · ") || "не заданы"}
-              </span>{" "}
-              <button
-                type="button"
-                data-testid="edit-goals"
-                className="text-[var(--accent-ink)] underline-offset-2 hover:underline"
-                onClick={openEditGoals}
-              >
-                изменить
-              </button>
-            </p>
-
-            <HomeFavorites
-              favorites={favorites}
-              onOpen={(key) => openPractice(key)}
-            />
-
-            {favorites.length === 0 && (
-              <p className="text-[0.92rem] text-[var(--ink-muted)]">
-                Звёздочка в практиках — частое появится здесь.
-              </p>
-            )}
-
-            <button
-              type="button"
-              data-testid="open-stats"
-              className="clarity-link-quiet inline-flex items-center gap-1.5 text-[0.95rem] font-medium"
-              onClick={() => setScreen("stats")}
-            >
-              <PracticeGlyph name="stats" className="h-4 w-4" />
-              Что уже заметили
-            </button>
-
-            {pendingFeedback.length > 0 && (
-              <div className="space-y-2.5 border-t border-[var(--line)] pt-4">
-                <h3 className="font-display text-base text-[var(--ink)]">
-                  Обратная связь
-                </h3>
-                <ul className="space-y-2">
-                  {pendingFeedback.slice(0, 3).map((s) => (
-                    <li key={s.id}>
-                      <button
-                        type="button"
-                        className="w-full rounded-xl border border-[var(--line)] bg-[var(--surface)] px-3 py-2.5 text-left transition hover:border-[var(--accent)]"
-                        onClick={() => openFeedback(s.id)}
-                      >
-                        <span className="line-clamp-2 text-[0.98rem] text-[var(--ink)]">
-                          {s.text}
-                        </span>
-                        <span className="mt-0.5 block text-[0.88rem] text-[var(--ink-muted)]">
-                          {DECISION_LABELS[s.decision]}
-                        </span>
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            <details className="border-t border-[var(--line)] pt-3 text-[0.95rem] text-[var(--ink-muted)]">
-              <summary
-                className="cursor-pointer list-none font-medium text-[var(--ink-soft)] marker:content-none [&::-webkit-details-marker]:hidden"
-                data-testid="home-more"
-              >
-                Ещё
-              </summary>
-              <div className="mt-3 space-y-4">
-                <div className="space-y-2">
-                  <p className="font-medium text-[var(--ink)]">Мой специалист</p>
-                  {state.specialist ? (
-                    <div className="rounded-xl bg-[var(--surface)] px-3 py-2.5">
-                      <p className="font-medium text-[var(--ink)]">
-                        {state.specialist.name}
-                      </p>
-                      {state.specialist.contact && (
-                        <p className="text-[var(--ink-soft)]">
-                          {state.specialist.contact}
-                        </p>
-                      )}
-                    </div>
-                  ) : (
-                    <p>Пока не указан.</p>
-                  )}
-                  <button
-                    type="button"
-                    className="text-[var(--accent-ink)] underline-offset-2 hover:underline"
-                    onClick={() => setScreen("specialist")}
-                  >
-                    {state.specialist ? "Изменить контакты" : "Указать контакты"}
-                  </button>
-                </div>
-                <button
-                  type="button"
-                  className="clarity-link-quiet underline-offset-2 hover:underline"
-                  onClick={() => {
-                    const next = emptyState();
-                    persist(next);
-                    fillGoalInputs([]);
-                    setScreen("onboarding");
-                  }}
-                >
-                  Сбросить данные
-                </button>
-                <p className="leading-relaxed">
-                  Не ставит диагнозов и не заменяет врача или психолога. При
-                  тяжёлом состоянии — к специалисту.
-                </p>
-              </div>
-            </details>
-          </section>
+          <HomeScreen
+            variant={homeVariant}
+            onVariantChange={(v) => {
+              setHomeVariant(v);
+              saveHomeVariant(v);
+            }}
+            goalsLabel={
+              state.goals.map((g) => g.text).join(" · ") || "не заданы"
+            }
+            favorites={favorites}
+            pendingFeedback={pendingFeedback}
+            onStartDecision={startNew}
+            onOpenPractices={() => setScreen("practices")}
+            onOpenStats={() => setScreen("stats")}
+            onEditGoals={openEditGoals}
+            onOpenFavorite={(key) => openPractice(key)}
+            onOpenFeedback={openFeedback}
+            onOpenSpecialist={() => setScreen("specialist")}
+            onReset={() => {
+              const next = emptyState();
+              persist(next);
+              fillGoalInputs([]);
+              setScreen("onboarding");
+            }}
+            hasSpecialist={Boolean(state.specialist)}
+            specialistName={state.specialist?.name}
+            specialistContact={state.specialist?.contact}
+          />
         )}
 
         {screen === "practices" && (
