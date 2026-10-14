@@ -14,7 +14,7 @@ export const ATMOSPHERES: AtmosphereOption[] = [
   {
     id: "original",
     label: "Основной",
-    hint: "как было",
+    hint: "светлая бумага",
     swatch: "#e8f0ed",
     telegramBg: "#eef4f2",
   },
