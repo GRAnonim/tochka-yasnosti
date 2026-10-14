@@ -622,7 +622,7 @@ export function ClarityApp() {
   };
 
   return (
-    <div className="clarity-shell relative mx-auto flex min-h-dvh w-full max-w-xl flex-col px-4 pb-10 pt-5 sm:px-6">
+    <div className="clarity-shell relative mx-auto flex min-h-dvh w-full max-w-2xl flex-col px-3 pb-10 pt-5 sm:px-5">
       <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
         <div className="clarity-orb clarity-orb-a" />
         <div className="clarity-orb clarity-orb-b" />

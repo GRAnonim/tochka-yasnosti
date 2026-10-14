@@ -75,23 +75,23 @@ function PracticeRow({
   const meta = PRACTICE_META[practiceKey];
   return (
     <div
-      className="practice-tile flex w-full items-stretch gap-1 rounded-2xl border border-[var(--line)] bg-[var(--surface-strong)]"
+      className="practice-tile flex w-full items-stretch rounded-2xl border border-[var(--line)] bg-[var(--surface-strong)]"
       data-testid={`practice-${practiceKey}`}
     >
       <button
         type="button"
-        className="flex min-w-0 flex-1 items-start gap-3.5 px-3.5 py-4 text-left transition hover:opacity-95"
+        className="flex min-w-0 flex-1 items-start gap-2.5 px-3 py-3.5 text-left transition hover:opacity-95"
         onClick={onOpen}
       >
         <PracticeIconMark
           name={practiceKey}
-          className="mt-0.5 h-12 w-12 rounded-2xl"
+          className="mt-0.5 h-10 w-10 shrink-0 rounded-xl"
         />
         <span className="min-w-0 flex-1">
-          <span className="block text-[1.05rem] font-semibold leading-snug text-[var(--ink)]">
+          <span className="block text-[1.02rem] font-semibold leading-snug text-[var(--ink)]">
             {meta.title}
           </span>
-          <span className="mt-1.5 block text-[1.02rem] leading-relaxed text-[var(--ink-muted)]">
+          <span className="mt-1 block text-[0.95rem] leading-snug text-[var(--ink-muted)]">
             {meta.blurb}
           </span>
         </span>
@@ -105,8 +105,8 @@ function PracticeRow({
         aria-pressed={favorite}
         className={
           favorite
-            ? "flex w-14 shrink-0 items-center justify-center text-[var(--accent-ink)]"
-            : "flex w-14 shrink-0 items-center justify-center text-[var(--ink-muted)] opacity-70 hover:opacity-100"
+            ? "flex w-11 shrink-0 items-center justify-center text-[var(--accent-ink)]"
+            : "flex w-11 shrink-0 items-center justify-center text-[var(--ink-muted)] opacity-70 hover:opacity-100"
         }
         onClick={(e) => {
           e.stopPropagation();
@@ -184,7 +184,7 @@ export function PracticesMenu({
               <button
                 type="button"
                 data-testid={`practice-group-toggle-${group.id}`}
-                className="flex w-full items-center justify-between gap-3 px-4 py-4 text-left"
+                className="flex w-full items-center justify-between gap-3 px-3.5 py-3.5 text-left"
                 aria-expanded={open}
                 onClick={() => toggleGroup(group.id)}
               >
@@ -192,7 +192,7 @@ export function PracticesMenu({
                   <span className="block text-base font-semibold text-[var(--ink)]">
                     {group.title}
                   </span>
-                  <span className="mt-1 block text-[1.02rem] text-[var(--ink-muted)]">
+                  <span className="mt-1 block text-[0.95rem] text-[var(--ink-muted)]">
                     {group.items.length} практики · нажмите, чтобы открыть
                   </span>
                 </span>
@@ -208,7 +208,7 @@ export function PracticesMenu({
                 </span>
               </button>
               {open && (
-                <div className="grid gap-2.5 border-t border-[var(--line)] px-3 py-3">
+                <div className="-mx-px grid gap-2 border-t border-[var(--line)] px-1.5 py-2.5 sm:px-2">
                   {group.items.map((key) => (
                     <PracticeRow
                       key={key}

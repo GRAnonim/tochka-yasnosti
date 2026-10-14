@@ -1,11 +1,21 @@
 import type { Metadata, Viewport } from "next";
-import { Manrope } from "next/font/google";
+import { Figtree, Geist_Mono, Sora } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 
-const manrope = Manrope({
-  variable: "--font-manrope",
-  subsets: ["latin", "cyrillic", "cyrillic-ext"],
+const sora = Sora({
+  variable: "--font-sora",
+  subsets: ["latin", "latin-ext"],
+});
+
+const figtree = Figtree({
+  variable: "--font-figtree",
+  subsets: ["latin", "latin-ext"],
+});
+
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
@@ -28,8 +38,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ru" className={manrope.variable}>
-      <body className={`${manrope.className} antialiased`}>
+    <html lang="ru">
+      <body
+        className={`${sora.variable} ${figtree.variable} ${geistMono.variable} antialiased`}
+      >
         <Script
           src="https://telegram.org/js/telegram-web-app.js"
           strategy="lazyOnload"

@@ -217,9 +217,9 @@ export function PracticeIconMark({
 }) {
   return (
     <span
-      className={`inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[color-mix(in_oklab,var(--secondary)_88%,white)] text-[var(--accent-ink)] ${className}`}
+      className={`inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[color-mix(in_oklab,var(--secondary)_88%,white)] text-[var(--accent-ink)] ${className}`}
     >
-      <PracticeGlyph name={name} className="h-6 w-6" />
+      <PracticeGlyph name={name} className="h-5 w-5" />
     </span>
   );
 }
