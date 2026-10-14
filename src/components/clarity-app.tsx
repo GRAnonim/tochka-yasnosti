@@ -741,18 +741,18 @@ export function ClarityApp() {
         {screen === "home" && (
           <section className="space-y-6">
             <div className="space-y-2">
-              <p className="text-[1.15rem] leading-snug text-[var(--ink)]">
+              <p className="leading-snug text-[var(--ink)]">
                 Здесь можно мягко разобрать день и решения — без давления и без
                 оценок.
               </p>
-              <p className="text-[15px] text-[var(--ink-muted)]">
+              <p className="text-[1.02rem] leading-relaxed text-[var(--ink-muted)]">
                 Ваши ориентиры:{" "}
                 {state.goals.map((g) => g.text).join(" · ") || "не заданы"}
               </p>
               <button
                 type="button"
                 data-testid="edit-goals"
-                className="text-left text-sm text-[var(--accent-ink)] underline-offset-4 hover:underline"
+                className="text-left text-[1.02rem] text-[var(--accent-ink)] underline-offset-4 hover:underline"
                 onClick={openEditGoals}
               >
                 Изменить ориентиры
@@ -763,7 +763,7 @@ export function ClarityApp() {
               <button
                 type="button"
                 data-testid="new-situation"
-                className="inline-flex h-12 w-full items-center justify-center gap-2.5 rounded-xl bg-[var(--primary)] px-4 text-base font-medium text-[var(--primary-foreground)] transition hover:opacity-95"
+                className="inline-flex h-12 w-full items-center justify-center gap-2.5 rounded-xl bg-[var(--primary)] px-4 text-[1.05rem] font-medium text-[var(--primary-foreground)] transition hover:opacity-95"
                 onClick={startNew}
               >
                 <PracticeGlyph name="decision" className="h-5 w-5 opacity-95" />
@@ -772,7 +772,7 @@ export function ClarityApp() {
               <button
                 type="button"
                 data-testid="open-practices"
-                className="inline-flex h-11 w-full items-center justify-center gap-2.5 rounded-xl bg-[var(--secondary)] px-4 text-sm font-medium text-[var(--secondary-foreground)] transition hover:opacity-95"
+                className="inline-flex h-11 w-full items-center justify-center gap-2.5 rounded-xl bg-[var(--secondary)] px-4 text-[1.05rem] font-medium text-[var(--secondary-foreground)] transition hover:opacity-95"
                 onClick={() => setScreen("practices")}
               >
                 <PracticeGlyph
@@ -784,7 +784,7 @@ export function ClarityApp() {
               <button
                 type="button"
                 data-testid="open-stats"
-                className="inline-flex h-11 w-full items-center justify-center gap-2.5 rounded-xl bg-[var(--secondary)] px-4 text-sm font-medium text-[var(--secondary-foreground)] transition hover:opacity-95"
+                className="inline-flex h-11 w-full items-center justify-center gap-2.5 rounded-xl bg-[var(--secondary)] px-4 text-[1.05rem] font-medium text-[var(--secondary-foreground)] transition hover:opacity-95"
                 onClick={() => setScreen("stats")}
               >
                 <PracticeGlyph
@@ -801,7 +801,7 @@ export function ClarityApp() {
             />
 
             {favorites.length === 0 && (
-              <p className="text-xs leading-relaxed text-[var(--ink-muted)]">
+              <p className="text-[1.02rem] leading-relaxed text-[var(--ink-muted)]">
                 В «Все практики» можно отметить звёздочкой то, чем пользуетесь
                 часто — оно появится здесь.
               </p>
@@ -812,7 +812,7 @@ export function ClarityApp() {
                 <h2 className="font-display text-lg text-[var(--ink)]">
                   Обратная связь
                 </h2>
-                <p className="text-[15px] text-[var(--ink-muted)]">
+                <p className="text-[1.02rem] leading-relaxed text-[var(--ink-muted)]">
                   В тесте можно ответить сразу. В жизни — через 1–3 дня после
                   решения.
                 </p>
@@ -824,10 +824,10 @@ export function ClarityApp() {
                         className="w-full rounded-xl border border-[var(--line)] bg-[var(--surface)] px-3 py-3 text-left transition hover:border-[var(--accent)]"
                         onClick={() => openFeedback(s.id)}
                       >
-                        <span className="line-clamp-2 text-sm text-[var(--ink)]">
+                        <span className="line-clamp-2 text-[1.02rem] text-[var(--ink)]">
                           {s.text}
                         </span>
-                        <span className="mt-1 block text-xs text-[var(--ink-muted)]">
+                        <span className="mt-1 block text-[0.98rem] text-[var(--ink-muted)]">
                           Решение: {DECISION_LABELS[s.decision]}
                         </span>
                       </button>
@@ -841,12 +841,12 @@ export function ClarityApp() {
               <h2 className="font-display text-lg text-[var(--ink)]">
                 Мой специалист
               </h2>
-              <p className="text-[15px] text-[var(--ink-muted)]">
+              <p className="text-[1.02rem] leading-relaxed text-[var(--ink-muted)]">
                 Тихий блок — не мешает рефлексии. Контакты только те, кому вы
                 доверяете.
               </p>
               {state.specialist ? (
-                <div className="rounded-xl bg-[var(--surface)] px-3 py-3 text-sm">
+                <div className="rounded-xl bg-[var(--surface)] px-3 py-3 text-[1.02rem]">
                   <p className="font-medium text-[var(--ink)]">
                     {state.specialist.name}
                   </p>
@@ -862,7 +862,9 @@ export function ClarityApp() {
                   )}
                 </div>
               ) : (
-                <p className="text-sm text-[var(--ink-muted)]">Пока не указан.</p>
+                <p className="text-[1.02rem] text-[var(--ink-muted)]">
+                  Пока не указан.
+                </p>
               )}
               <Button
                 variant="outline"
@@ -873,7 +875,7 @@ export function ClarityApp() {
               </Button>
             </div>
 
-            <div className="flex flex-wrap gap-3 pt-2 text-sm">
+            <div className="flex flex-wrap gap-3 pt-2 text-[1.02rem]">
               <button
                 type="button"
                 className="text-[var(--ink-muted)] underline-offset-4 hover:underline"

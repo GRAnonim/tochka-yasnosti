@@ -1,17 +1,13 @@
 import type { Metadata, Viewport } from "next";
-import { Geist_Mono, Source_Sans_3 } from "next/font/google";
+import { Source_Sans_3 } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 
-/** Source Sans 3 — спокойный читаемый гротеск с кириллицей, OFL */
+/** Один шрифт на всё приложение — Source Sans 3 (OFL, кириллица) */
 const sourceSans = Source_Sans_3({
   variable: "--font-source-sans",
   subsets: ["latin", "cyrillic", "cyrillic-ext"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = {
@@ -34,10 +30,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ru">
-      <body
-        className={`${sourceSans.variable} ${geistMono.variable} antialiased`}
-      >
+    <html lang="ru" className={sourceSans.variable}>
+      <body className={`${sourceSans.className} antialiased`}>
         <Script
           src="https://telegram.org/js/telegram-web-app.js"
           strategy="lazyOnload"

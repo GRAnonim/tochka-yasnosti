@@ -88,10 +88,10 @@ function PracticeRow({
           className="mt-0.5 h-12 w-12 rounded-2xl"
         />
         <span className="min-w-0 flex-1">
-          <span className="block text-[15px] font-semibold leading-snug text-[var(--ink)]">
+          <span className="block text-[1.05rem] font-semibold leading-snug text-[var(--ink)]">
             {meta.title}
           </span>
-          <span className="mt-1.5 block text-[13px] leading-relaxed text-[var(--ink-muted)]">
+          <span className="mt-1.5 block text-[1.02rem] leading-relaxed text-[var(--ink-muted)]">
             {meta.blurb}
           </span>
         </span>
@@ -146,8 +146,8 @@ export function PracticesMenu({
   return (
     <section className="space-y-5" data-testid="practices-menu">
       <div>
-        <h2 className="font-display text-xl text-[var(--ink)]">Практики</h2>
-        <p className="mt-1 text-sm text-[var(--ink-muted)]">
+        <h2 className="font-display text-lg text-[var(--ink)]">Практики</h2>
+        <p className="mt-1 text-[1.02rem] leading-relaxed text-[var(--ink-muted)]">
           Откройте нужный раздел. Звезда — на главный экран в избранное.
           Разбор решения остаётся на главной.
         </p>
@@ -192,7 +192,7 @@ export function PracticesMenu({
                   <span className="block text-base font-semibold text-[var(--ink)]">
                     {group.title}
                   </span>
-                  <span className="mt-1 block text-sm text-[var(--ink-muted)]">
+                  <span className="mt-1 block text-[1.02rem] text-[var(--ink-muted)]">
                     {group.items.length} практики · нажмите, чтобы открыть
                   </span>
                 </span>
