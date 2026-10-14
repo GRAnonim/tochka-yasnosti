@@ -1,0 +1,54 @@
+{
+  "name": "Точка ясности",
+  "slug": "kit",
+  "color": "#2f6b63",
+  "typeStyle": "sans",
+  "ogTemplate": "minimal",
+  "steps": [
+    {
+      "step": "wordmark",
+      "artifact": "logo.svg",
+      "status": "ok"
+    },
+    {
+      "step": "png",
+      "artifact": "logo.png",
+      "status": "ok"
+    },
+    {
+      "step": "favicons",
+      "artifact": "favicon.ico",
+      "status": "ok"
+    },
+    {
+      "step": "manifest",
+      "artifact": "site.webmanifest",
+      "status": "ok"
+    },
+    {
+      "step": "palette",
+      "artifact": "palette.json",
+      "status": "ok"
+    },
+    {
+      "step": "type-pairing",
+      "artifact": "type-pairing.json",
+      "status": "ok"
+    },
+    {
+      "step": "og",
+      "artifact": "og.png",
+      "status": "ok"
+    },
+    {
+      "step": "brand-book",
+      "artifact": "brand-book.pdf",
+      "status": "ok"
+    },
+    {
+      "step": "readme",
+      "artifact": "README.md",
+      "status": "ok"
+    }
+  ]
+}

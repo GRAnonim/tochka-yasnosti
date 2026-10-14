@@ -1,0 +1,21 @@
+{
+	"name": "Точка ясности",
+	"short_name": "Ясность",
+	"icons": [
+		{
+			"src": "icon-192.png",
+			"type": "image/png",
+			"sizes": "192x192",
+			"purpose": "any maskable"
+		},
+		{
+			"src": "icon-512.png",
+			"type": "image/png",
+			"sizes": "512x512",
+			"purpose": "any maskable"
+		}
+	],
+	"theme_color": "#2f6b63",
+	"background_color": "#eef4f2",
+	"display": "standalone"
+}

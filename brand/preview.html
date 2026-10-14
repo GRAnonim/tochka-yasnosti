@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <title>Точка ясности — знак</title>
+    <style>
+      body {
+        margin: 0;
+        font-family: ui-sans-serif, system-ui, sans-serif;
+        background: #eef4f2;
+        color: #24383e;
+        padding: 32px;
+      }
+      h1 { font-size: 1.4rem; font-weight: 600; }
+      .row { display: flex; flex-wrap: wrap; gap: 20px; margin: 24px 0; }
+      figure {
+        margin: 0;
+        padding: 16px;
+        background: #fff;
+        border-radius: 16px;
+        width: 180px;
+      }
+      figure.dark { background: #1a211f; color: #e8f0ed; }
+      img, object { width: 120px; height: 120px; display: block; }
+      figcaption { margin-top: 10px; font-size: 0.88rem; }
+      code { font-size: 0.78rem; }
+    </style>
+  </head>
+  <body>
+    <h1>Точка ясности</h1>
+    <p>Знак: точка в двух кольцах. Копируйте <code>svg/mark.svg</code>.</p>
+    <div class="row">
+      <figure>
+        <img src="svg/mark.svg" alt="Знак на светлом" />
+        <figcaption>mark.svg</figcaption>
+      </figure>
+      <figure class="dark">
+        <img src="svg/mark-on-dark.svg" alt="Знак на тёмном" />
+        <figcaption>mark-on-dark.svg</figcaption>
+      </figure>
+      <figure>
+        <img src="svg/avatar.svg" alt="Плитка Telegram" />
+        <figcaption>avatar.svg → BotFather</figcaption>
+      </figure>
+      <figure>
+        <img src="svg/avatar-light.svg" alt="Светлая плитка" />
+        <figcaption>avatar-light.svg</figcaption>
+      </figure>
+    </div>
+    <p>
+      <img src="svg/lockup.svg" alt="Знак и имя" width="320" height="67" />
+    </p>
+  </body>
+</html>
