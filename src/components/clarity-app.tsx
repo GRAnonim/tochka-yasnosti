@@ -157,7 +157,7 @@ export function ClarityApp() {
   const [fiveNeedNow, setFiveNeedNow] = useState("");
   const [favorites, setFavorites] = useState<MenuPracticeKey[]>([]);
   const [lastDoneTitle, setLastDoneTitle] = useState("");
-  const [homeVariant, setHomeVariant] = useState<HomeVariant>("b");
+  const [homeVariant, setHomeVariant] = useState<HomeVariant>("d");
 
   const finishPractice = (key: MenuPracticeKey) => {
     setLastDoneTitle(PRACTICE_META[key]?.title ?? "Практика");
@@ -510,14 +510,16 @@ export function ClarityApp() {
     setScreen(key);
   };
 
-  const startNew = () => {
-    setDraftText("");
+  const startNew = (initialText?: string) => {
+    const text = (initialText ?? "").trim();
+    setDraftText(text);
     setDraftFilter(null);
     setDraftAnswers([]);
     setQIndex(0);
     setDraftSummary("");
     setDraftLean("mixed");
-    setScreen("new-situation");
+    // Journal home already captured the situation — skip retyping
+    setScreen(text.length >= 8 ? "filter" : "new-situation");
   };
 
   const openEditGoals = () => {
@@ -837,6 +839,7 @@ export function ClarityApp() {
             pendingFeedback={pendingFeedback}
             onStartDecision={startNew}
             onOpenPractices={() => setScreen("practices")}
+            onOpenBreath={() => openPractice("breath")}
             onOpenStats={() => setScreen("stats")}
             onEditGoals={openEditGoals}
             onOpenFavorite={(key) => openPractice(key)}

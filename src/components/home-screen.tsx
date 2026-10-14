@@ -1,12 +1,14 @@
 "use client";
 
+import { useState } from "react";
 import { HomeFavorites } from "@/components/package1-practices";
 import { PracticeGlyph } from "@/components/practice-icons";
+import { Textarea } from "@/components/ui/textarea";
 import { DECISION_LABELS } from "@/lib/questions";
 import type { MenuPracticeKey } from "@/lib/practices";
 import type { SituationRecord } from "@/lib/types";
 
-export type HomeVariant = "a" | "b" | "c";
+export type HomeVariant = "a" | "b" | "c" | "d";
 
 export const HOME_VARIANT_KEY = "tochka-home-variant-v1";
 
@@ -15,32 +17,41 @@ export const HOME_VARIANT_META: Record<
   { label: string; blurb: string }
 > = {
   a: {
-    label: "A · сейчас",
-    blurb: "Зелёный CTA, ориентиры ниже действий",
+    label: "A · меню + зелёный",
+    blurb: "Две крупные кнопки, зелёный CTA",
   },
   b: {
-    label: "B · тише",
-    blurb: "Ориентиры выше, CTA без зелёной заливки",
+    label: "B · меню + тёмный",
+    blurb: "Ориентиры выше, CTA без зелёного",
   },
   c: {
     label: "C · два пути",
-    blurb: "Контекст сверху, два равных входа без зелёного",
+    blurb: "Две равные карточки-входа",
+  },
+  d: {
+    label: "D · как дневник",
+    blurb: "Одно поле: написать → разобрать. Без меню кнопок",
   },
 };
 
 export function loadHomeVariant(): HomeVariant {
-  if (typeof window === "undefined") return "b";
+  if (typeof window === "undefined") return "d";
   try {
     const fromQuery = new URLSearchParams(window.location.search).get("home");
-    if (fromQuery === "a" || fromQuery === "b" || fromQuery === "c") {
+    if (
+      fromQuery === "a" ||
+      fromQuery === "b" ||
+      fromQuery === "c" ||
+      fromQuery === "d"
+    ) {
       return fromQuery;
     }
     const raw = window.localStorage.getItem(HOME_VARIANT_KEY);
-    if (raw === "a" || raw === "b" || raw === "c") return raw;
+    if (raw === "a" || raw === "b" || raw === "c" || raw === "d") return raw;
   } catch {
     /* ignore */
   }
-  return "b";
+  return "d";
 }
 
 export function saveHomeVariant(v: HomeVariant) {
@@ -54,8 +65,9 @@ type Props = {
   goalsLabel: string;
   favorites: MenuPracticeKey[];
   pendingFeedback: SituationRecord[];
-  onStartDecision: () => void;
+  onStartDecision: (initialText?: string) => void;
   onOpenPractices: () => void;
+  onOpenBreath: () => void;
   onOpenStats: () => void;
   onEditGoals: () => void;
   onOpenFavorite: (key: MenuPracticeKey) => void;
@@ -70,19 +82,26 @@ type Props = {
 function GoalsLine({
   goalsLabel,
   onEditGoals,
-  className = "",
+  whisper = false,
 }: {
   goalsLabel: string;
   onEditGoals: () => void;
-  className?: string;
+  whisper?: boolean;
 }) {
   return (
     <p
-      className={`text-[0.92rem] leading-snug text-[var(--ink-muted)] ${className}`}
+      className={
+        whisper
+          ? "text-[0.88rem] leading-snug text-[var(--ink-muted)]"
+          : "text-[0.92rem] leading-snug text-[var(--ink-muted)]"
+      }
       data-testid="home-goals"
     >
-      Ориентиры:{" "}
-      <span className="text-[var(--ink-soft)]">{goalsLabel}</span>{" "}
+      {whisper ? "Сейчас берегу: " : "Ориентиры: "}
+      <span className="text-[var(--ink-soft)]">{goalsLabel}</span>
+      <span aria-hidden className="mx-1.5 text-[var(--line)]">
+        ·
+      </span>
       <button
         type="button"
         data-testid="edit-goals"
@@ -124,10 +143,6 @@ function MoreBlock({
       <div className="mt-3 space-y-4">
         <div className="space-y-2" data-testid="home-variant-switcher">
           <p className="font-medium text-[var(--ink)]">Вариант главной</p>
-          <p className="text-[0.88rem] leading-snug">
-            Сравнение раскладок. Можно переключать и смотреть, куда уходит
-            внимание.
-          </p>
           <div className="grid gap-1.5">
             {(Object.keys(HOME_VARIANT_META) as HomeVariant[]).map((key) => (
               <button
@@ -136,7 +151,7 @@ function MoreBlock({
                 data-testid={`home-variant-${key}`}
                 className={
                   variant === key
-                    ? "rounded-xl bg-[var(--primary)] px-3 py-2.5 text-left text-[0.92rem] text-[var(--primary-foreground)]"
+                    ? "rounded-xl bg-[var(--ink)] px-3 py-2.5 text-left text-[0.92rem] text-[var(--primary-foreground)]"
                     : "rounded-xl border border-[var(--line)] bg-[var(--surface)] px-3 py-2.5 text-left text-[0.92rem] text-[var(--ink)]"
                 }
                 onClick={() => onVariantChange(key)}
@@ -221,7 +236,6 @@ function FeedbackBlock({
   );
 }
 
-/** A — current: green primary, goals below actions */
 function HomeA(props: Props) {
   return (
     <>
@@ -233,7 +247,7 @@ function HomeA(props: Props) {
           type="button"
           data-testid="new-situation"
           className="clarity-cta-primary inline-flex h-14 w-full items-center justify-center gap-2.5 rounded-2xl px-4 text-[1.1rem] font-semibold transition hover:opacity-95"
-          onClick={props.onStartDecision}
+          onClick={() => props.onStartDecision()}
         >
           <PracticeGlyph name="decision" className="h-5 w-5 opacity-95" />
           Разобрать решение
@@ -241,7 +255,7 @@ function HomeA(props: Props) {
         <button
           type="button"
           data-testid="open-practices"
-          className="clarity-path-card flex w-full items-center gap-3 rounded-2xl border border-[color-mix(in_oklab,var(--primary)_18%,transparent)] bg-[color-mix(in_oklab,var(--primary)_6%,white)] px-3.5 py-3.5 text-left hover:border-[color-mix(in_oklab,var(--primary)_30%,transparent)]"
+          className="clarity-path-card flex w-full items-center gap-3 rounded-2xl border border-[color-mix(in_oklab,var(--primary)_18%,transparent)] bg-[color-mix(in_oklab,var(--primary)_6%,white)] px-3.5 py-3.5 text-left"
           onClick={props.onOpenPractices}
         >
           <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[color-mix(in_oklab,white_72%,transparent)] text-[var(--accent-ink)]">
@@ -251,12 +265,9 @@ function HomeA(props: Props) {
             <span className="block text-[1.05rem] font-semibold text-[var(--ink)]">
               Практики для себя
             </span>
-            <span className="mt-0.5 block text-[0.92rem] leading-snug text-[var(--ink-muted)]">
-              Настроение, дыхание, мысли — когда нет решения, а есть чувство
+            <span className="mt-0.5 block text-[0.92rem] text-[var(--ink-muted)]">
+              Когда нет решения, а есть чувство
             </span>
-          </span>
-          <span className="text-[var(--ink-muted)]" aria-hidden>
-            ›
           </span>
         </button>
       </div>
@@ -268,12 +279,11 @@ function HomeA(props: Props) {
   );
 }
 
-/** B — goals up, ink outline CTA (no green fill), warmer practices name */
 function HomeB(props: Props) {
   return (
     <>
       <div className="space-y-3">
-        <h2 className="font-display text-[1.55rem] leading-tight text-[var(--ink)] sm:text-[1.7rem]">
+        <h2 className="font-display text-[1.55rem] leading-tight text-[var(--ink)]">
           Что сейчас не даёт покоя?
         </h2>
         <GoalsLine
@@ -285,31 +295,24 @@ function HomeB(props: Props) {
         <button
           type="button"
           data-testid="new-situation"
-          className="inline-flex h-14 w-full items-center justify-center gap-2.5 rounded-2xl border-2 border-[var(--ink)] bg-[var(--ink)] px-4 text-[1.1rem] font-semibold text-[var(--primary-foreground)] transition hover:opacity-95"
-          onClick={props.onStartDecision}
+          className="inline-flex h-14 w-full items-center justify-center gap-2.5 rounded-2xl bg-[var(--ink)] px-4 text-[1.1rem] font-semibold text-[var(--primary-foreground)]"
+          onClick={() => props.onStartDecision()}
         >
-          <PracticeGlyph name="decision" className="h-5 w-5 opacity-95" />
           Разобрать решение
         </button>
         <button
           type="button"
           data-testid="open-practices"
-          className="clarity-path-card flex w-full items-center gap-3 rounded-2xl border border-[var(--line)] bg-[var(--surface-strong)] px-3.5 py-3.5 text-left hover:border-[color-mix(in_oklab,var(--ink)_22%,transparent)]"
+          className="clarity-path-card flex w-full items-center gap-3 rounded-2xl border border-[var(--line)] bg-[var(--surface-strong)] px-3.5 py-3.5 text-left"
           onClick={props.onOpenPractices}
         >
-          <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--secondary)] text-[var(--ink-soft)]">
-            <PracticeGlyph name="practices" className="h-5 w-5" />
-          </span>
           <span className="min-w-0 flex-1">
             <span className="block text-[1.05rem] font-semibold text-[var(--ink)]">
               Разобраться в себе
             </span>
-            <span className="mt-0.5 block text-[0.92rem] leading-snug text-[var(--ink-muted)]">
-              Короткие практики, когда нет выбора — есть чувство
+            <span className="mt-0.5 block text-[0.92rem] text-[var(--ink-muted)]">
+              Короткие практики без «надо решить»
             </span>
-          </span>
-          <span className="text-[var(--ink-muted)]" aria-hidden>
-            ›
           </span>
         </button>
       </div>
@@ -317,64 +320,47 @@ function HomeB(props: Props) {
   );
 }
 
-/** C — two calm paths, no filled accent; goals as context chips above */
 function HomeC(props: Props) {
   return (
     <>
-      <div className="space-y-3">
-        <GoalsLine
-          goalsLabel={props.goalsLabel}
-          onEditGoals={props.onEditGoals}
-        />
-        <h2 className="font-display text-[1.5rem] leading-tight text-[var(--ink)] sm:text-[1.65rem]">
+      <GoalsLine
+        goalsLabel={props.goalsLabel}
+        onEditGoals={props.onEditGoals}
+      />
+      <div className="space-y-2">
+        <h2 className="font-display text-[1.5rem] leading-tight text-[var(--ink)]">
           С чего начнём?
         </h2>
-        <p className="text-[0.95rem] leading-relaxed text-[var(--ink-muted)]">
-          Один вход — если есть выбор. Другой — если нужно просто побыть с
-          собой.
-        </p>
       </div>
       <div className="grid gap-2.5">
         <button
           type="button"
           data-testid="new-situation"
-          className="flex w-full items-start gap-3 rounded-2xl border border-[color-mix(in_oklab,var(--ink)_16%,transparent)] bg-[var(--surface-strong)] px-3.5 py-3.5 text-left transition hover:border-[color-mix(in_oklab,var(--ink)_28%,transparent)]"
-          onClick={props.onStartDecision}
+          className="flex w-full items-start gap-3 rounded-2xl border border-[color-mix(in_oklab,var(--ink)_16%,transparent)] bg-[var(--surface-strong)] px-3.5 py-3.5 text-left"
+          onClick={() => props.onStartDecision()}
         >
-          <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--ink)] text-[var(--primary-foreground)]">
-            <PracticeGlyph name="decision" className="h-5 w-5" />
-          </span>
           <span className="min-w-0 flex-1">
             <span className="block text-[1.08rem] font-semibold text-[var(--ink)]">
-              Есть решение
+              Нужно решить
             </span>
-            <span className="mt-0.5 block text-[0.92rem] leading-snug text-[var(--ink-muted)]">
-              Разобрать выбор по шагам — без давления
+            <span className="mt-0.5 block text-[0.92rem] text-[var(--ink-muted)]">
+              Разбор выбора по шагам
             </span>
-          </span>
-          <span className="mt-1 text-[var(--ink-muted)]" aria-hidden>
-            ›
           </span>
         </button>
         <button
           type="button"
           data-testid="open-practices"
-          className="flex w-full items-start gap-3 rounded-2xl border border-[var(--line)] bg-[var(--surface)] px-3.5 py-3.5 text-left transition hover:border-[color-mix(in_oklab,var(--ink)_18%,transparent)]"
+          className="flex w-full items-start gap-3 rounded-2xl border border-[var(--line)] bg-[var(--surface)] px-3.5 py-3.5 text-left"
           onClick={props.onOpenPractices}
         >
-          <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--secondary)] text-[var(--ink-soft)]">
-            <PracticeGlyph name="practices" className="h-5 w-5" />
-          </span>
           <span className="min-w-0 flex-1">
             <span className="block text-[1.08rem] font-semibold text-[var(--ink)]">
-              Просто побыть с собой
+              Побыть с собой
             </span>
-            <span className="mt-0.5 block text-[0.92rem] leading-snug text-[var(--ink-muted)]">
-              Настроение, дыхание, мысли — без «надо решить»
+            <span className="mt-0.5 block text-[0.92rem] text-[var(--ink-muted)]">
+              Настроение, дыхание, мысли
             </span>
-          </span>
-          <span className="mt-1 text-[var(--ink-muted)]" aria-hidden>
-            ›
           </span>
         </button>
       </div>
@@ -382,34 +368,120 @@ function HomeC(props: Props) {
   );
 }
 
-export function HomeScreen(props: Props) {
-  const Body =
-    props.variant === "a" ? HomeA : props.variant === "b" ? HomeB : HomeC;
+/** D — journal entry: write first, no button menu */
+function HomeD(props: Props) {
+  const [text, setText] = useState("");
+  const ready = text.trim().length >= 8;
 
   return (
-    <section className="space-y-7" data-testid="home-screen" data-variant={props.variant}>
-      <Body {...props} />
+    <div className="space-y-6" data-testid="home-journal">
+      <GoalsLine
+        goalsLabel={props.goalsLabel}
+        onEditGoals={props.onEditGoals}
+        whisper
+      />
+
+      <div className="space-y-3">
+        <h2 className="font-display text-[1.65rem] leading-[1.2] text-[var(--ink)] sm:text-[1.8rem]">
+          Что не отпускает?
+        </h2>
+        <p className="max-w-md text-[1rem] leading-relaxed text-[var(--ink-muted)]">
+          Напишите своими словами. Дальше разберём мягко — или просто оставим
+          как заметку для себя.
+        </p>
+      </div>
+
+      <div className="space-y-3">
+        <Textarea
+          data-testid="home-journal-text"
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          rows={5}
+          placeholder="Например: не знаю, ехать ли к маме в выходные…"
+          className="min-h-[8.5rem] resize-none rounded-2xl border-[color-mix(in_oklab,var(--ink)_10%,transparent)] bg-[color-mix(in_oklab,white_55%,transparent)] px-3.5 py-3 text-[1.05rem] leading-relaxed shadow-none focus-visible:ring-[var(--ink)]/20"
+        />
+        <button
+          type="button"
+          data-testid="new-situation"
+          disabled={!ready}
+          className="inline-flex h-12 w-full items-center justify-center rounded-2xl bg-[var(--ink)] px-4 text-[1.05rem] font-semibold text-[var(--primary-foreground)] transition enabled:hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-35"
+          onClick={() => props.onStartDecision(text.trim())}
+        >
+          Разобрать
+        </button>
+      </div>
+
+      <nav
+        className="flex flex-wrap items-center gap-x-3 gap-y-2 text-[0.95rem] text-[var(--ink-muted)]"
+        aria-label="Тихие действия"
+      >
+        <button
+          type="button"
+          data-testid="home-quiet-breath"
+          className="clarity-link-quiet font-medium underline-offset-2 hover:underline"
+          onClick={props.onOpenBreath}
+        >
+          дыхание
+        </button>
+        <span aria-hidden>·</span>
+        <button
+          type="button"
+          data-testid="open-practices"
+          className="clarity-link-quiet font-medium underline-offset-2 hover:underline"
+          onClick={props.onOpenPractices}
+        >
+          практики
+        </button>
+        <span aria-hidden>·</span>
+        <button
+          type="button"
+          data-testid="open-stats"
+          className="clarity-link-quiet font-medium underline-offset-2 hover:underline"
+          onClick={props.onOpenStats}
+        >
+          записи
+        </button>
+      </nav>
+    </div>
+  );
+}
+
+export function HomeScreen(props: Props) {
+  const isJournal = props.variant === "d";
+
+  return (
+    <section
+      className={isJournal ? "space-y-6" : "space-y-7"}
+      data-testid="home-screen"
+      data-variant={props.variant}
+    >
+      {props.variant === "a" && <HomeA {...props} />}
+      {props.variant === "b" && <HomeB {...props} />}
+      {props.variant === "c" && <HomeC {...props} />}
+      {props.variant === "d" && <HomeD {...props} />}
 
       <HomeFavorites
         favorites={props.favorites}
         onOpen={props.onOpenFavorite}
       />
 
-      {props.favorites.length === 0 && (
+      {!isJournal && props.favorites.length === 0 && (
         <p className="text-[0.92rem] text-[var(--ink-muted)]">
           Звёздочка в практиках — частое появится здесь.
         </p>
       )}
 
-      <button
-        type="button"
-        data-testid="open-stats"
-        className="clarity-link-quiet inline-flex items-center gap-1.5 text-[0.95rem] font-medium"
-        onClick={props.onOpenStats}
-      >
-        <PracticeGlyph name="stats" className="h-4 w-4" />
-        {props.variant === "c" ? "Мои записи" : "Что уже заметили"}
-      </button>
+      {!isJournal && (
+        <button
+          type="button"
+          data-testid="open-stats"
+          className="clarity-link-quiet inline-flex items-center gap-1.5 text-[0.95rem] font-medium"
+          onClick={props.onOpenStats}
+        >
+          <PracticeGlyph name="stats" className="h-4 w-4" />
+          {props.variant === "c" ? "Мои записи" : "Что уже заметили"}
+        </button>
+      )}
 
       <FeedbackBlock
         pendingFeedback={props.pendingFeedback}
