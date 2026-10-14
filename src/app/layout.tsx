@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
+  // Allow pinch-zoom for low-vision users (Lighthouse/axe fail on maximum-scale=1)
   themeColor: "#1f6f6b",
 };
 

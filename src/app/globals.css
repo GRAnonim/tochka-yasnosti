@@ -62,7 +62,8 @@
   */
   --ink: #24383e;
   --ink-soft: #3a5259;
-  --ink-muted: #6e868d;
+  /* Darker muted text so secondary copy passes WCAG AA on soft surfaces */
+  --ink-muted: #5a7279;
   --accent: #3f7f76;
   --accent-ink: #2f625b;
   --surface: color-mix(in oklab, #ffffff 82%, #d7ebe6);
@@ -82,7 +83,7 @@
   --secondary: color-mix(in oklab, #ffffff 70%, #d5e6e1);
   --secondary-foreground: #3a5259;
   --muted: #e2ece9;
-  --muted-foreground: #6e868d;
+  --muted-foreground: #5a7279;
   --accent-foreground: #f4fffc;
   --destructive: oklch(0.55 0.12 25);
   --border: color-mix(in oklab, #24383e 11%, transparent);
