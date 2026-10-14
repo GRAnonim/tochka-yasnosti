@@ -41,10 +41,10 @@ type Props = {
 };
 
 const groupTone: Record<string, string> = {
-  day: "bg-[color-mix(in_oklab,#d8ebe4_55%,white)] border-[color-mix(in_oklab,var(--primary)_22%,transparent)]",
+  day: "bg-[var(--surface)] border-[color-mix(in_oklab,var(--primary)_28%,transparent)]",
   thoughts:
-    "bg-[color-mix(in_oklab,#d9e4ec_55%,white)] border-[color-mix(in_oklab,#7aa3ae_28%,transparent)]",
-  body: "bg-[color-mix(in_oklab,#e4eee6_55%,white)] border-[color-mix(in_oklab,#8eb8a8_28%,transparent)]",
+    "bg-[color-mix(in_oklab,var(--surface)_82%,var(--bg-wash-b))] border-[color-mix(in_oklab,var(--ink)_14%,transparent)]",
+  body: "bg-[color-mix(in_oklab,var(--surface)_88%,var(--bg-wash-c))] border-[color-mix(in_oklab,var(--primary)_22%,transparent)]",
 };
 
 const groupIcon = {
@@ -131,7 +131,7 @@ export function HomeScreen({
                 }
               >
                 <span className="flex min-w-0 items-start gap-3">
-                  <span className="mt-0.5 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[color-mix(in_oklab,white_72%,transparent)] text-[var(--accent-ink)]">
+                  <span className="mt-0.5 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--field)] text-[var(--accent-ink)]">
                     <GroupIcon className="h-5 w-5" />
                   </span>
                   <span className="min-w-0">
@@ -145,7 +145,7 @@ export function HomeScreen({
                 </span>
                 <span
                   aria-hidden
-                  className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_oklab,white_70%,transparent)] text-[var(--ink-muted)] transition-transform"
+                  className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--field)] text-[var(--ink-muted)] transition-transform"
                   style={{
                     transform: open ? "rotate(90deg)" : "rotate(0deg)",
                   }}
@@ -154,13 +154,13 @@ export function HomeScreen({
                 </span>
               </button>
               {open && (
-                <div className="space-y-2 border-t border-[color-mix(in_oklab,var(--ink)_10%,transparent)] bg-[color-mix(in_oklab,white_72%,transparent)] px-2 py-2">
+                <div className="space-y-2 border-t border-[color-mix(in_oklab,var(--ink)_10%,transparent)] bg-[var(--field)] px-2 py-2">
                   {group.items.map((key) => (
                     <button
                       type="button"
                       key={key}
                       data-testid={`home-practice-${key}`}
-                      className="flex w-full items-start gap-2.5 rounded-xl px-2.5 py-2.5 text-left transition hover:bg-[color-mix(in_oklab,white_80%,transparent)]"
+                      className="flex w-full items-start gap-2.5 rounded-xl px-2.5 py-2.5 text-left transition hover:bg-[var(--surface-strong)]"
                       onClick={() => onOpenPractice(key)}
                     >
                       <PracticeIconMark

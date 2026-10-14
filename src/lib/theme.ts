@@ -17,8 +17,8 @@ export const ATMOSPHERES: AtmosphereOption[] = [
     id: "dusk",
     label: "Сумерки",
     hint: "чуть темнее, мягче для глаз",
-    swatch: "#c5d4d0",
-    telegramBg: "#cfdad6",
+    swatch: "#b7c6c1",
+    telegramBg: "#bdcbc6",
   },
   {
     id: "mist",

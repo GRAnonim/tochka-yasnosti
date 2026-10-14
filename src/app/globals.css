@@ -65,20 +65,20 @@ html[data-atmosphere="dusk"] {
   --ink-muted: #53686f;
   --accent: #3a756e;
   --accent-ink: #2a5a54;
-  --surface: color-mix(in oklab, #d7e3df 78%, #9eb4ae);
-  --surface-strong: color-mix(in oklab, #e4eeea 86%, #b7c9c3);
-  --line: color-mix(in oklab, #1f3338 12%, transparent);
+  --surface: color-mix(in oklab, #c5d4cf 72%, #8fa49d);
+  --surface-strong: color-mix(in oklab, #d2dfda 80%, #9eb3ac);
+  --line: color-mix(in oklab, #1f3338 14%, transparent);
   --danger-soft: #9a5b5b;
-  --panel: color-mix(in oklab, #dce8e4 70%, transparent);
-  --field: color-mix(in oklab, #e8f0ed 88%, #b8cac4);
+  --panel: color-mix(in oklab, #c9d8d3 78%, #8fa49d);
+  --field: color-mix(in oklab, #d8e4df 84%, #a3b8b1);
 
-  --bg-base: #cfdad6;
-  --bg-wash-a: #b7cdc4;
-  --bg-wash-b: #b4c4ce;
-  --bg-wash-c: #c5d2c9;
-  --bg-grad-from: #d5e0dc;
-  --bg-grad-mid: #c7d4d0;
-  --bg-grad-to: #c2ced4;
+  --bg-base: #bdcbc6;
+  --bg-wash-a: #a8c2b8;
+  --bg-wash-b: #a5b6c2;
+  --bg-wash-c: #b5c4bb;
+  --bg-grad-from: #c5d3ce;
+  --bg-grad-mid: #b7c6c1;
+  --bg-grad-to: #b0bfc6;
   --orb-a: #8fb5ab;
   --orb-b: #8fa3b3;
 

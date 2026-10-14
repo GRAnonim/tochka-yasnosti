@@ -13,7 +13,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   // Allow pinch-zoom for low-vision users (Lighthouse/axe fail on maximum-scale=1)
-  themeColor: "#cfdad6",
+  themeColor: "#bdcbc6",
 };
 
 export default function RootLayout({
