@@ -1,7 +1,7 @@
 import { chromium } from "playwright";
 import { mkdirSync } from "fs";
 
-const base = process.env.APP_URL || "http://127.0.0.1:43123";
+const base = process.env.APP_URL || "http://127.0.0.1:3000";
 const out = "/opt/cursor/artifacts/screenshots";
 mkdirSync(out, { recursive: true });
 
@@ -15,6 +15,7 @@ await page.getByTestId("goal-0").fill("беречь сон");
 await page.getByTestId("goal-1").fill("закончить проект");
 await page.getByTestId("start-onboarding").click();
 await page.getByTestId("open-practices").click();
+await page.getByTestId("practice-group-toggle-body").click();
 await page.screenshot({ path: `${out}/p4-practices-menu.png`, fullPage: true });
 
 await page.getByTestId("practice-ideal-day").click();
@@ -30,6 +31,7 @@ await page.getByTestId("practice-log-view").waitFor();
 
 await page.getByRole("button", { name: "На главную" }).click();
 await page.getByTestId("open-practices").click();
+await page.getByTestId("practice-group-toggle-thoughts").click();
 await page.getByTestId("practice-five-whys").click();
 await page.getByTestId("five-start").fill("раздражаюсь от сообщений вечером");
 await page.getByTestId("five-why-0").fill("потому что хочу отдохнуть");

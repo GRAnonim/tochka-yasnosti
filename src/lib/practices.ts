@@ -77,7 +77,8 @@ export const PRACTICE_META = {
   },
 } as const;
 
-/** Groups help the eye scan a long list without rainbow categories */
+/** Groups help the eye scan a long list without rainbow categories.
+ *  «Разобрать решение» живёт только на главном — это отдельный цикл, не практика. */
 export const PRACTICE_MENU_GROUPS = [
   {
     id: "day",
@@ -94,12 +95,39 @@ export const PRACTICE_MENU_GROUPS = [
     title: "Тело и картина жизни",
     items: ["breath", "wheel", "ideal-day"],
   },
-  {
-    id: "choice",
-    title: "Решение",
-    items: ["decision"],
-  },
 ] as const;
+
+export type MenuPracticeKey =
+  (typeof PRACTICE_MENU_GROUPS)[number]["items"][number];
+
+export const MENU_PRACTICE_KEYS: MenuPracticeKey[] =
+  PRACTICE_MENU_GROUPS.flatMap((g) => [...g.items]);
+
+export const PRACTICE_FAVORITES_KEY = "tochka-practice-favorites-v1";
+
+export function loadPracticeFavorites(): MenuPracticeKey[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = window.localStorage.getItem(PRACTICE_FAVORITES_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw) as unknown;
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter((k): k is MenuPracticeKey =>
+      MENU_PRACTICE_KEYS.includes(k as MenuPracticeKey),
+    );
+  } catch {
+    return [];
+  }
+}
+
+export function savePracticeFavorites(keys: MenuPracticeKey[]): void {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(PRACTICE_FAVORITES_KEY, JSON.stringify(keys));
+  } catch {
+    /* ignore */
+  }
+}
 
 export const IDEAL_DAY_HORIZONS = [
   "Обычный хороший день",

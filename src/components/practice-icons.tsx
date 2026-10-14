@@ -162,6 +162,22 @@ export function IconPractices(props: IconProps) {
   );
 }
 
+/** Quiet star — favorites (outline / filled) */
+export function IconStar({
+  filled = false,
+  ...props
+}: IconProps & { filled?: boolean }) {
+  return (
+    <BaseIcon {...props}>
+      <path
+        d="M12 4.8 13.7 9.2l4.7.4-3.6 3.1 1.1 4.5L12 14.9 7.1 17.2l1.1-4.5-3.6-3.1 4.7-.4Z"
+        fill={filled ? "currentColor" : "none"}
+        opacity={filled ? 0.9 : 1}
+      />
+    </BaseIcon>
+  );
+}
+
 export const PRACTICE_ICONS = {
   mood: IconMood,
   gratitude: IconGratitude,

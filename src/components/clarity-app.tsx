@@ -33,6 +33,7 @@ import type {
 import {
   EmotionsPracticeForm,
   GratitudePracticeForm,
+  HomeFavorites,
   MoodPracticeForm,
   PracticeLog,
   PracticesMenu,
@@ -52,8 +53,11 @@ import {
 import { WheelResultView } from "@/components/wheel-chart";
 import { PracticeGlyph } from "@/components/practice-icons";
 import {
+  loadPracticeFavorites,
   QUESTION_TOPICS,
+  savePracticeFavorites,
   WHEEL_AREAS,
+  type MenuPracticeKey,
   type QuestionTopicId,
 } from "@/lib/practices";
 
@@ -119,6 +123,7 @@ export function ClarityApp() {
   const [fiveStarting, setFiveStarting] = useState("");
   const [fiveSteps, setFiveSteps] = useState<string[]>([""]);
   const [fiveNeedNow, setFiveNeedNow] = useState("");
+  const [favorites, setFavorites] = useState<MenuPracticeKey[]>([]);
 
   const fillGoalInputs = (goals: { text: string }[]) => {
     setGoalInputs([
@@ -148,6 +153,7 @@ export function ClarityApp() {
       setSpecContact(loaded.specialist.contact);
       setSpecNote(loaded.specialist.note);
     }
+    setFavorites(loadPracticeFavorites());
 
     // Telegram script may load later (lazyOnload)
     const syncTg = () => {
@@ -448,6 +454,19 @@ export function ClarityApp() {
 
   const questions = draftFilter ? QUESTIONS_BY_FILTER[draftFilter] : [];
 
+  const openPractice = (key: MenuPracticeKey) => {
+    if (key === "mood") resetMoodDraft();
+    if (key === "gratitude") resetGratitudeDraft();
+    if (key === "emotions") resetEmotionsDraft();
+    if (key === "abc") resetAbcDraft();
+    if (key === "questions") resetQuestionsDraft();
+    if (key === "wheel") resetWheelDraft();
+    if (key === "breath") resetBreathDraft();
+    if (key === "ideal-day") resetIdealDayDraft();
+    if (key === "five-whys") resetFiveWhysDraft();
+    setScreen(key);
+  };
+
   const startNew = () => {
     setDraftText("");
     setDraftFilter(null);
@@ -701,24 +720,24 @@ export function ClarityApp() {
             <div className="flex flex-col gap-3">
               <button
                 type="button"
-                data-testid="open-practices"
+                data-testid="new-situation"
                 className="inline-flex h-12 w-full items-center justify-center gap-2.5 rounded-xl bg-[var(--primary)] px-4 text-base font-medium text-[var(--primary-foreground)] transition hover:opacity-95"
-                onClick={() => setScreen("practices")}
+                onClick={startNew}
               >
-                <PracticeGlyph name="practices" className="h-5 w-5 opacity-95" />
-                Практики
+                <PracticeGlyph name="decision" className="h-5 w-5 opacity-95" />
+                Разобрать решение
               </button>
               <button
                 type="button"
-                data-testid="new-situation"
+                data-testid="open-practices"
                 className="inline-flex h-11 w-full items-center justify-center gap-2.5 rounded-xl bg-[var(--secondary)] px-4 text-sm font-medium text-[var(--secondary-foreground)] transition hover:opacity-95"
-                onClick={startNew}
+                onClick={() => setScreen("practices")}
               >
                 <PracticeGlyph
-                  name="decision"
+                  name="practices"
                   className="h-5 w-5 text-[var(--accent-ink)]"
                 />
-                Разобрать решение
+                Все практики
               </button>
               <button
                 type="button"
@@ -733,6 +752,18 @@ export function ClarityApp() {
                 Статистика
               </button>
             </div>
+
+            <HomeFavorites
+              favorites={favorites}
+              onOpen={(key) => openPractice(key)}
+            />
+
+            {favorites.length === 0 && (
+              <p className="text-xs leading-relaxed text-[var(--ink-muted)]">
+                В «Все практики» можно отметить звёздочкой то, чем пользуетесь
+                часто — оно появится здесь.
+              </p>
+            )}
 
             {pendingFeedback.length > 0 && (
               <div className="space-y-3 border-t border-[var(--line)] pt-4">
@@ -830,22 +861,12 @@ export function ClarityApp() {
 
         {screen === "practices" && (
           <PracticesMenu
-            onOpen={(key) => {
-              if (key === "decision") {
-                startNew();
-                return;
-              }
-              if (key === "mood") resetMoodDraft();
-              if (key === "gratitude") resetGratitudeDraft();
-              if (key === "emotions") resetEmotionsDraft();
-              if (key === "abc") resetAbcDraft();
-              if (key === "questions") resetQuestionsDraft();
-              if (key === "wheel") resetWheelDraft();
-              if (key === "breath") resetBreathDraft();
-              if (key === "ideal-day") resetIdealDayDraft();
-              if (key === "five-whys") resetFiveWhysDraft();
-              setScreen(key);
+            favorites={favorites}
+            onFavoritesChange={(next) => {
+              setFavorites(next);
+              savePracticeFavorites(next);
             }}
+            onOpen={(key) => openPractice(key)}
             onLog={() => setScreen("practice-log")}
           />
         )}

@@ -1,7 +1,10 @@
 "use client";
 
-import type { ReactNode } from "react";
-import { PracticeIconMark } from "@/components/practice-icons";
+import { useState, type ReactNode } from "react";
+import {
+  IconStar,
+  PracticeIconMark,
+} from "@/components/practice-icons";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -13,6 +16,7 @@ import {
   PRACTICE_META,
   formatPracticeDate,
   moodLabel,
+  type MenuPracticeKey,
 } from "@/lib/practices";
 import type {
   AbcPractice,
@@ -55,72 +59,167 @@ function Chip({
   );
 }
 
-export type PracticeMenuKey =
-  | "mood"
-  | "gratitude"
-  | "emotions"
-  | "questions"
-  | "abc"
-  | "wheel"
-  | "breath"
-  | "ideal-day"
-  | "five-whys"
-  | "decision";
+export type PracticeMenuKey = MenuPracticeKey;
+
+function PracticeRow({
+  practiceKey,
+  favorite,
+  onOpen,
+  onToggleFavorite,
+}: {
+  practiceKey: MenuPracticeKey;
+  favorite: boolean;
+  onOpen: () => void;
+  onToggleFavorite: () => void;
+}) {
+  const meta = PRACTICE_META[practiceKey];
+  return (
+    <div
+      className="practice-tile flex w-full items-stretch gap-1 rounded-2xl border border-[var(--line)] bg-[var(--surface-strong)]"
+      data-testid={`practice-${practiceKey}`}
+    >
+      <button
+        type="button"
+        className="flex min-w-0 flex-1 items-center gap-3 px-3 py-3 text-left transition hover:opacity-95"
+        onClick={onOpen}
+      >
+        <PracticeIconMark name={practiceKey} />
+        <span className="min-w-0 flex-1">
+          <span className="block font-medium text-[var(--ink)]">
+            {meta.title}
+          </span>
+          <span className="mt-0.5 block text-sm leading-snug text-[var(--ink-muted)]">
+            {meta.blurb}
+          </span>
+        </span>
+      </button>
+      <button
+        type="button"
+        data-testid={`favorite-${practiceKey}`}
+        aria-label={
+          favorite ? "Убрать из избранного" : "Добавить в избранное"
+        }
+        aria-pressed={favorite}
+        className={
+          favorite
+            ? "flex w-12 shrink-0 items-center justify-center text-[var(--accent-ink)]"
+            : "flex w-12 shrink-0 items-center justify-center text-[var(--ink-muted)] opacity-70 hover:opacity-100"
+        }
+        onClick={(e) => {
+          e.stopPropagation();
+          onToggleFavorite();
+        }}
+      >
+        <IconStar filled={favorite} className="h-5 w-5" />
+      </button>
+    </div>
+  );
+}
 
 export function PracticesMenu({
   onOpen,
   onLog,
+  favorites,
+  onFavoritesChange,
 }: {
   onOpen: (screen: PracticeMenuKey) => void;
   onLog: () => void;
+  favorites: MenuPracticeKey[];
+  onFavoritesChange: (next: MenuPracticeKey[]) => void;
 }) {
+  const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
+
+  const toggleGroup = (id: string) => {
+    setOpenGroups((prev) => ({ ...prev, [id]: !prev[id] }));
+  };
+
+  const toggleFavorite = (key: MenuPracticeKey) => {
+    const next = favorites.includes(key)
+      ? favorites.filter((k) => k !== key)
+      : [...favorites, key];
+    onFavoritesChange(next);
+  };
+
   return (
     <section className="space-y-5" data-testid="practices-menu">
       <div>
         <h2 className="font-display text-xl text-[var(--ink)]">Практики</h2>
         <p className="mt-1 text-sm text-[var(--ink-muted)]">
-          Короткий список по смыслу — выберите, что нужно сейчас.
+          Откройте нужный раздел. Звезда — на главный экран в избранное.
+          Разбор решения остаётся на главной.
         </p>
       </div>
 
-      <div className="space-y-5">
-        {PRACTICE_MENU_GROUPS.map((group) => (
-          <div key={group.id} className="space-y-2">
-            <p className="px-0.5 text-[11px] font-medium tracking-[0.08em] text-[var(--ink-muted)] uppercase">
-              {group.title}
-            </p>
-            <div className="grid gap-1.5">
-              {group.items.map((key) => {
-                const meta = PRACTICE_META[key];
-                return (
-                  <button
-                    type="button"
-                    key={key}
-                    data-testid={`practice-${key}`}
-                    className="practice-tile flex w-full items-center gap-3 rounded-2xl border border-[var(--line)] bg-[var(--surface-strong)] px-3 py-3 text-left transition hover:border-[var(--accent)]"
-                    onClick={() => onOpen(key)}
-                  >
-                    <PracticeIconMark name={key} />
-                    <span className="min-w-0 flex-1">
-                      <span className="block font-medium text-[var(--ink)]">
-                        {meta.title}
-                      </span>
-                      <span className="mt-0.5 block text-sm leading-snug text-[var(--ink-muted)]">
-                        {meta.blurb}
-                      </span>
-                    </span>
-                    <span
-                      aria-hidden
-                      className="shrink-0 text-[var(--ink-muted)] opacity-50"
-                    >
-                      ›
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
+      {favorites.length > 0 && (
+        <div className="space-y-2" data-testid="favorites-in-menu">
+          <p className="px-0.5 text-[11px] font-medium tracking-[0.08em] text-[var(--ink-muted)] uppercase">
+            Избранное
+          </p>
+          <div className="grid gap-1.5">
+            {favorites.map((key) => (
+              <PracticeRow
+                key={key}
+                practiceKey={key}
+                favorite
+                onOpen={() => onOpen(key)}
+                onToggleFavorite={() => toggleFavorite(key)}
+              />
+            ))}
           </div>
-        ))}
+        </div>
+      )}
+
+      <div className="space-y-2">
+        {PRACTICE_MENU_GROUPS.map((group) => {
+          const open = Boolean(openGroups[group.id]);
+          return (
+            <div
+              key={group.id}
+              className="overflow-hidden rounded-2xl border border-[var(--line)] bg-[var(--surface)]"
+              data-testid={`practice-group-${group.id}`}
+            >
+              <button
+                type="button"
+                data-testid={`practice-group-toggle-${group.id}`}
+                className="flex w-full items-center justify-between gap-3 px-3.5 py-3 text-left"
+                aria-expanded={open}
+                onClick={() => toggleGroup(group.id)}
+              >
+                <span>
+                  <span className="block text-sm font-medium text-[var(--ink)]">
+                    {group.title}
+                  </span>
+                  <span className="mt-0.5 block text-xs text-[var(--ink-muted)]">
+                    {group.items.length} практики
+                  </span>
+                </span>
+                <span
+                  aria-hidden
+                  className="text-[var(--ink-muted)] transition-transform"
+                  style={{
+                    display: "inline-block",
+                    transform: open ? "rotate(90deg)" : "rotate(0deg)",
+                  }}
+                >
+                  ›
+                </span>
+              </button>
+              {open && (
+                <div className="grid gap-1.5 border-t border-[var(--line)] px-2 py-2">
+                  {group.items.map((key) => (
+                    <PracticeRow
+                      key={key}
+                      practiceKey={key}
+                      favorite={favorites.includes(key)}
+                      onOpen={() => onOpen(key)}
+                      onToggleFavorite={() => toggleFavorite(key)}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          );
+        })}
       </div>
 
       <button
@@ -136,6 +235,44 @@ export function PracticesMenu({
         Журнал практик
       </button>
     </section>
+  );
+}
+
+/** Quick favorites on the home screen */
+export function HomeFavorites({
+  favorites,
+  onOpen,
+}: {
+  favorites: MenuPracticeKey[];
+  onOpen: (key: MenuPracticeKey) => void;
+}) {
+  if (favorites.length === 0) return null;
+  return (
+    <div className="space-y-2" data-testid="home-favorites">
+      <div className="flex items-baseline justify-between gap-2">
+        <h2 className="font-display text-base text-[var(--ink)]">Избранное</h2>
+        <span className="text-xs text-[var(--ink-muted)]">частое</span>
+      </div>
+      <div className="grid gap-1.5">
+        {favorites.map((key) => (
+          <button
+            type="button"
+            key={key}
+            data-testid={`home-favorite-${key}`}
+            className="flex w-full items-center gap-3 rounded-2xl border border-[var(--line)] bg-[var(--surface-strong)] px-3 py-3 text-left transition hover:border-[var(--accent)]"
+            onClick={() => onOpen(key)}
+          >
+            <PracticeIconMark name={key} />
+            <span className="min-w-0 flex-1">
+              <span className="block font-medium text-[var(--ink)]">
+                {PRACTICE_META[key].title}
+              </span>
+            </span>
+            <IconStar filled className="h-4 w-4 shrink-0 text-[var(--accent-ink)]" />
+          </button>
+        ))}
+      </div>
+    </div>
   );
 }
 

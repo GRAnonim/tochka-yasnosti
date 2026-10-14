@@ -1,7 +1,7 @@
 import { chromium } from "playwright";
 import { mkdirSync } from "fs";
 
-const base = process.env.APP_URL || "http://127.0.0.1:43123";
+const base = process.env.APP_URL || "http://127.0.0.1:3000";
 const out = "/opt/cursor/artifacts/screenshots";
 mkdirSync(out, { recursive: true });
 

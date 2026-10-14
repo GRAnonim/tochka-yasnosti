@@ -1,7 +1,7 @@
 import { chromium } from "playwright";
 import { mkdirSync } from "fs";
 
-const base = process.env.APP_URL || "http://127.0.0.1:43123";
+const base = process.env.APP_URL || "http://127.0.0.1:3000";
 const out = "/opt/cursor/artifacts/screenshots";
 mkdirSync(out, { recursive: true });
 
@@ -15,6 +15,7 @@ await page.getByTestId("goal-0").fill("беречь сон");
 await page.getByTestId("goal-1").fill("закончить проект");
 await page.getByTestId("start-onboarding").click();
 await page.getByTestId("open-practices").click();
+await page.getByTestId("practice-group-toggle-day").click();
 await page.screenshot({ path: `${out}/p1-practices-menu.png`, fullPage: true });
 
 await page.getByTestId("practice-mood").click();
@@ -26,6 +27,7 @@ await page.getByTestId("practice-log-view").waitFor();
 
 await page.getByRole("button", { name: "На главную" }).click();
 await page.getByTestId("open-practices").click();
+await page.getByTestId("practice-group-toggle-day").click();
 await page.getByTestId("practice-gratitude").click();
 await page.getByTestId("gratitude-0").fill("тёплый чай");
 await page.getByTestId("gratitude-1").fill("сообщение друга");
@@ -33,6 +35,7 @@ await page.getByTestId("gratitude-save").click();
 
 await page.getByRole("button", { name: "На главную" }).click();
 await page.getByTestId("open-practices").click();
+await page.getByTestId("practice-group-toggle-day").click();
 await page.getByTestId("practice-emotions").click();
 await page.getByTestId("emotion-спокойствие").click();
 await page.getByTestId("emotion-надежда").click();
