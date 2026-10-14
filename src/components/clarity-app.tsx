@@ -843,8 +843,9 @@ export function ClarityApp() {
                 Мой специалист
               </h2>
               <p className="text-[1.02rem] leading-relaxed text-[var(--ink-muted)]">
-                Тихий блок — не мешает рефлексии. Контакты только те, кому вы
-                доверяете.
+                Тихий блок — не мешает рефлексии. Сейчас можно сохранить своего
+                специалиста; позже здесь появятся контакты доверенных
+                психологов.
               </p>
               {state.specialist ? (
                 <div className="rounded-xl bg-[var(--surface)] px-3 py-3 text-[1.02rem]">
