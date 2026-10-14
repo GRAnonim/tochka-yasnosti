@@ -13,7 +13,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   // Allow pinch-zoom for low-vision users (Lighthouse/axe fail on maximum-scale=1)
-  themeColor: "#bdcbc6",
+  themeColor: "#1f6f6b",
 };
 
 export default function RootLayout({
@@ -22,11 +22,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ru" data-atmosphere="dusk">
+    <html lang="ru" data-atmosphere="original">
       <head>
         <script
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var k='tochka-atmosphere-v1';var v=localStorage.getItem(k);if(v==='mist'||v==='dusk'||v==='warm'){document.documentElement.dataset.atmosphere=v;}}catch(e){}})();`,
+            __html: `(function(){try{var k='tochka-atmosphere-v2';var v=localStorage.getItem(k);if(v==='original'||v==='dark'||v==='white'){document.documentElement.dataset.atmosphere=v;}}catch(e){}})();`,
           }}
         />
       </head>

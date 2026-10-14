@@ -41,10 +41,10 @@ type Props = {
 };
 
 const groupTone: Record<string, string> = {
-  day: "bg-[var(--surface)] border-[color-mix(in_oklab,var(--primary)_28%,transparent)]",
+  day: "bg-[var(--group-day)] border-[color-mix(in_oklab,var(--primary)_22%,transparent)]",
   thoughts:
-    "bg-[color-mix(in_oklab,var(--surface)_82%,var(--bg-wash-b))] border-[color-mix(in_oklab,var(--ink)_14%,transparent)]",
-  body: "bg-[color-mix(in_oklab,var(--surface)_88%,var(--bg-wash-c))] border-[color-mix(in_oklab,var(--primary)_22%,transparent)]",
+    "bg-[var(--group-thoughts)] border-[color-mix(in_oklab,#7aa3ae_28%,transparent)]",
+  body: "bg-[var(--group-body)] border-[color-mix(in_oklab,#8eb8a8_28%,transparent)]",
 };
 
 const groupIcon = {
@@ -131,7 +131,7 @@ export function HomeScreen({
                 }
               >
                 <span className="flex min-w-0 items-start gap-3">
-                  <span className="mt-0.5 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--field)] text-[var(--accent-ink)]">
+                  <span className="mt-0.5 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--icon-mark)] text-[var(--accent-ink)]">
                     <GroupIcon className="h-5 w-5" />
                   </span>
                   <span className="min-w-0">
@@ -145,7 +145,7 @@ export function HomeScreen({
                 </span>
                 <span
                   aria-hidden
-                  className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--field)] text-[var(--ink-muted)] transition-transform"
+                  className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--icon-mark)] text-[var(--ink-muted)] transition-transform"
                   style={{
                     transform: open ? "rotate(90deg)" : "rotate(0deg)",
                   }}
@@ -270,7 +270,7 @@ export function HomeScreen({
           <div className="space-y-2" data-testid="atmosphere-picker">
             <p className="font-medium text-[var(--ink)]">Фон</p>
             <p className="text-[0.88rem] leading-snug text-[var(--ink-muted)]">
-              Выберите оттенок, который приятнее для чтения и заполнения.
+              Основной, тёмный или белый.
             </p>
             <div className="grid grid-cols-3 gap-2">
               {ATMOSPHERES.map((option) => {

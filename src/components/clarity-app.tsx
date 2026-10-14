@@ -127,7 +127,7 @@ export function ClarityApp() {
   const [fbFeeling, setFbFeeling] = useState<Feeling>("same");
   const [fbWorth, setFbWorth] = useState<boolean | null>(null);
   const [tgHint, setTgHint] = useState("Браузерный режим");
-  const [atmosphere, setAtmosphere] = useState<AtmosphereId>("dusk");
+  const [atmosphere, setAtmosphere] = useState<AtmosphereId>("original");
   const [moodValue, setMoodValue] = useState<MoodLevel | null>(null);
   const [moodActivities, setMoodActivities] = useState<string[]>([]);
   const [moodNote, setMoodNote] = useState("");

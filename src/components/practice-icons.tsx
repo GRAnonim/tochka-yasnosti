@@ -262,7 +262,7 @@ export function PracticeIconMark({
 }) {
   return (
     <span
-      className={`inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--field)] text-[var(--accent-ink)] ${className}`}
+      className={`inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--icon-mark)] text-[var(--accent-ink)] ${className}`}
     >
       <PracticeGlyph name={name} className="h-5 w-5" />
     </span>

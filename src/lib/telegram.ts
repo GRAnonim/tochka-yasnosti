@@ -62,7 +62,7 @@ export function syncTelegramChrome(bgHex: string): void {
   }
 }
 
-export function initTelegram(bgHex = "#cfdad6"): TelegramWebApp | null {
+export function initTelegram(bgHex = "#eef4f2"): TelegramWebApp | null {
   const wa = getTelegramWebApp();
   if (!wa) return null;
   try {

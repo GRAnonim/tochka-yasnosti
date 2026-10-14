@@ -1,45 +1,43 @@
-export type AtmosphereId = "mist" | "dusk" | "warm";
+export type AtmosphereId = "original" | "dark" | "white";
 
 export type AtmosphereOption = {
   id: AtmosphereId;
   label: string;
   hint: string;
-  /** Swatch for the picker */
   swatch: string;
-  /** Telegram header / chrome color */
   telegramBg: string;
 };
 
-const ATMOSPHERE_KEY = "tochka-atmosphere-v1";
+const ATMOSPHERE_KEY = "tochka-atmosphere-v2";
 
 export const ATMOSPHERES: AtmosphereOption[] = [
   {
-    id: "dusk",
-    label: "Сумерки",
-    hint: "чуть темнее, мягче для глаз",
-    swatch: "#b7c6c1",
-    telegramBg: "#bdcbc6",
-  },
-  {
-    id: "mist",
-    label: "Туман",
-    hint: "светлее и воздушнее",
-    swatch: "#e4eeea",
+    id: "original",
+    label: "Основной",
+    hint: "как было",
+    swatch: "#e8f0ed",
     telegramBg: "#eef4f2",
   },
   {
-    id: "warm",
-    label: "Камень",
-    hint: "тёплый приглушённый тон",
-    swatch: "#d8d2c8",
-    telegramBg: "#ddd6cb",
+    id: "dark",
+    label: "Тёмный",
+    hint: "тише для глаз",
+    swatch: "#1a211f",
+    telegramBg: "#161c1b",
+  },
+  {
+    id: "white",
+    label: "Белый",
+    hint: "светлая бумага",
+    swatch: "#f7f8f7",
+    telegramBg: "#f7f8f7",
   },
 ];
 
-const DEFAULT_ATMOSPHERE: AtmosphereId = "dusk";
+const DEFAULT_ATMOSPHERE: AtmosphereId = "original";
 
 function isAtmosphereId(value: unknown): value is AtmosphereId {
-  return value === "mist" || value === "dusk" || value === "warm";
+  return value === "original" || value === "dark" || value === "white";
 }
 
 export function loadAtmosphere(): AtmosphereId {
