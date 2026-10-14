@@ -40,17 +40,23 @@ async function api(method, body) {
   return res.json();
 }
 
-const START_TEXT = [
-  "Здравствуйте. Это бот «Точка ясности».",
-  "",
-  "Здесь можно спокойно разобрать решение или сделать короткую практику.",
-  "",
-  "Как открыть приложение:",
-  "• нажмите кнопку ниже «Открыть приложение», или",
-  "• слева внизу у поля ввода — кнопка меню «Точка ясности».",
-  "",
-  "Это не терапия и не диагноз. При тяжёлом состоянии обратитесь к специалисту (в РФ: 8-800-2000-122).",
-].join("\n");
+function startText(firstName) {
+  const name = (firstName || "").trim();
+  const hello = name ? `Здравствуйте, ${name}.` : "Здравствуйте.";
+  return [
+    hello,
+    "",
+    "🌿 Это бот «Точка ясности».",
+    "",
+    "✨ Здесь можно спокойно разобрать решение или сделать короткую практику.",
+    "",
+    "Как открыть приложение:",
+    "▫️ нажмите кнопку ниже «Открыть приложение»",
+    "▫️ или слева внизу у поля ввода — меню «Точка ясности»",
+    "",
+    "🕊️ Это не терапия и не диагноз. При тяжёлом состоянии обратитесь к специалисту.",
+  ].join("\n");
+}
 
 function startMarkup() {
   return {
@@ -77,11 +83,13 @@ async function handleUpdate(update) {
     text === "/app" ||
     text.startsWith("/app ");
 
+  const firstName = msg.from?.first_name || "";
+
   if (!isStart) {
+    const tipName = firstName ? `, ${firstName}` : "";
     await api("sendMessage", {
       chat_id: msg.chat.id,
-      text:
-        "Чтобы открыть «Точку ясности», нажмите /start или кнопку меню слева внизу.",
+      text: `▫️ Чтобы открыть «Точку ясности»${tipName}, нажмите /start или кнопку меню слева внизу.`,
       reply_markup: startMarkup(),
     });
     return;
@@ -89,7 +97,7 @@ async function handleUpdate(update) {
 
   await api("sendMessage", {
     chat_id: msg.chat.id,
-    text: START_TEXT,
+    text: startText(firstName),
     reply_markup: startMarkup(),
   });
 }

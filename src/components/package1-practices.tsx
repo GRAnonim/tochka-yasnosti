@@ -253,7 +253,7 @@ export function HomeFavorites({
   return (
     <div className="space-y-2" data-testid="home-favorites">
       <div className="flex items-baseline justify-between gap-2">
-        <h2 className="font-display text-base text-[var(--ink)]">Избранное</h2>
+        <h2 className="font-display text-lg text-[var(--ink)]">Избранное</h2>
         <span className="text-xs text-[var(--ink-muted)]">частое</span>
       </div>
       <div className="grid gap-1.5">

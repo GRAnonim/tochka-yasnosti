@@ -1,11 +1,11 @@
 import type { Metadata, Viewport } from "next";
-import { Geist_Mono, Manrope } from "next/font/google";
+import { Geist_Mono, Source_Sans_3 } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 
-/** Manrope — спокойный гротеск с кириллицей, OFL, бесплатно для продукта */
-const manrope = Manrope({
-  variable: "--font-manrope",
+/** Source Sans 3 — спокойный читаемый гротеск с кириллицей, OFL */
+const sourceSans = Source_Sans_3({
+  variable: "--font-source-sans",
   subsets: ["latin", "cyrillic", "cyrillic-ext"],
 });
 
@@ -35,7 +35,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ru">
-      <body className={`${manrope.variable} ${geistMono.variable} antialiased`}>
+      <body
+        className={`${sourceSans.variable} ${geistMono.variable} antialiased`}
+      >
         <Script
           src="https://telegram.org/js/telegram-web-app.js"
           strategy="lazyOnload"

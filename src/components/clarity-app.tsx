@@ -732,8 +732,8 @@ export function ClarityApp() {
               </button>
             )}
             <p className="pt-2 text-xs leading-relaxed text-[var(--ink-muted)]">
-              Не терапия и не диагноз. При кризисе — к специалисту
-              (8-800-2000-122). Данные теста остаются в этом браузере.
+              Не терапия и не диагноз. При тяжёлом состоянии — к специалисту.
+              Данные теста остаются в этом браузере.
             </p>
           </section>
         )}
@@ -741,11 +741,11 @@ export function ClarityApp() {
         {screen === "home" && (
           <section className="space-y-6">
             <div className="space-y-2">
-              <p className="text-lg leading-snug text-[var(--ink)]">
+              <p className="text-[1.15rem] leading-snug text-[var(--ink)]">
                 Здесь можно мягко разобрать день и решения — без давления и без
                 оценок.
               </p>
-              <p className="text-sm text-[var(--ink-muted)]">
+              <p className="text-[15px] text-[var(--ink-muted)]">
                 Ваши ориентиры:{" "}
                 {state.goals.map((g) => g.text).join(" · ") || "не заданы"}
               </p>
@@ -809,10 +809,10 @@ export function ClarityApp() {
 
             {pendingFeedback.length > 0 && (
               <div className="space-y-3 border-t border-[var(--line)] pt-4">
-                <h2 className="font-display text-base text-[var(--ink)]">
+                <h2 className="font-display text-lg text-[var(--ink)]">
                   Обратная связь
                 </h2>
-                <p className="text-sm text-[var(--ink-muted)]">
+                <p className="text-[15px] text-[var(--ink-muted)]">
                   В тесте можно ответить сразу. В жизни — через 1–3 дня после
                   решения.
                 </p>
@@ -838,10 +838,10 @@ export function ClarityApp() {
             )}
 
             <div className="space-y-2 border-t border-[var(--line)] pt-4">
-              <h2 className="font-display text-base text-[var(--ink)]">
+              <h2 className="font-display text-lg text-[var(--ink)]">
                 Мой специалист
               </h2>
-              <p className="text-sm text-[var(--ink-muted)]">
+              <p className="text-[15px] text-[var(--ink-muted)]">
                 Тихий блок — не мешает рефлексии. Контакты только те, кому вы
                 доверяете.
               </p>
@@ -894,7 +894,7 @@ export function ClarityApp() {
               <div className="mt-2 space-y-2 leading-relaxed">
                 <p>
                   «Точка ясности» не ставит диагнозов и не заменяет врача или
-                  психолога. При кризисе: 8-800-2000-122.
+                  психолога. При тяжёлом состоянии обратитесь к специалисту.
                 </p>
               </div>
             </details>
