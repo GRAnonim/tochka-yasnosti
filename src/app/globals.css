@@ -535,6 +535,15 @@ html[data-atmosphere="dark"] .practice-card {
   border: 0;
 }
 
+/* Telegram / iOS: long-press on a real PNG can save to the photo gallery. */
+.wheel-save-photo {
+  display: block;
+  -webkit-touch-callout: default;
+  -webkit-user-select: none;
+  user-select: none;
+  pointer-events: auto;
+}
+
 .practice-fill-cell[data-current="true"] {
   background: var(--primary);
   color: var(--primary-foreground);

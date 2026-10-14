@@ -1,14 +1,20 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { WheelPractice } from "@/lib/types";
+import { isInsideTelegram } from "@/lib/telegram";
 import {
   WHEEL_CHART_COLORS,
   WHEEL_LAYOUT,
   buildWheelChartModel,
-  downloadSvgAsPng,
+  canSharePngFile,
+  prefersGallerySave,
+  rasterizeSvgToPng,
+  sharePngFile,
+  triggerPngDownload,
   wheelCaptionDate,
   wheelFileDate,
+  type WheelPng,
 } from "@/lib/wheel-chart";
 
 export function WheelChartCard({
@@ -21,29 +27,98 @@ export function WheelChartCard({
   const svgRef = useRef<SVGSVGElement | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [png, setPng] = useState<WheelPng | null>(null);
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const [status, setStatus] = useState<string | null>(null);
   const model = buildWheelChartModel(entry.scores);
   const c = WHEEL_CHART_COLORS;
   const dateLabel = wheelCaptionDate(entry.createdAt);
-  const { width, height, titleY, subtitleY, dateY } = {
-    width: model.width,
-    height: model.height,
-    ...WHEEL_LAYOUT,
+  const filename = `tochka-koleso-${wheelFileDate(entry.createdAt)}.png`;
+  const { width, height } = model;
+  const { titleY, subtitleY, dateY } = WHEEL_LAYOUT;
+
+  useEffect(() => {
+    if (!sheetOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [sheetOpen]);
+
+  const preparePng = async (): Promise<WheelPng> => {
+    if (!svgRef.current) {
+      throw new Error("Круг ещё не готов");
+    }
+    const next = await rasterizeSvgToPng(svgRef.current, filename);
+    setPng(next);
+    return next;
+  };
+
+  const onSharePrepared = async (prepared: WheelPng) => {
+    const result = await sharePngFile(prepared.file);
+    if (result === "shared") {
+      setStatus("В меню выберите «Сохранить изображение», чтобы фото попало в галерею.");
+      return result;
+    }
+    if (result === "aborted") {
+      setStatus("Можно зажать фото ниже и сохранить его в галерею.");
+      return result;
+    }
+    return result;
   };
 
   const onDownload = async () => {
     if (!svgRef.current) return;
     setBusy(true);
     setError(null);
+    setStatus(null);
     try {
-      await downloadSvgAsPng(
-        svgRef.current,
-        `tochka-koleso-${wheelFileDate(entry.createdAt)}.png`,
+      const prepared = await preparePng();
+      setSheetOpen(true);
+      if (canSharePngFile(prepared.file)) {
+        const shared = await onSharePrepared(prepared);
+        if (shared === "unavailable") {
+          setStatus("Зажмите фото и выберите «Сохранить изображение».");
+        }
+        return;
+      }
+      if (prefersGallerySave() || isInsideTelegram()) {
+        setStatus("Зажмите фото и выберите «Сохранить изображение».");
+        return;
+      }
+      triggerPngDownload(prepared.blob, filename);
+      setStatus(
+        "Файл ушёл в загрузки. На телефоне зажмите фото, чтобы сохранить в галерею.",
       );
     } catch {
-      setError("Не получилось скачать. Попробуйте ещё раз.");
+      setError("Не получилось подготовить фото. Попробуйте ещё раз.");
     } finally {
       setBusy(false);
     }
+  };
+
+  const onShareClick = async () => {
+    if (!png) return;
+    setBusy(true);
+    setError(null);
+    try {
+      const shared = await onSharePrepared(png);
+      if (shared === "unavailable") {
+        triggerPngDownload(png.blob, filename);
+        setStatus("Файл ушёл в загрузки. Если его нет в галерее, зажмите фото выше.");
+      }
+    } catch {
+      setError("Не получилось поделиться. Зажмите фото и сохраните его вручную.");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const onFileDownload = () => {
+    if (!png) return;
+    triggerPngDownload(png.blob, filename);
+    setStatus("Файл ушёл в загрузки. В Telegram это не галерея: зажмите фото выше.");
   };
 
   return (
@@ -186,16 +261,93 @@ export function WheelChartCard({
             onClick={onDownload}
             className="inline-flex h-11 w-full items-center justify-center rounded-xl bg-[var(--primary)] px-4 text-sm font-medium text-[var(--primary-foreground)] disabled:opacity-50"
           >
-            {busy ? "Готовим файл…" : "Скачать круг (PNG)"}
+            {busy ? "Готовим фото…" : "Сохранить круг"}
           </button>
           <p className="text-center text-xs text-[var(--ink-muted)]">
-            Сохраните снимок, чтобы потом сравнить с новым колесом.
+            На телефоне откроется меню или само фото: сохраните его в галерею,
+            чтобы потом сравнить с новым колесом.
           </p>
           {error && (
             <p className="text-center text-xs text-[var(--danger-soft)]">
               {error}
             </p>
           )}
+          {status && !sheetOpen && (
+            <p className="text-center text-xs text-[var(--ink-soft)]">{status}</p>
+          )}
+        </div>
+      )}
+
+      {sheetOpen && png && (
+        <div
+          className="fixed inset-0 z-50 flex items-end justify-center bg-[color-mix(in_oklab,black_42%,transparent)] p-3 sm:items-center"
+          style={{
+            paddingTop: "max(12px, var(--app-safe-top))",
+            paddingBottom: "max(12px, var(--app-safe-bottom))",
+          }}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="wheel-save-title"
+          data-testid="wheel-save-sheet"
+          onClick={() => setSheetOpen(false)}
+        >
+          <div
+            className="max-h-full w-full max-w-[420px] overflow-y-auto rounded-3xl border border-[var(--line)] bg-[var(--surface-strong)] p-4 shadow-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3
+              id="wheel-save-title"
+              className="font-display text-lg text-[var(--ink)]"
+            >
+              Сохранить в галерею
+            </h3>
+            <p className="mt-1 text-sm leading-relaxed text-[var(--ink-muted)]">
+              Зажмите фото на секунду и выберите «Сохранить изображение» или
+              «Добавить в Фото». Так снимок попадает в галерею, а не только в
+              загрузки.
+            </p>
+            <img
+              src={png.dataUrl}
+              alt={`Колесо баланса от ${dateLabel}`}
+              className="wheel-save-photo mt-3 w-full rounded-2xl"
+              data-testid="wheel-save-photo"
+              draggable
+            />
+            {status && (
+              <p className="mt-2 text-center text-xs text-[var(--ink-soft)]">
+                {status}
+              </p>
+            )}
+            <div className="mt-3 grid gap-2">
+              {canSharePngFile(png.file) && (
+                <button
+                  type="button"
+                  data-testid="wheel-share"
+                  disabled={busy}
+                  onClick={onShareClick}
+                  className="inline-flex h-11 w-full items-center justify-center rounded-xl bg-[var(--primary)] px-4 text-sm font-medium text-[var(--primary-foreground)] disabled:opacity-50"
+                >
+                  Поделиться, чтобы сохранить
+                </button>
+              )}
+              <button
+                type="button"
+                data-testid="wheel-file-download"
+                onClick={onFileDownload}
+                className="inline-flex h-11 w-full items-center justify-center rounded-xl bg-[var(--secondary)] px-4 text-sm font-medium"
+              >
+                Скачать файл
+              </button>
+              <button
+                type="button"
+                data-testid="wheel-save-close"
+                onClick={() => setSheetOpen(false)}
+                className="inline-flex h-10 w-full items-center justify-center rounded-xl px-4 text-sm text-[var(--accent-ink)]"
+              >
+                Закрыть
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
@@ -218,7 +370,7 @@ export function WheelResultView({
           Ваше колесо
         </h2>
         <p className="mt-1 text-sm text-[var(--ink-muted)]">
-          Снимок на дату ниже. Можно скачать и позже сравнить с новым.
+          Снимок на дату ниже. Можно сохранить в галерею и позже сравнить с новым.
         </p>
       </div>
       <WheelChartCard entry={entry} />

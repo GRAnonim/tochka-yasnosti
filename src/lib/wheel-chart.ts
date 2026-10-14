@@ -111,44 +111,118 @@ export function wheelCaptionDate(iso: string): string {
   }
 }
 
-/** Rasterize an SVG element to a PNG download. */
-export async function downloadSvgAsPng(
+export type WheelPng = {
+  blob: Blob;
+  dataUrl: string;
+  file: File;
+};
+
+/** Phone / Telegram WebView: silent <a download> does not put a photo in the gallery. */
+export function prefersGallerySave(): boolean {
+  if (typeof window === "undefined") return false;
+  const ua = navigator.userAgent || "";
+  if (/Android|iPhone|iPad|iPod/i.test(ua)) return true;
+  try {
+    if (window.matchMedia?.("(pointer: coarse)").matches) return true;
+  } catch {
+    /* ignore */
+  }
+  return false;
+}
+
+export function canSharePngFile(file: File): boolean {
+  if (typeof navigator === "undefined" || typeof navigator.share !== "function") {
+    return false;
+  }
+  try {
+    if (typeof navigator.canShare === "function") {
+      return navigator.canShare({ files: [file] });
+    }
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export async function sharePngFile(
+  file: File,
+): Promise<"shared" | "aborted" | "unavailable"> {
+  if (!canSharePngFile(file)) return "unavailable";
+  try {
+    await navigator.share({
+      files: [file],
+      title: "Колесо баланса",
+      text: "Точка ясности",
+    });
+    return "shared";
+  } catch (err) {
+    const name =
+      err && typeof err === "object" && "name" in err
+        ? String((err as { name: string }).name)
+        : "";
+    if (name === "AbortError") return "aborted";
+    return "unavailable";
+  }
+}
+
+/** Desktop / files app fallback. Telegram Mini App usually ignores this. */
+export function triggerPngDownload(blob: Blob, filename: string): void {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  a.rel = "noopener";
+  a.style.display = "none";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  window.setTimeout(() => URL.revokeObjectURL(url), 2500);
+}
+
+/** Rasterize an SVG element to a PNG blob + data URL for gallery save. */
+export async function rasterizeSvgToPng(
   svg: SVGSVGElement,
   filename: string,
-): Promise<void> {
+): Promise<WheelPng> {
   const clone = svg.cloneNode(true) as SVGSVGElement;
   clone.setAttribute("xmlns", "http://www.w3.org/2000/svg");
   const xml = new XMLSerializer().serializeToString(clone);
-  const blob = new Blob([xml], { type: "image/svg+xml;charset=utf-8" });
-  const url = URL.createObjectURL(blob);
+  const svgBlob = new Blob([xml], { type: "image/svg+xml;charset=utf-8" });
+  const url = URL.createObjectURL(svgBlob);
 
   const img = new Image();
   const width = Number(svg.getAttribute("width") || 360);
   const height = Number(svg.getAttribute("height") || 420);
 
-  await new Promise<void>((resolve, reject) => {
-    img.onload = () => resolve();
-    img.onerror = () => reject(new Error("Не удалось подготовить изображение"));
-    img.src = url;
-  });
+  try {
+    await new Promise<void>((resolve, reject) => {
+      img.onload = () => resolve();
+      img.onerror = () => reject(new Error("Не удалось подготовить изображение"));
+      img.src = url;
+    });
+  } finally {
+    URL.revokeObjectURL(url);
+  }
 
   const canvas = document.createElement("canvas");
   canvas.width = width * 2;
   canvas.height = height * 2;
   const ctx = canvas.getContext("2d");
   if (!ctx) {
-    URL.revokeObjectURL(url);
     throw new Error("Canvas недоступен");
   }
   ctx.scale(2, 2);
   ctx.fillStyle = WHEEL_CHART_COLORS.bg;
   ctx.fillRect(0, 0, width, height);
   ctx.drawImage(img, 0, 0, width, height);
-  URL.revokeObjectURL(url);
 
-  const png = canvas.toDataURL("image/png");
-  const a = document.createElement("a");
-  a.href = png;
-  a.download = filename;
-  a.click();
+  const dataUrl = canvas.toDataURL("image/png");
+  const blob = await new Promise<Blob>((resolve, reject) => {
+    canvas.toBlob((next) => {
+      if (next) resolve(next);
+      else reject(new Error("Не удалось собрать PNG"));
+    }, "image/png");
+  });
+  const file = new File([blob], filename, { type: "image/png" });
+  return { blob, dataUrl, file };
 }

@@ -42,7 +42,7 @@ function getTelegramWebApp(): TelegramWebApp | null {
 }
 
 /** True only inside a real Telegram client (not desktop browser with the script loaded). */
-function isInsideTelegram(): boolean {
+export function isInsideTelegram(): boolean {
   const wa = getTelegramWebApp();
   if (!wa) return false;
   return Boolean(
