@@ -50,6 +50,7 @@ import {
   IdealDayPracticeForm,
 } from "@/components/package4-practices";
 import { WheelResultView } from "@/components/wheel-chart";
+import { PracticeGlyph } from "@/components/practice-icons";
 import {
   QUESTION_TOPICS,
   WHEEL_AREAS,
@@ -701,25 +702,34 @@ export function ClarityApp() {
               <button
                 type="button"
                 data-testid="open-practices"
-                className="inline-flex h-12 w-full items-center justify-center rounded-xl bg-[var(--primary)] px-4 text-base font-medium text-[var(--primary-foreground)] transition hover:opacity-95"
+                className="inline-flex h-12 w-full items-center justify-center gap-2.5 rounded-xl bg-[var(--primary)] px-4 text-base font-medium text-[var(--primary-foreground)] transition hover:opacity-95"
                 onClick={() => setScreen("practices")}
               >
+                <PracticeGlyph name="practices" className="h-5 w-5 opacity-95" />
                 Практики
               </button>
               <button
                 type="button"
                 data-testid="new-situation"
-                className="inline-flex h-11 w-full items-center justify-center rounded-xl bg-[var(--secondary)] px-4 text-sm font-medium text-[var(--secondary-foreground)] transition hover:opacity-95"
+                className="inline-flex h-11 w-full items-center justify-center gap-2.5 rounded-xl bg-[var(--secondary)] px-4 text-sm font-medium text-[var(--secondary-foreground)] transition hover:opacity-95"
                 onClick={startNew}
               >
+                <PracticeGlyph
+                  name="decision"
+                  className="h-5 w-5 text-[var(--accent-ink)]"
+                />
                 Разобрать решение
               </button>
               <button
                 type="button"
                 data-testid="open-stats"
-                className="inline-flex h-11 w-full items-center justify-center rounded-xl bg-[var(--secondary)] px-4 text-sm font-medium text-[var(--secondary-foreground)] transition hover:opacity-95"
+                className="inline-flex h-11 w-full items-center justify-center gap-2.5 rounded-xl bg-[var(--secondary)] px-4 text-sm font-medium text-[var(--secondary-foreground)] transition hover:opacity-95"
                 onClick={() => setScreen("stats")}
               >
+                <PracticeGlyph
+                  name="stats"
+                  className="h-5 w-5 text-[var(--accent-ink)]"
+                />
                 Статистика
               </button>
             </div>

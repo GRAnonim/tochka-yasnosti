@@ -77,6 +77,30 @@ export const PRACTICE_META = {
   },
 } as const;
 
+/** Groups help the eye scan a long list without rainbow categories */
+export const PRACTICE_MENU_GROUPS = [
+  {
+    id: "day",
+    title: "День и чувства",
+    items: ["mood", "gratitude", "emotions"],
+  },
+  {
+    id: "thoughts",
+    title: "Мысли и ясность",
+    items: ["questions", "abc", "five-whys"],
+  },
+  {
+    id: "body",
+    title: "Тело и картина жизни",
+    items: ["breath", "wheel", "ideal-day"],
+  },
+  {
+    id: "choice",
+    title: "Решение",
+    items: ["decision"],
+  },
+] as const;
+
 export const IDEAL_DAY_HORIZONS = [
   "Обычный хороший день",
   "Через месяц",

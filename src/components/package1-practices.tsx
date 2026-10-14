@@ -1,6 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
+import { PracticeIconMark } from "@/components/practice-icons";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -8,6 +9,7 @@ import {
   ACTIVITY_TAGS,
   EMOTION_TAGS,
   MOOD_OPTIONS,
+  PRACTICE_MENU_GROUPS,
   PRACTICE_META,
   formatPracticeDate,
   moodLabel,
@@ -73,51 +75,64 @@ export function PracticesMenu({
   onLog: () => void;
 }) {
   return (
-    <section className="space-y-4" data-testid="practices-menu">
+    <section className="space-y-5" data-testid="practices-menu">
       <div>
         <h2 className="font-display text-xl text-[var(--ink)]">Практики</h2>
         <p className="mt-1 text-sm text-[var(--ink-muted)]">
-          Пакеты 1–4: полный набор коротких упражнений. Разбор решения —
-          отдельно.
+          Короткий список по смыслу — выберите, что нужно сейчас.
         </p>
       </div>
-      <div className="grid gap-2">
-        {(
-          [
-            ["mood", PRACTICE_META.mood],
-            ["gratitude", PRACTICE_META.gratitude],
-            ["emotions", PRACTICE_META.emotions],
-            ["questions", PRACTICE_META.questions],
-            ["abc", PRACTICE_META.abc],
-            ["wheel", PRACTICE_META.wheel],
-            ["breath", PRACTICE_META.breath],
-            ["ideal-day", PRACTICE_META["ideal-day"]],
-            ["five-whys", PRACTICE_META["five-whys"]],
-            ["decision", PRACTICE_META.decision],
-          ] as const
-        ).map(([key, meta]) => (
-          <button
-            type="button"
-            key={key}
-            data-testid={`practice-${key}`}
-            className="practice-tile rounded-2xl border border-[var(--line)] bg-[var(--surface-strong)] px-4 py-3.5 text-left hover:border-[var(--accent)]"
-            onClick={() => onOpen(key)}
-          >
-            <span className="block font-medium text-[var(--ink)]">
-              {meta.title}
-            </span>
-            <span className="mt-1 block text-sm text-[var(--ink-muted)]">
-              {meta.blurb}
-            </span>
-          </button>
+
+      <div className="space-y-5">
+        {PRACTICE_MENU_GROUPS.map((group) => (
+          <div key={group.id} className="space-y-2">
+            <p className="px-0.5 text-[11px] font-medium tracking-[0.08em] text-[var(--ink-muted)] uppercase">
+              {group.title}
+            </p>
+            <div className="grid gap-1.5">
+              {group.items.map((key) => {
+                const meta = PRACTICE_META[key];
+                return (
+                  <button
+                    type="button"
+                    key={key}
+                    data-testid={`practice-${key}`}
+                    className="practice-tile flex w-full items-center gap-3 rounded-2xl border border-[var(--line)] bg-[var(--surface-strong)] px-3 py-3 text-left transition hover:border-[var(--accent)]"
+                    onClick={() => onOpen(key)}
+                  >
+                    <PracticeIconMark name={key} />
+                    <span className="min-w-0 flex-1">
+                      <span className="block font-medium text-[var(--ink)]">
+                        {meta.title}
+                      </span>
+                      <span className="mt-0.5 block text-sm leading-snug text-[var(--ink-muted)]">
+                        {meta.blurb}
+                      </span>
+                    </span>
+                    <span
+                      aria-hidden
+                      className="shrink-0 text-[var(--ink-muted)] opacity-50"
+                    >
+                      ›
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
         ))}
       </div>
+
       <button
         type="button"
         data-testid="practice-log"
-        className="inline-flex h-11 w-full items-center justify-center rounded-xl bg-[var(--secondary)] px-4 text-sm font-medium"
+        className="inline-flex h-12 w-full items-center justify-center gap-2.5 rounded-xl bg-[var(--secondary)] px-4 text-sm font-medium text-[var(--ink)]"
         onClick={onLog}
       >
+        <PracticeIconMark
+          name="log"
+          className="h-9 w-9 rounded-xl bg-[color-mix(in_oklab,white_55%,transparent)]"
+        />
         Журнал практик
       </button>
     </section>
