@@ -1,16 +1,12 @@
 import type { Metadata, Viewport } from "next";
-import { Figtree, Geist_Mono, Sora } from "next/font/google";
+import { Geist_Mono, Manrope } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 
-const sora = Sora({
-  variable: "--font-sora",
-  subsets: ["latin", "latin-ext"],
-});
-
-const figtree = Figtree({
-  variable: "--font-figtree",
-  subsets: ["latin", "latin-ext"],
+/** Manrope — спокойный гротеск с кириллицей, OFL, бесплатно для продукта */
+const manrope = Manrope({
+  variable: "--font-manrope",
+  subsets: ["latin", "cyrillic", "cyrillic-ext"],
 });
 
 const geistMono = Geist_Mono({
@@ -39,9 +35,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ru">
-      <body
-        className={`${sora.variable} ${figtree.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className={`${manrope.variable} ${geistMono.variable} antialiased`}>
         <Script
           src="https://telegram.org/js/telegram-web-app.js"
           strategy="lazyOnload"

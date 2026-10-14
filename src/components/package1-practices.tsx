@@ -80,15 +80,18 @@ function PracticeRow({
     >
       <button
         type="button"
-        className="flex min-w-0 flex-1 items-center gap-3 px-3 py-3 text-left transition hover:opacity-95"
+        className="flex min-w-0 flex-1 items-start gap-3.5 px-3.5 py-4 text-left transition hover:opacity-95"
         onClick={onOpen}
       >
-        <PracticeIconMark name={practiceKey} />
+        <PracticeIconMark
+          name={practiceKey}
+          className="mt-0.5 h-12 w-12 rounded-2xl"
+        />
         <span className="min-w-0 flex-1">
-          <span className="block font-medium text-[var(--ink)]">
+          <span className="block text-[15px] font-semibold leading-snug text-[var(--ink)]">
             {meta.title}
           </span>
-          <span className="mt-0.5 block text-sm leading-snug text-[var(--ink-muted)]">
+          <span className="mt-1.5 block text-[13px] leading-relaxed text-[var(--ink-muted)]">
             {meta.blurb}
           </span>
         </span>
@@ -102,8 +105,8 @@ function PracticeRow({
         aria-pressed={favorite}
         className={
           favorite
-            ? "flex w-12 shrink-0 items-center justify-center text-[var(--accent-ink)]"
-            : "flex w-12 shrink-0 items-center justify-center text-[var(--ink-muted)] opacity-70 hover:opacity-100"
+            ? "flex w-14 shrink-0 items-center justify-center text-[var(--accent-ink)]"
+            : "flex w-14 shrink-0 items-center justify-center text-[var(--ink-muted)] opacity-70 hover:opacity-100"
         }
         onClick={(e) => {
           e.stopPropagation();
@@ -169,33 +172,33 @@ export function PracticesMenu({
         </div>
       )}
 
-      <div className="space-y-2">
+      <div className="space-y-3">
         {PRACTICE_MENU_GROUPS.map((group) => {
           const open = Boolean(openGroups[group.id]);
           return (
             <div
               key={group.id}
-              className="overflow-hidden rounded-2xl border border-[var(--line)] bg-[var(--surface)]"
+              className="rounded-2xl border border-[var(--line)] bg-[var(--surface)]"
               data-testid={`practice-group-${group.id}`}
             >
               <button
                 type="button"
                 data-testid={`practice-group-toggle-${group.id}`}
-                className="flex w-full items-center justify-between gap-3 px-3.5 py-3 text-left"
+                className="flex w-full items-center justify-between gap-3 px-4 py-4 text-left"
                 aria-expanded={open}
                 onClick={() => toggleGroup(group.id)}
               >
-                <span>
-                  <span className="block text-sm font-medium text-[var(--ink)]">
+                <span className="min-w-0">
+                  <span className="block text-base font-semibold text-[var(--ink)]">
                     {group.title}
                   </span>
-                  <span className="mt-0.5 block text-xs text-[var(--ink-muted)]">
-                    {group.items.length} практики
+                  <span className="mt-1 block text-sm text-[var(--ink-muted)]">
+                    {group.items.length} практики · нажмите, чтобы открыть
                   </span>
                 </span>
                 <span
                   aria-hidden
-                  className="text-[var(--ink-muted)] transition-transform"
+                  className="shrink-0 text-lg text-[var(--ink-muted)] transition-transform"
                   style={{
                     display: "inline-block",
                     transform: open ? "rotate(90deg)" : "rotate(0deg)",
@@ -205,7 +208,7 @@ export function PracticesMenu({
                 </span>
               </button>
               {open && (
-                <div className="grid gap-1.5 border-t border-[var(--line)] px-2 py-2">
+                <div className="grid gap-2.5 border-t border-[var(--line)] px-3 py-3">
                   {group.items.map((key) => (
                     <PracticeRow
                       key={key}

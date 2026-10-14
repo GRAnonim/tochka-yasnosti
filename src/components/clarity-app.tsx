@@ -592,34 +592,76 @@ export function ClarityApp() {
     setScreen("home");
   };
 
+  const screenBack: Partial<Record<Screen, Screen>> = {
+    "edit-goals": "home",
+    practices: "home",
+    mood: "practices",
+    gratitude: "practices",
+    emotions: "practices",
+    abc: "practices",
+    questions: "practices",
+    wheel: "practices",
+    "wheel-result": "practice-log",
+    breath: "practices",
+    "ideal-day": "practices",
+    "five-whys": "practices",
+    "practice-log": "practices",
+    "new-situation": "home",
+    filter: "new-situation",
+    "decision-questions": "filter",
+    summary: "decision-questions",
+    decision: "summary",
+    feedback: "home",
+    stats: "home",
+    specialist: "home",
+  };
+
+  const backScreen = screenBack[screen];
+  const goBack = () => {
+    if (backScreen) setScreen(backScreen);
+  };
+
   return (
-    <div className="clarity-shell relative mx-auto flex min-h-dvh w-full max-w-lg flex-col px-4 pb-10 pt-6 sm:px-6">
+    <div className="clarity-shell relative mx-auto flex min-h-dvh w-full max-w-xl flex-col px-4 pb-10 pt-5 sm:px-6">
       <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
         <div className="clarity-orb clarity-orb-a" />
         <div className="clarity-orb clarity-orb-b" />
         <div className="clarity-grain" />
       </div>
 
-      <header className="mb-6 flex items-start justify-between gap-3">
-        <div>
-          <p className="font-display text-[0.7rem] tracking-[0.22em] text-[var(--ink-muted)] uppercase">
-            {tgHint}
-          </p>
-          <h1 className="font-display mt-1 text-2xl leading-tight text-[var(--ink)] sm:text-[1.7rem]">
-            Точка ясности
-          </h1>
+      <header className="mb-5 space-y-3">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <p className="font-display text-[0.7rem] tracking-[0.18em] text-[var(--ink-muted)] uppercase">
+              {tgHint}
+            </p>
+            <h1 className="font-display mt-1 text-2xl leading-tight text-[var(--ink)] sm:text-[1.75rem]">
+              Точка ясности
+            </h1>
+          </div>
         </div>
-        {screen !== "home" &&
-          screen !== "onboarding" &&
-          screen !== "edit-goals" && (
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-[var(--ink-muted)]"
-            onClick={() => setScreen("home")}
-          >
-            На главную
-          </Button>
+        {backScreen && (
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              data-testid="nav-back"
+              className="inline-flex h-10 flex-1 items-center justify-center gap-2 rounded-xl border border-[var(--line)] bg-[var(--surface-strong)] px-3 text-sm font-medium text-[var(--ink)]"
+              onClick={goBack}
+            >
+              <span aria-hidden>←</span>
+              Назад
+            </button>
+            {backScreen !== "home" && (
+              <button
+                type="button"
+                data-testid="nav-home"
+                className="inline-flex h-10 items-center justify-center rounded-xl bg-[var(--secondary)] px-3 text-sm font-medium text-[var(--ink-soft)]"
+                onClick={() => setScreen("home")}
+              >
+                На главную
+              </button>
+            )}
+          </div>
         )}
       </header>
 
