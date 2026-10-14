@@ -18,7 +18,12 @@ import {
 import { computeStats } from "@/lib/stats";
 import { StatsView } from "@/components/stats-view";
 import { emptyState, loadState, saveState, uid } from "@/lib/storage";
-import { initTelegram } from "@/lib/telegram";
+import {
+  applyTelegramSafeArea,
+  hasTelegramBackButton,
+  initTelegram,
+  syncTelegramBackButton,
+} from "@/lib/telegram";
 import type {
   AbcPractice,
   AppState,
@@ -155,6 +160,7 @@ export function ClarityApp() {
   const [lastDoneTitle, setLastDoneTitle] = useState("");
   const [lastDoneKey, setLastDoneKey] = useState<MenuPracticeKey | null>(null);
   const [exportNotice, setExportNotice] = useState("");
+  const [tgNativeBack, setTgNativeBack] = useState(false);
 
   const finishPractice = (key: MenuPracticeKey) => {
     setLastDoneTitle(PRACTICE_META[key]?.title ?? "Практика");
@@ -199,15 +205,33 @@ export function ClarityApp() {
     setFavorites(loadPracticeFavorites());
 
     // Telegram script may load later (lazyOnload)
+    let stopSafeArea = () => {};
     const syncTg = () => {
       const wa = initTelegram();
-      if (!wa) return;
+      stopSafeArea();
+      stopSafeArea = applyTelegramSafeArea();
+      setTgNativeBack(hasTelegramBackButton());
+      if (!wa) {
+        setTgHint("Браузерный режим");
+        return;
+      }
       const name = wa.initDataUnsafe?.user?.first_name;
-      setTgHint(name ? `Telegram · ${name}` : "Telegram Mini App");
+      setTgHint(
+        name
+          ? `Telegram · ${name}`
+          : hasTelegramBackButton()
+            ? "Telegram Mini App"
+            : "Браузерный режим",
+      );
     };
     syncTg();
     const t = window.setTimeout(syncTg, 800);
-    return () => window.clearTimeout(t);
+    const t2 = window.setTimeout(syncTg, 2000);
+    return () => {
+      window.clearTimeout(t);
+      window.clearTimeout(t2);
+      stopSafeArea();
+    };
   }, []);
 
   const persist = (next: AppState) => {
@@ -649,20 +673,21 @@ export function ClarityApp() {
     setScreen("home");
   };
 
+  // Practices live on home now — back from a practice returns to home
   const screenBack: Partial<Record<Screen, Screen>> = {
     "edit-goals": "home",
     practices: "home",
-    mood: "practices",
-    gratitude: "practices",
-    emotions: "practices",
-    abc: "practices",
-    questions: "practices",
-    wheel: "practices",
+    mood: "home",
+    gratitude: "home",
+    emotions: "home",
+    abc: "home",
+    questions: "home",
+    wheel: "home",
     "wheel-result": "practice-done",
-    breath: "practices",
-    "ideal-day": "practices",
-    "five-whys": "practices",
-    "practice-log": "practices",
+    breath: "home",
+    "ideal-day": "home",
+    "five-whys": "home",
+    "practice-log": "home",
     "practice-done": "home",
     "new-situation": "home",
     filter: "new-situation",
@@ -679,8 +704,19 @@ export function ClarityApp() {
     if (backScreen) setScreen(backScreen);
   };
 
+  // Native Telegram header back — hide duplicate in-app «Назад» when available
+  useEffect(() => {
+    return syncTelegramBackButton(Boolean(backScreen), () => {
+      const target = screenBack[screen];
+      if (target) setScreen(target);
+    });
+  }, [screen, backScreen]);
+
+  const showInAppBack = Boolean(backScreen) && !tgNativeBack;
+  const showHomeChip = Boolean(backScreen && backScreen !== "home");
+
   return (
-    <div className="clarity-shell relative mx-auto flex min-h-dvh w-full max-w-2xl flex-col px-2.5 pb-10 pt-5 sm:px-4">
+    <div className="clarity-shell relative mx-auto flex min-h-dvh w-full max-w-2xl flex-col">
       <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
         <div className="clarity-orb clarity-orb-a" />
         <div className="clarity-orb clarity-orb-b" />
@@ -719,22 +755,28 @@ export function ClarityApp() {
             </div>
           </div>
         )}
-        {backScreen && (
+        {(showInAppBack || showHomeChip) && (
           <div className="flex items-center gap-2">
-            <button
-              type="button"
-              data-testid="nav-back"
-              className="inline-flex h-10 flex-1 items-center justify-center gap-2 rounded-xl border border-[var(--line)] bg-[var(--surface-strong)] px-3 text-sm font-medium text-[var(--ink)]"
-              onClick={goBack}
-            >
-              <span aria-hidden>←</span>
-              Назад
-            </button>
-            {backScreen !== "home" && (
+            {showInAppBack && (
+              <button
+                type="button"
+                data-testid="nav-back"
+                className="inline-flex h-10 flex-1 items-center justify-center gap-2 rounded-xl border border-[var(--line)] bg-[var(--surface-strong)] px-3 text-sm font-medium text-[var(--ink)]"
+                onClick={goBack}
+              >
+                <span aria-hidden>←</span>
+                Назад
+              </button>
+            )}
+            {showHomeChip && (
               <button
                 type="button"
                 data-testid="nav-home"
-                className="inline-flex h-10 items-center justify-center rounded-xl bg-[var(--secondary)] px-3 text-sm font-medium text-[var(--ink-soft)]"
+                className={
+                  showInAppBack
+                    ? "inline-flex h-10 items-center justify-center rounded-xl bg-[var(--secondary)] px-3 text-sm font-medium text-[var(--ink-soft)]"
+                    : "inline-flex h-10 flex-1 items-center justify-center rounded-xl border border-[var(--line)] bg-[var(--surface-strong)] px-3 text-sm font-medium text-[var(--ink)]"
+                }
                 onClick={() => setScreen("home")}
               >
                 На главную

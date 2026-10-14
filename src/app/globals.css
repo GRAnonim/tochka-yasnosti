@@ -138,6 +138,30 @@
 
 .clarity-shell {
   color: var(--ink);
+  /* Device notch (env) + Telegram chrome insets (--app-safe-* from JS) */
+  padding-top: calc(
+    1.25rem + env(safe-area-inset-top, 0px) + var(--app-safe-top, 0px)
+  );
+  padding-bottom: calc(
+    2.5rem + env(safe-area-inset-bottom, 0px) + var(--app-safe-bottom, 0px)
+  );
+  padding-left: calc(
+    0.625rem + env(safe-area-inset-left, 0px) + var(--app-safe-left, 0px)
+  );
+  padding-right: calc(
+    0.625rem + env(safe-area-inset-right, 0px) + var(--app-safe-right, 0px)
+  );
+}
+
+@media (min-width: 640px) {
+  .clarity-shell {
+    padding-left: calc(
+      1rem + env(safe-area-inset-left, 0px) + var(--app-safe-left, 0px)
+    );
+    padding-right: calc(
+      1rem + env(safe-area-inset-right, 0px) + var(--app-safe-right, 0px)
+    );
+  }
 }
 
 .clarity-panel {
