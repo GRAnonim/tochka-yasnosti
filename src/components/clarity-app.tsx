@@ -157,7 +157,7 @@ export function ClarityApp() {
   const [fiveNeedNow, setFiveNeedNow] = useState("");
   const [favorites, setFavorites] = useState<MenuPracticeKey[]>([]);
   const [lastDoneTitle, setLastDoneTitle] = useState("");
-  const [homeVariant, setHomeVariant] = useState<HomeVariant>("d");
+  const [homeVariant, setHomeVariant] = useState<HomeVariant>("e");
 
   const finishPractice = (key: MenuPracticeKey) => {
     setLastDoneTitle(PRACTICE_META[key]?.title ?? "Практика");

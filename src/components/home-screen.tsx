@@ -8,9 +8,11 @@ import { DECISION_LABELS } from "@/lib/questions";
 import type { MenuPracticeKey } from "@/lib/practices";
 import type { SituationRecord } from "@/lib/types";
 
-export type HomeVariant = "a" | "b" | "c" | "d";
+export type HomeVariant = "a" | "b" | "c" | "d" | "e";
 
-export const HOME_VARIANT_KEY = "tochka-home-variant-v1";
+export const HOME_VARIANT_KEY = "tochka-home-variant-v2";
+
+const VALID_HOME: HomeVariant[] = ["a", "b", "c", "d", "e"];
 
 export const HOME_VARIANT_META: Record<
   HomeVariant,
@@ -18,40 +20,41 @@ export const HOME_VARIANT_META: Record<
 > = {
   a: {
     label: "A · меню + зелёный",
-    blurb: "Две крупные кнопки, зелёный CTA",
+    blurb: "Разбор решения доминирует",
   },
   b: {
     label: "B · меню + тёмный",
-    blurb: "Ориентиры выше, CTA без зелёного",
+    blurb: "Разбор всё ещё главный CTA",
   },
   c: {
     label: "C · два пути",
-    blurb: "Две равные карточки-входа",
+    blurb: "Решение и практики как два входа",
   },
   d: {
     label: "D · как дневник",
-    blurb: "Одно поле: написать → разобрать. Без меню кнопок",
+    blurb: "Сначала текст, потом разбор",
+  },
+  e: {
+    label: "E · практики сначала",
+    blurb: "Упражнения в центре; разбор решения наравне с ними",
   },
 };
 
 export function loadHomeVariant(): HomeVariant {
-  if (typeof window === "undefined") return "d";
+  if (typeof window === "undefined") return "e";
   try {
     const fromQuery = new URLSearchParams(window.location.search).get("home");
-    if (
-      fromQuery === "a" ||
-      fromQuery === "b" ||
-      fromQuery === "c" ||
-      fromQuery === "d"
-    ) {
-      return fromQuery;
+    if (fromQuery && VALID_HOME.includes(fromQuery as HomeVariant)) {
+      return fromQuery as HomeVariant;
     }
     const raw = window.localStorage.getItem(HOME_VARIANT_KEY);
-    if (raw === "a" || raw === "b" || raw === "c" || raw === "d") return raw;
+    if (raw && VALID_HOME.includes(raw as HomeVariant)) {
+      return raw as HomeVariant;
+    }
   } catch {
     /* ignore */
   }
-  return "d";
+  return "e";
 }
 
 export function saveHomeVariant(v: HomeVariant) {
@@ -368,6 +371,98 @@ function HomeC(props: Props) {
   );
 }
 
+function EqualEntry({
+  testId,
+  icon,
+  title,
+  blurb,
+  onClick,
+}: {
+  testId: string;
+  icon: "breath" | "mood" | "decision" | "practices";
+  title: string;
+  blurb: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      data-testid={testId}
+      className="flex w-full items-start gap-3 rounded-2xl border border-[var(--line)] bg-[var(--surface-strong)] px-3.5 py-3.5 text-left transition hover:border-[color-mix(in_oklab,var(--ink)_18%,transparent)]"
+      onClick={onClick}
+    >
+      <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--secondary)] text-[var(--ink-soft)]">
+        <PracticeGlyph name={icon} className="h-5 w-5" />
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="block text-[1.05rem] font-semibold text-[var(--ink)]">
+          {title}
+        </span>
+        <span className="mt-0.5 block text-[0.92rem] leading-snug text-[var(--ink-muted)]">
+          {blurb}
+        </span>
+      </span>
+      <span className="mt-1 text-[var(--ink-muted)]" aria-hidden>
+        ›
+      </span>
+    </button>
+  );
+}
+
+/** E — practices first; decision is one equal peer, not the hero */
+function HomeE(props: Props) {
+  return (
+    <div className="space-y-5" data-testid="home-practices-first">
+      <div className="space-y-2">
+        <h2 className="font-display text-[1.55rem] leading-tight text-[var(--ink)] sm:text-[1.7rem]">
+          Практики и ясность
+        </h2>
+        <p className="text-[0.98rem] leading-relaxed text-[var(--ink-muted)]">
+          Упражнения для себя — и разбор решения рядом, на одном уровне. Без
+          главного «надо».
+        </p>
+      </div>
+
+      <div className="grid gap-2.5">
+        <EqualEntry
+          testId="home-equal-breath"
+          icon="breath"
+          title="Дыхание"
+          blurb="1–3 минуты, чтобы чуть отпустить тело"
+          onClick={props.onOpenBreath}
+        />
+        <EqualEntry
+          testId="home-equal-mood"
+          icon="mood"
+          title="Настроение"
+          blurb="Отметить фон дня — без оценки"
+          onClick={() => props.onOpenFavorite("mood")}
+        />
+        <EqualEntry
+          testId="new-situation"
+          icon="decision"
+          title="Разобрать решение"
+          blurb="Когда есть конкретный выбор — по шагам"
+          onClick={() => props.onStartDecision()}
+        />
+        <EqualEntry
+          testId="open-practices"
+          icon="practices"
+          title="Все практики"
+          blurb="Благодарность, эмоции, ABC, колесо и другие"
+          onClick={props.onOpenPractices}
+        />
+      </div>
+
+      <GoalsLine
+        goalsLabel={props.goalsLabel}
+        onEditGoals={props.onEditGoals}
+        whisper
+      />
+    </div>
+  );
+}
+
 /** D — journal entry: write first, no button menu */
 function HomeD(props: Props) {
   const [text, setText] = useState("");
@@ -448,10 +543,11 @@ function HomeD(props: Props) {
 
 export function HomeScreen(props: Props) {
   const isJournal = props.variant === "d";
+  const isPracticesFirst = props.variant === "e";
 
   return (
     <section
-      className={isJournal ? "space-y-6" : "space-y-7"}
+      className={isJournal || isPracticesFirst ? "space-y-6" : "space-y-7"}
       data-testid="home-screen"
       data-variant={props.variant}
     >
@@ -459,13 +555,14 @@ export function HomeScreen(props: Props) {
       {props.variant === "b" && <HomeB {...props} />}
       {props.variant === "c" && <HomeC {...props} />}
       {props.variant === "d" && <HomeD {...props} />}
+      {props.variant === "e" && <HomeE {...props} />}
 
       <HomeFavorites
         favorites={props.favorites}
         onOpen={props.onOpenFavorite}
       />
 
-      {!isJournal && props.favorites.length === 0 && (
+      {!isJournal && !isPracticesFirst && props.favorites.length === 0 && (
         <p className="text-[0.92rem] text-[var(--ink-muted)]">
           Звёздочка в практиках — частое появится здесь.
         </p>
@@ -479,7 +576,9 @@ export function HomeScreen(props: Props) {
           onClick={props.onOpenStats}
         >
           <PracticeGlyph name="stats" className="h-4 w-4" />
-          {props.variant === "c" ? "Мои записи" : "Что уже заметили"}
+          {isPracticesFirst || props.variant === "c"
+            ? "Мои записи"
+            : "Что уже заметили"}
         </button>
       )}
 
