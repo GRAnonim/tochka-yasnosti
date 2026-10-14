@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import type { WheelPractice } from "@/lib/types";
 import {
   WHEEL_CHART_COLORS,
+  WHEEL_LAYOUT,
   buildWheelChartModel,
   downloadSvgAsPng,
   wheelCaptionDate,
@@ -23,7 +24,11 @@ export function WheelChartCard({
   const model = buildWheelChartModel(entry.scores);
   const c = WHEEL_CHART_COLORS;
   const dateLabel = wheelCaptionDate(entry.createdAt);
-  const height = 420;
+  const { width, height, titleY, subtitleY, dateY } = {
+    width: model.width,
+    height: model.height,
+    ...WHEEL_LAYOUT,
+  };
 
   const onDownload = async () => {
     if (!svgRef.current) return;
@@ -48,18 +53,18 @@ export function WheelChartCard({
     >
       <svg
         ref={svgRef}
-        width={model.size}
+        width={width}
         height={height}
-        viewBox={`0 0 ${model.size} ${height}`}
+        viewBox={`0 0 ${width} ${height}`}
         role="img"
         aria-label={`Колесо баланса от ${dateLabel}`}
         className="mx-auto h-auto w-full max-w-[360px]"
         data-testid="wheel-chart-svg"
       >
-        <rect width={model.size} height={height} fill={c.bg} rx="24" />
+        <rect width={width} height={height} fill={c.bg} rx="24" />
         <text
-          x={model.size / 2}
-          y={28}
+          x={width / 2}
+          y={titleY}
           textAnchor="middle"
           fill={c.ink}
           fontFamily="Georgia, 'Times New Roman', serif"
@@ -69,77 +74,97 @@ export function WheelChartCard({
           Точка ясности
         </text>
         <text
-          x={model.size / 2}
-          y={50}
+          x={width / 2}
+          y={subtitleY}
+          textAnchor="middle"
+          fill={c.muted}
+          fontFamily="system-ui, sans-serif"
+          fontSize="13"
+        >
+          Колесо баланса
+        </text>
+        <text
+          x={width / 2}
+          y={dateY}
           textAnchor="middle"
           fill={c.muted}
           fontFamily="system-ui, sans-serif"
           fontSize="12"
+          data-testid="wheel-chart-date"
         >
-          Колесо баланса · {dateLabel}
+          {dateLabel}
         </text>
 
-        <g transform="translate(0, 18)">
-          {model.rings.map((ring) => (
-            <circle
-              key={ring.level}
-              cx={model.cx}
-              cy={model.cy}
-              r={ring.r}
-              fill="none"
-              stroke={c.grid}
-              strokeWidth="1"
-            />
-          ))}
-          {model.axes.map((axis) => (
-            <line
-              key={axis.label}
-              x1={model.cx}
-              y1={model.cy}
-              x2={axis.outer.x}
-              y2={axis.outer.y}
-              stroke={c.grid}
-              strokeWidth="1"
-            />
-          ))}
-          <polygon
-            points={model.polygon}
-            fill={c.fill}
-            stroke={c.stroke}
-            strokeWidth="2.5"
-            strokeLinejoin="round"
+        {model.rings.map((ring) => (
+          <circle
+            key={ring.level}
+            cx={model.cx}
+            cy={model.cy}
+            r={ring.r}
+            fill="none"
+            stroke={c.grid}
+            strokeWidth="1"
           />
-          {model.points.map((p) => (
-            <circle
-              key={p.label}
-              cx={p.x}
-              cy={p.y}
-              r="3.5"
-              fill={c.stroke}
-            />
-          ))}
-          {model.axes.map((axis) => (
+        ))}
+        {model.axes.map((axis) => (
+          <line
+            key={axis.label}
+            x1={model.cx}
+            y1={model.cy}
+            x2={axis.outer.x}
+            y2={axis.outer.y}
+            stroke={c.grid}
+            strokeWidth="1"
+          />
+        ))}
+        <polygon
+          points={model.polygon}
+          fill={c.fill}
+          stroke={c.stroke}
+          strokeWidth="2.5"
+          strokeLinejoin="round"
+        />
+        {model.points.map((p) => (
+          <circle
+            key={p.label}
+            cx={p.x}
+            cy={p.y}
+            r="3.5"
+            fill={c.stroke}
+          />
+        ))}
+        {model.axes.map((axis) => {
+          const lines = axis.lines;
+          const lineH = 12;
+          const startY = axis.labelPos.y - ((lines.length - 1) * lineH) / 2;
+          return (
             <text
               key={`label-${axis.label}`}
               x={axis.labelPos.x}
-              y={axis.labelPos.y}
+              y={startY}
               textAnchor="middle"
               dominantBaseline="middle"
               fill={c.soft}
               fontFamily="system-ui, sans-serif"
-              fontSize="10"
+              fontSize="11"
             >
-              {axis.label.length > 14
-                ? `${axis.label.slice(0, 12)}…`
-                : axis.label}
+              {lines.map((line, i) => (
+                <tspan
+                  key={line}
+                  x={axis.labelPos.x}
+                  dy={i === 0 ? 0 : lineH}
+                >
+                  {line}
+                </tspan>
+              ))}
             </text>
-          ))}
-        </g>
+          );
+        })}
 
         {entry.focusNote ? (
           <text
-            x={model.size / 2}
-            y={height - 28}
+            x={width / 2}
+            y={height - 22}
             textAnchor="middle"
             fill={c.muted}
             fontFamily="system-ui, sans-serif"

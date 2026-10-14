@@ -28,12 +28,30 @@ function polar(cx: number, cy: number, r: number, angle: number) {
   };
 }
 
+function labelLines(label: string): string[] {
+  if (label.includes(" / ")) return label.split(" / ").map((p) => p.trim());
+  if (label.length > 16) return [`${label.slice(0, 14)}…`];
+  return [label];
+}
+
+/** Keep title + date in the header, wheel labels below it. */
+export const WHEEL_LAYOUT = {
+  width: 360,
+  titleY: 26,
+  subtitleY: 46,
+  dateY: 64,
+  headerBottom: 112,
+  maxR: 100,
+  labelR: 134,
+  footer: 52,
+};
+
 export function buildWheelChartModel(scores: WheelScore[]) {
   const n = scores.length;
-  const size = 360;
-  const cx = size / 2;
-  const cy = size / 2 - 8;
-  const maxR = 108;
+  const { width, headerBottom, maxR, labelR, footer } = WHEEL_LAYOUT;
+  const cx = width / 2;
+  const cy = headerBottom + labelR;
+  const height = cy + labelR + footer;
   const start = -Math.PI / 2;
 
   const points = scores.map((s, i) => {
@@ -52,11 +70,18 @@ export function buildWheelChartModel(scores: WheelScore[]) {
   const axes = scores.map((s, i) => {
     const angle = start + (i * 2 * Math.PI) / n;
     const outer = polar(cx, cy, maxR, angle);
-    const labelPos = polar(cx, cy, maxR + 28, angle);
-    return { label: s.label, score: s.score, outer, labelPos, angle };
+    const labelPos = polar(cx, cy, labelR, angle);
+    return {
+      label: s.label,
+      lines: labelLines(s.label),
+      score: s.score,
+      outer,
+      labelPos,
+      angle,
+    };
   });
 
-  return { size, cx, cy, maxR, polygon, rings, axes, points };
+  return { size: width, width, height, cx, cy, maxR, polygon, rings, axes, points };
 }
 
 export function wheelFileDate(iso: string): string {
@@ -75,7 +100,15 @@ export function wheelFileDate(iso: string): string {
 }
 
 export function wheelCaptionDate(iso: string): string {
-  return formatPracticeDate(iso);
+  try {
+    return new Intl.DateTimeFormat("ru-RU", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    }).format(new Date(iso));
+  } catch {
+    return formatPracticeDate(iso);
+  }
 }
 
 /** Rasterize an SVG element to a PNG download. */
