@@ -2,7 +2,11 @@
 
 import { useState, type ReactNode } from "react";
 import {
+  IconGroupBody,
+  IconGroupDay,
+  IconGroupThoughts,
   IconStar,
+  PracticeGlyph,
   PracticeIconMark,
 } from "@/components/practice-icons";
 import { Input } from "@/components/ui/input";
@@ -150,6 +154,12 @@ export function PracticesMenu({
     body: "bg-[color-mix(in_oklab,#e4eee6_55%,white)] border-[color-mix(in_oklab,#8eb8a8_28%,transparent)]",
   };
 
+  const groupIcon = {
+    day: IconGroupDay,
+    thoughts: IconGroupThoughts,
+    body: IconGroupBody,
+  } as const;
+
   return (
     <section
       className="-mx-1 space-y-4 sm:-mx-2"
@@ -158,35 +168,15 @@ export function PracticesMenu({
       <div className="px-0.5">
         <h2 className="font-display text-lg text-[var(--ink)]">Практики</h2>
         <p className="mt-1 text-[1.02rem] leading-relaxed text-[var(--ink-muted)]">
-          Откройте раздел. Звезда — на главный экран в избранное.
+          Откройте раздел. Звезда — в избранное внизу и на главную.
         </p>
       </div>
-
-      {favorites.length > 0 && (
-        <div
-          className="space-y-2 rounded-2xl border border-[color-mix(in_oklab,var(--primary)_20%,transparent)] bg-[color-mix(in_oklab,var(--primary)_8%,white)] p-2.5"
-          data-testid="favorites-in-menu"
-        >
-          <p className="px-1 text-[11px] font-medium tracking-[0.08em] text-[var(--ink-muted)] uppercase">
-            Избранное
-          </p>
-          <div className="grid gap-2">
-            {favorites.map((key) => (
-              <PracticeRow
-                key={key}
-                practiceKey={key}
-                favorite
-                onOpen={() => onOpen(key)}
-                onToggleFavorite={() => toggleFavorite(key)}
-              />
-            ))}
-          </div>
-        </div>
-      )}
 
       <div className="space-y-3.5">
         {PRACTICE_MENU_GROUPS.map((group) => {
           const open = Boolean(openGroups[group.id]);
+          const GroupIcon =
+            groupIcon[group.id as keyof typeof groupIcon] ?? IconGroupDay;
           return (
             <div
               key={group.id}
@@ -200,12 +190,17 @@ export function PracticesMenu({
                 aria-expanded={open}
                 onClick={() => toggleGroup(group.id)}
               >
-                <span className="min-w-0">
-                  <span className="block text-[1.05rem] font-semibold text-[var(--ink)]">
-                    {group.title}
+                <span className="flex min-w-0 items-start gap-3">
+                  <span className="mt-0.5 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[color-mix(in_oklab,white_72%,transparent)] text-[var(--accent-ink)]">
+                    <GroupIcon className="h-5 w-5" />
                   </span>
-                  <span className="mt-1 block text-[0.95rem] text-[var(--ink-muted)]">
-                    {group.items.length} практики · нажмите, чтобы открыть
+                  <span className="min-w-0">
+                    <span className="block text-[1.05rem] font-semibold text-[var(--ink)]">
+                      {group.title}
+                    </span>
+                    <span className="mt-1 block text-[0.95rem] text-[var(--ink-muted)]">
+                      {group.items.length} практики · нажмите, чтобы открыть
+                    </span>
                   </span>
                 </span>
                 <span
@@ -247,15 +242,37 @@ export function PracticesMenu({
       <button
         type="button"
         data-testid="practice-log"
-        className="inline-flex h-12 w-full items-center justify-center gap-2.5 rounded-2xl border border-[color-mix(in_oklab,var(--primary)_20%,transparent)] bg-[color-mix(in_oklab,var(--primary)_8%,white)] px-4 text-sm font-medium text-[var(--ink)]"
+        className="inline-flex h-12 w-full items-center justify-center gap-2.5 rounded-2xl border border-[color-mix(in_oklab,var(--primary)_20%,transparent)] bg-[color-mix(in_oklab,var(--primary)_8%,white)] px-4 text-[1.02rem] font-medium text-[var(--ink)]"
         onClick={onLog}
       >
-        <PracticeIconMark
-          name="log"
-          className="h-9 w-9 rounded-xl bg-[color-mix(in_oklab,white_55%,transparent)]"
-        />
+        <PracticeGlyph name="log" className="h-5 w-5 text-[var(--accent-ink)]" />
         Журнал практик
       </button>
+
+      {favorites.length > 0 && (
+        <div
+          className="space-y-2 rounded-2xl border border-[color-mix(in_oklab,var(--primary)_20%,transparent)] bg-[color-mix(in_oklab,var(--primary)_8%,white)] p-2.5"
+          data-testid="favorites-in-menu"
+        >
+          <div className="flex items-center gap-2 px-1">
+            <IconStar filled className="h-4 w-4 text-[var(--accent-ink)]" />
+            <p className="text-[11px] font-medium tracking-[0.08em] text-[var(--ink-muted)] uppercase">
+              Избранное
+            </p>
+          </div>
+          <div className="grid gap-2">
+            {favorites.map((key) => (
+              <PracticeRow
+                key={key}
+                practiceKey={key}
+                favorite
+                onOpen={() => onOpen(key)}
+                onToggleFavorite={() => toggleFavorite(key)}
+              />
+            ))}
+          </div>
+        </div>
+      )}
     </section>
   );
 }

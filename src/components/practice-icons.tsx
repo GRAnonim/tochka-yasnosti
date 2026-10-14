@@ -129,13 +129,47 @@ export function IconDecision(props: IconProps) {
   );
 }
 
-/** Quiet ledger lines — practice log */
+/** Quiet notebook — practice log */
 export function IconLog(props: IconProps) {
   return (
     <BaseIcon {...props}>
-      <path d="M7 6.5h10" />
-      <path d="M7 12h10" opacity={0.65} />
-      <path d="M7 17.5h7" opacity={0.4} />
+      <path d="M7 5.5h10a1.5 1.5 0 0 1 1.5 1.5v10a1.5 1.5 0 0 1-1.5 1.5H7A1.5 1.5 0 0 1 5.5 17V7A1.5 1.5 0 0 1 7 5.5Z" />
+      <path d="M9 9.5h6" opacity={0.7} />
+      <path d="M9 12.5h6" opacity={0.5} />
+      <path d="M9 15.5h4" opacity={0.35} />
+    </BaseIcon>
+  );
+}
+
+/** Group: day & feelings */
+export function IconGroupDay(props: IconProps) {
+  return (
+    <BaseIcon {...props}>
+      <path d="M4.5 14.5c2.2-2.8 4.6-4.2 7.5-4.2s5.3 1.4 7.5 4.2" />
+      <circle cx="12" cy="8.2" r="2.2" opacity={0.55} />
+    </BaseIcon>
+  );
+}
+
+/** Group: thoughts & clarity */
+export function IconGroupThoughts(props: IconProps) {
+  return (
+    <BaseIcon {...props}>
+      <path d="M7 8.5h8" />
+      <path d="M7 12h10" opacity={0.7} />
+      <path d="M7 15.5h6" opacity={0.45} />
+      <circle cx="17.2" cy="8.5" r="1.1" opacity={0.5} />
+    </BaseIcon>
+  );
+}
+
+/** Group: body & life picture */
+export function IconGroupBody(props: IconProps) {
+  return (
+    <BaseIcon {...props}>
+      <circle cx="12" cy="12" r="7" opacity={0.45} />
+      <path d="M12 5.5v13M5.5 12h13" opacity={0.4} />
+      <circle cx="12" cy="12" r="2.2" opacity={0.7} />
     </BaseIcon>
   );
 }
